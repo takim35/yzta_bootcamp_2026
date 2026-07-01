@@ -17,8 +17,8 @@ curl -X DELETE http://localhost:8000/follow \
 import sqlite3
 from fastapi import APIRouter, Depends, HTTPException
 
-from app.database import get_db
-from app.models import FollowRequest, MessageResponse
+from app.core.database import get_db
+from app.domain.schemas import FollowRequest, MessageResponse
 
 router = APIRouter()
 

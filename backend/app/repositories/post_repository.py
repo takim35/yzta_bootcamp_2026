@@ -1,54 +1,24 @@
-"""
-Posts Router — Post oluşturma ve profil postları.
-
-Curl Örnekleri:
---------------
-# Yeni post oluştur
-curl -X POST http://localhost:8000/posts \
-  -H "Content-Type: application/json" \
-  -d '{
-    "user_id": "user-a-0001",
-    "image_url": "https://example.com/posts/new.jpg",
-    "caption": "Yeni kombinom!",
-    "outfit_items": ["item-blazer-001", "item-pantolon-001"],
-    "visibility": "public",
-    "ai_training_consent": true
-  }'
-
-# Profil postlarını getir (sahibi olarak)
-curl "http://localhost:8000/posts/users/user-a-0001/posts?viewer_id=user-a-0001"
-
-# Profil postlarını getir (takipçi olarak)
-curl "http://localhost:8000/posts/users/user-a-0001/posts?viewer_id=user-b-0002"
-
-# Profil postlarını getir (yabancı olarak)
-curl "http://localhost:8000/posts/users/user-a-0001/posts?viewer_id=user-c-0003"
-"""
-
-import uuid
 import sqlite3
-from fastapi import APIRouter, Depends, HTTPException, Query
-from typing import Optional
+import uuid
+from typing import Optional, List
+from fastapi import HTTPException
 
-from app.database import get_db
-from app.models import PostCreate, PostResponse, OutfitItemResponse, MessageResponse
+from app.domain.schemas import PostCreate, PostResponse, OutfitItemResponse
 
-router = APIRouter()
+class PostRepository:
+    def __init__(self, db: sqlite3.Connection):
+        self.db = db
 
-
-@router.post("", response_model=MessageResponse, status_code=201)
-def create_post(post: PostCreate, db: sqlite3.Connection = Depends(get_db)):
-    """Yeni post oluşturur."""
-    try:
+    def create_post(self, post: PostCreate) -> str:
         post_id = str(uuid.uuid4())
 
-        # Kullanıcı var mı kontrol et
-        user = db.execute("SELECT user_id FROM users WHERE user_id = ?", (post.user_id,)).fetchone()
+        # Check if user exists
+        user = self.db.execute("SELECT user_id FROM users WHERE user_id = ?", (post.user_id,)).fetchone()
         if not user:
             raise HTTPException(status_code=404, detail="Kullanıcı bulunamadı")
 
-        # Post'u oluştur
-        db.execute(
+        # Create post
+        self.db.execute(
             """
             INSERT INTO posts (post_id, user_id, image_url, caption, visibility, ai_training_consent)
             VALUES (?, ?, ?, ?, ?, ?)
@@ -63,9 +33,9 @@ def create_post(post: PostCreate, db: sqlite3.Connection = Depends(get_db)):
             ),
         )
 
-        # Outfit items ekle
+        # Add outfit items
         for item_id in post.outfit_items:
-            db.execute(
+            self.db.execute(
                 """
                 INSERT INTO post_outfit_items (post_id, item_id)
                 VALUES (?, ?)
@@ -73,45 +43,18 @@ def create_post(post: PostCreate, db: sqlite3.Connection = Depends(get_db)):
                 (post_id, item_id),
             )
 
-        db.commit()
+        self.db.commit()
+        return post_id
 
-        return MessageResponse(
-            success=True,
-            message="Post başarıyla oluşturuldu",
-            data={"post_id": post_id},
-        )
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Post oluşturulurken hata: {str(e)}")
-
-
-@router.get(
-    "/users/{user_id}/posts",
-    response_model=list[PostResponse],
-)
-def get_user_posts(
-    user_id: str,
-    viewer_id: Optional[str] = Query(None, description="Görüntüleyen kullanıcı ID"),
-    db: sqlite3.Connection = Depends(get_db),
-):
-    """
-    Kullanıcının profil postlarını döndürür.
-    Visibility kuralları SQL seviyesinde uygulanır:
-    - viewer == owner → tüm postlar
-    - viewer takipçi → public + followers
-    - viewer diğer → sadece public
-    """
-    try:
-        # Kullanıcı var mı kontrol et
-        user = db.execute("SELECT user_id FROM users WHERE user_id = ?", (user_id,)).fetchone()
+    def get_user_posts(self, user_id: str, viewer_id: Optional[str]) -> List[PostResponse]:
+        # Check if user exists
+        user = self.db.execute("SELECT user_id FROM users WHERE user_id = ?", (user_id,)).fetchone()
         if not user:
             raise HTTPException(status_code=404, detail="Kullanıcı bulunamadı")
 
         if viewer_id and viewer_id == user_id:
-            # Owner: tüm postları gör
-            rows = db.execute(
+            # Owner: see all
+            rows = self.db.execute(
                 """
                 SELECT p.*, u.username, u.display_name, u.avatar_url
                 FROM posts p
@@ -122,8 +65,8 @@ def get_user_posts(
                 (user_id,),
             ).fetchall()
         elif viewer_id:
-            # Takipçi mi kontrol et ve buna göre filtrele
-            rows = db.execute(
+            # Follower or public
+            rows = self.db.execute(
                 """
                 SELECT p.*, u.username, u.display_name, u.avatar_url
                 FROM posts p
@@ -144,8 +87,8 @@ def get_user_posts(
                 (user_id, viewer_id),
             ).fetchall()
         else:
-            # Anonim: sadece public
-            rows = db.execute(
+            # Anonymous
+            rows = self.db.execute(
                 """
                 SELECT p.*, u.username, u.display_name, u.avatar_url
                 FROM posts p
@@ -156,20 +99,17 @@ def get_user_posts(
                 (user_id,),
             ).fetchall()
 
-        # Postları response modeline dönüştür
         posts = []
         for row in rows:
-            # is_liked kontrolü
             is_liked = False
             if viewer_id:
-                like_check = db.execute(
+                like_check = self.db.execute(
                     "SELECT 1 FROM likes WHERE post_id = ? AND user_id = ?",
                     (row["post_id"], viewer_id),
                 ).fetchone()
                 is_liked = like_check is not None
 
-            # Outfit items
-            outfit_rows = db.execute(
+            outfit_rows = self.db.execute(
                 "SELECT item_id, category, image_url FROM post_outfit_items WHERE post_id = ?",
                 (row["post_id"],),
             ).fetchall()
@@ -202,7 +142,5 @@ def get_user_posts(
 
         return posts
 
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Postlar getirilirken hata: {str(e)}")
+def get_post_repository(db: sqlite3.Connection) -> PostRepository:
+    return PostRepository(db)

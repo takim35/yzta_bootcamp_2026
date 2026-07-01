@@ -12,9 +12,9 @@ from pathlib import Path
 from contextlib import contextmanager
 from typing import Generator
 
-from app.config import settings
+from app.core.config import settings
 
-SCHEMA_PATH = Path(__file__).resolve().parent.parent / "schema.sql"
+SCHEMA_PATH = Path(__file__).resolve().parent.parent.parent / "schema.sql"
 
 
 def _connect() -> sqlite3.Connection:

@@ -5,7 +5,7 @@ Not: Bu dosya şu an placeholder implementasyon içerir.
 Gerçek Firebase SDK entegrasyonu için firebase-admin paketi gerekir.
 """
 
-from app.config import settings
+from app.core.config import settings
 
 
 def generate_upload_url(user_id: str, post_id: str, filename: str) -> dict:

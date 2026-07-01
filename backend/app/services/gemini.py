@@ -17,8 +17,8 @@ curl -X POST http://localhost:8000/captions/suggest \
 """
 
 from fastapi import APIRouter, HTTPException
-from app.models import CaptionRequest, MessageResponse
-from app.config import settings
+from app.domain.schemas import CaptionRequest, MessageResponse
+from app.core.config import settings
 
 router = APIRouter()
 

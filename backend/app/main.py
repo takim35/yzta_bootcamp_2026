@@ -10,9 +10,9 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.config import settings
-from app.database import init_db
-from app.routers import posts, feed, follows, likes, users
+from app.core.config import settings
+from app.core.database import init_db
+from app.api.routers import posts, feed, follows, likes, users
 from app.services.gemini import router as captions_router
 
 
