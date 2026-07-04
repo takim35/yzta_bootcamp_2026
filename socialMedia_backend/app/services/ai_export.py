@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import Optional, Union
 """
 AI Eğitim Verisi Export Batch Job
 =================================
@@ -43,7 +45,7 @@ VALUES (?, ?, ?, ?)
 """
 
 
-def _get_connection(db_path: str | Path | None = None) -> sqlite3.Connection:
+def _get_connection(db_path: Optional[Union[str, Path]] = None) -> sqlite3.Connection:
     """Veritabanı bağlantısı oluşturur."""
     path = str(db_path or DB_PATH)
     conn = sqlite3.connect(path)
@@ -82,8 +84,8 @@ def _build_post_records(rows: list[sqlite3.Row]) -> list[dict]:
 
 
 def run_export(
-    conn: sqlite3.Connection | None = None,
-    exports_dir: Path | None = None,
+    conn: Optional[sqlite3.Connection] = None,
+    exports_dir: Optional[Path] = None,
 ) -> list[dict]:
     """
     Ana export fonksiyonu.

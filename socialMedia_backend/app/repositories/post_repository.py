@@ -20,10 +20,10 @@ class PostRepository:
             for item_id in post.outfit_items:
                 db.execute(
                     'INSERT INTO post_outfit_items (post_id, item_id, category, image_url) VALUES (?, ?, ?, ?)',
-                    (post_id, item_id, 'unknown', '')
+                    (post_id, item_id, 'diğer', None)
                 )
         db.commit()
-        return MessageResponse(message='Post basariyla olusturuldu', id=post_id)
+        return MessageResponse(success=True, message='Post başarıyla oluşturuldu', data={"post_id": post_id})
 
     @staticmethod
     def get_user_posts(db: sqlite3.Connection, user_id: str, viewer_id: str = None):

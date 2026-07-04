@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/localization/locale_provider.dart';
+import '../../../../core/localization/app_strings.dart';
 import '../../../../services/api_service.dart';
 import '../providers/profile_provider.dart';
 import '../../../../features/auth/presentation/providers/auth_provider.dart';
+import '../../../../features/onboarding/presentation/screens/onboarding_screen.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -20,13 +22,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   @override
   void initState() {
     super.initState();
-    // In a real app we'd load this from the user's current settings
-    // For now we'll assume public unless we have that data
     final user = ref.read(profileProvider).user;
     if (user != null) {
-      // If we extended UserModel to include profileVisibility:
-      // _isPrivate = user.profileVisibility == 'private';
-      // For now we just default to false since we didn't update UserModel yet
+      // profileVisibility alanı genişletildiğinde buradan okunacak
     }
   }
 
@@ -35,15 +33,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       _isPrivate = val;
       _isLoading = true;
     });
-    
     try {
       final userId = ref.read(authProvider).currentUserId;
       if (userId == null) return;
       await ApiService().updatePrivacy(userId, val);
-      
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(ref.read(stringsProvider).isTr ? 'Gizlilik ayarı güncellendi.' : 'Privacy updated.')),
+          SnackBar(
+            content: Text(ref.read(stringsProvider).isTr
+                ? 'Gizlilik ayarı güncellendi.'
+                : 'Privacy updated.'),
+          ),
         );
       }
     } catch (e) {
@@ -54,9 +54,47 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         );
       }
     } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _logout() async {
+    final s = ref.read(stringsProvider);
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppTheme.cardDark,
+        title: Text(
+          s.isTr ? 'Çıkış Yap' : 'Log Out',
+          style: const TextStyle(color: AppTheme.textPrimary),
+        ),
+        content: Text(
+          s.isTr
+              ? 'Hesabınızdan çıkmak istediğinize emin misiniz?'
+              : 'Are you sure you want to log out?',
+          style: const TextStyle(color: AppTheme.textMuted),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(s.isTr ? 'İptal' : 'Cancel',
+                style: const TextStyle(color: AppTheme.textMuted)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(s.isTr ? 'Çıkış' : 'Log Out',
+                style: const TextStyle(color: AppTheme.accentViolet)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true && mounted) {
+      ref.read(authProvider).logout();
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const OnboardingScreen()),
+        (_) => false,
+      );
     }
   }
 
@@ -66,19 +104,24 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppTheme.cardDark,
-        title: Text(s.isTr ? 'Hesabı Sil' : 'Delete Account', style: const TextStyle(color: AppTheme.errorColor)),
+        title: Text(s.isTr ? 'Hesabı Sil' : 'Delete Account',
+            style: const TextStyle(color: AppTheme.errorColor)),
         content: Text(
-          s.isTr ? 'Hesabınızı silmek istediğinize emin misiniz? Bu işlem geri alınamaz.' : 'Are you sure you want to delete your account? This action cannot be undone.',
+          s.isTr
+              ? 'Hesabınızı silmek istediğinize emin misiniz? Bu işlem geri alınamaz.'
+              : 'Are you sure you want to delete your account? This action cannot be undone.',
           style: const TextStyle(color: AppTheme.textPrimary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: Text(s.isTr ? 'İptal' : 'Cancel', style: const TextStyle(color: AppTheme.textMuted)),
+            child: Text(s.isTr ? 'İptal' : 'Cancel',
+                style: const TextStyle(color: AppTheme.textMuted)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text(s.isTr ? 'Evet, Sil' : 'Yes, Delete', style: const TextStyle(color: AppTheme.errorColor)),
+            child: Text(s.isTr ? 'Evet, Sil' : 'Yes, Delete',
+                style: const TextStyle(color: AppTheme.errorColor)),
           ),
         ],
       ),
@@ -90,16 +133,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         final userId = ref.read(authProvider).currentUserId;
         if (userId != null) {
           await ApiService().deleteAccount(userId);
-          ref.read(authProvider).logout(); // Log out local state
+          ref.read(authProvider).logout();
           if (mounted) {
-            Navigator.pop(context); // Go back to login
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (_) => const OnboardingScreen()),
+              (_) => false,
+            );
           }
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error: $e')),
-          );
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text('Error: $e')));
         }
       } finally {
         if (mounted) setState(() => _isLoading = false);
@@ -110,63 +155,176 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final s = ref.watch(stringsProvider);
-    
+    final locale = ref.watch(localeProvider);
+
     return Scaffold(
       backgroundColor: AppTheme.primaryDark,
       appBar: AppBar(
-        title: Text(s.isTr ? 'Ayarlar' : 'Settings', style: const TextStyle(color: AppTheme.textPrimary)),
+        title: Text(s.isTr ? 'Ayarlar' : 'Settings',
+            style: const TextStyle(color: AppTheme.textPrimary)),
         backgroundColor: AppTheme.primaryDark,
         elevation: 0,
         iconTheme: const IconThemeData(color: AppTheme.textPrimary),
       ),
-      body: _isLoading 
-        ? const Center(child: CircularProgressIndicator(color: AppTheme.accentViolet))
-        : ListView(
-            padding: const EdgeInsets.all(24),
-            children: [
-              Text(
-                s.isTr ? 'Gizlilik' : 'Privacy',
-                style: const TextStyle(color: AppTheme.accentViolet, fontWeight: FontWeight.bold, fontSize: 16),
-              ),
-              const SizedBox(height: 16),
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(s.isTr ? 'Gizli Profil' : 'Private Profile', style: const TextStyle(color: AppTheme.textPrimary)),
-                subtitle: Text(
-                  s.isTr ? 'Sadece takipçilerin gönderilerini görebilir.' : 'Only followers can see your posts.',
-                  style: const TextStyle(color: AppTheme.textMuted),
+      body: _isLoading
+          ? const Center(
+              child: CircularProgressIndicator(color: AppTheme.accentViolet))
+          : ListView(
+              padding: const EdgeInsets.all(24),
+              children: [
+                // ── Dil / Language ──────────────────────────────
+                Text(
+                  s.isTr ? 'Dil' : 'Language',
+                  style: const TextStyle(
+                      color: AppTheme.accentViolet,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16),
                 ),
-                trailing: Switch(
-                  value: _isPrivate,
-                  onChanged: _updatePrivacy,
-                  activeColor: AppTheme.accentViolet,
+                const SizedBox(height: 12),
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppTheme.cardDark,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppTheme.dividerColor),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: _LangButton(
+                          label: '🇹🇷  Türkçe',
+                          selected: locale == AppLocale.tr,
+                          onTap: () => ref
+                              .read(localeProvider.notifier)
+                              .setLocale(AppLocale.tr),
+                        ),
+                      ),
+                      Container(width: 1, height: 48, color: AppTheme.dividerColor),
+                      Expanded(
+                        child: _LangButton(
+                          label: '🇬🇧  English',
+                          selected: locale == AppLocale.en,
+                          onTap: () => ref
+                              .read(localeProvider.notifier)
+                              .setLocale(AppLocale.en),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const Divider(color: AppTheme.dividerColor, height: 48),
-              Text(
-                s.isTr ? 'Hesap' : 'Account',
-                style: const TextStyle(color: AppTheme.errorColor, fontWeight: FontWeight.bold, fontSize: 16),
-              ),
-              const SizedBox(height: 16),
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(s.isTr ? 'Şifre Sıfırla' : 'Reset Password', style: const TextStyle(color: AppTheme.textPrimary)),
-                trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: AppTheme.textMuted),
-                onTap: () {
-                  // In a real app we would navigate to a reset password screen or send an email
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(s.isTr ? 'Şifre sıfırlama bağlantısı e-postanıza gönderildi.' : 'Password reset link sent to your email.')),
-                  );
-                },
-              ),
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(s.isTr ? 'Hesabımı Sil' : 'Delete My Account', style: const TextStyle(color: AppTheme.errorColor)),
-                trailing: const Icon(Icons.delete_forever_rounded, color: AppTheme.errorColor),
-                onTap: _deleteAccount,
-              ),
-            ],
+
+                const Divider(color: AppTheme.dividerColor, height: 48),
+
+                // ── Gizlilik ────────────────────────────────────
+                Text(
+                  s.isTr ? 'Gizlilik' : 'Privacy',
+                  style: const TextStyle(
+                      color: AppTheme.accentViolet,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16),
+                ),
+                const SizedBox(height: 16),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(s.isTr ? 'Gizli Profil' : 'Private Profile',
+                      style: const TextStyle(color: AppTheme.textPrimary)),
+                  subtitle: Text(
+                    s.isTr
+                        ? 'Sadece takipçilerin gönderilerini görebilir.'
+                        : 'Only followers can see your posts.',
+                    style: const TextStyle(color: AppTheme.textMuted),
+                  ),
+                  trailing: Switch(
+                    value: _isPrivate,
+                    onChanged: _updatePrivacy,
+                    activeColor: AppTheme.accentViolet,
+                  ),
+                ),
+
+                const Divider(color: AppTheme.dividerColor, height: 48),
+
+                // ── Hesap ───────────────────────────────────────
+                Text(
+                  s.isTr ? 'Hesap' : 'Account',
+                  style: const TextStyle(
+                      color: AppTheme.errorColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16),
+                ),
+                const SizedBox(height: 16),
+
+                // Çıkış Yap
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(s.isTr ? 'Çıkış Yap' : 'Log Out',
+                      style: const TextStyle(color: AppTheme.textPrimary)),
+                  trailing: const Icon(Icons.logout_rounded,
+                      color: AppTheme.accentViolet),
+                  onTap: _logout,
+                ),
+
+                // Şifre Sıfırla
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(s.isTr ? 'Şifre Sıfırla' : 'Reset Password',
+                      style: const TextStyle(color: AppTheme.textPrimary)),
+                  trailing: const Icon(Icons.arrow_forward_ios,
+                      size: 16, color: AppTheme.textMuted),
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                          content: Text(s.isTr
+                              ? 'Şifre sıfırlama bağlantısı e-postanıza gönderildi.'
+                              : 'Password reset link sent to your email.')),
+                    );
+                  },
+                ),
+
+                // Hesabı Sil
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(s.isTr ? 'Hesabımı Sil' : 'Delete My Account',
+                      style: const TextStyle(color: AppTheme.errorColor)),
+                  trailing: const Icon(Icons.delete_forever_rounded,
+                      color: AppTheme.errorColor),
+                  onTap: _deleteAccount,
+                ),
+              ],
+            ),
+    );
+  }
+}
+
+class _LangButton extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _LangButton({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 48,
+        decoration: BoxDecoration(
+          color: selected ? AppTheme.accentViolet.withValues(alpha: 0.15) : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          label,
+          style: TextStyle(
+            color: selected ? AppTheme.accentViolet : AppTheme.textMuted,
+            fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+            fontSize: 14,
           ),
+        ),
+      ),
     );
   }
 }

@@ -1,174 +1,171 @@
 """
-gemini_client.py
-----------------
-Google Gemini API ile konuşan tek nokta.
+ollama_client.py (eski adı: gemini_client.py)
+---------------------------------------------
+Yerel Ollama LLM ile konuşan servis katmanı.
+Gemini API yerine http://localhost:11434 üzerinde çalışan
+yerel llama3.2 modeli kullanılır.
 
-İki ana fonksiyon var:
-1. sohbet_yaniti_al()       -> Chatbot mesajına yanıt üretir + bağlam JSON'u çıkarır
-2. kombin_onerisi_uret()    -> Bağlam + temiz kıyafet listesine göre kombin önerir
-
-Gemini'nin "structured output" özelliğini kullanıyoruz: modele bir JSON
-şeması veriyoruz, o da garanti olarak o şemaya uyan JSON döndürüyor.
-Bu sayede regex/parse hatalarıyla uğraşmıyoruz.
+İki ana fonksiyon:
+1. sohbet_yaniti_al()    -> Chatbot mesajına yanıt üretir + bağlam JSON çıkarır
+2. kombin_onerisi_uret() -> Bağlam + temiz kıyafet listesine göre kombin önerir
 """
 
-import os
+from __future__ import annotations
 import json
-from google import genai
-from google.genai import types
-from dotenv import load_dotenv
+import os
+import re
+import httpx
+from typing import List, Dict
 
-load_dotenv()
-
-API_KEY = os.getenv("GEMINI_API_KEY")
-MODEL_NAME = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
-
-if not API_KEY or API_KEY == "BURAYA_KENDI_ANAHTARINI_YAPISTIR":
-    raise RuntimeError(
-        "GEMINI_API_KEY tanımlı değil. .env dosyasını oluşturup "
-        "kendi API anahtarını yapıştırman gerekiyor (.env.example dosyasına bak)."
-    )
-
-client = genai.Client(api_key=API_KEY)
+OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
+OLLAMA_MODEL    = os.getenv("OLLAMA_MODEL", "llama3.2")
 
 
-# ---------- 1) Chatbot ----------
+def _ollama_chat(messages: List[Dict], temperature: float = 0.7) -> str:
+    """Ollama /api/chat endpoint'ini çağırır, string yanıt döner."""
+    payload = {
+        "model": OLLAMA_MODEL,
+        "messages": messages,
+        "stream": False,
+        "options": {"temperature": temperature},
+    }
+    try:
+        with httpx.Client(timeout=60.0) as client:
+            resp = client.post(f"{OLLAMA_BASE_URL}/api/chat", json=payload)
+            resp.raise_for_status()
+            return resp.json()["message"]["content"]
+    except httpx.ConnectError:
+        raise RuntimeError(
+            f"Ollama sunucusuna bağlanılamadı ({OLLAMA_BASE_URL}). "
+            "Ollama'nın çalıştığından emin ol: `ollama serve`"
+        )
 
-CHATBOT_SISTEM_PROMPTU = """
-Sen "Akıllı Dolap" uygulamasının moda asistanısın. Görevin, kullanıcıyla
-kısa ve doğal bir sohbet ederek şu bilgileri öğrenmek:
+
+def _extract_json(text: str) -> dict:
+    """Model çıktısından JSON bloğunu ayıklar."""
+    # ```json ... ``` bloğu varsa içini al
+    match = re.search(r"```(?:json)?\s*([\s\S]+?)```", text)
+    if match:
+        text = match.group(1)
+    # Ham JSON bul
+    start = text.find("{")
+    end   = text.rfind("}") + 1
+    if start != -1 and end > start:
+        try:
+            return json.loads(text[start:end])
+        except json.JSONDecodeError:
+            pass
+    raise ValueError(f"Geçerli JSON bulunamadı:\n{text[:300]}")
+
+
+# ─────────────────────────────────────────────
+# 1) CHATBOT
+# ─────────────────────────────────────────────
+
+CHATBOT_SISTEM_PROMPTU = """\
+Sen "Akıllı Dolap" uygulamasının moda asistanısın. Görevin kullanıcıyla
+kısa ve doğal sohbet ederek şunları öğrenmek:
 - Nereye gidiyor / ne yapacak (etkinlik: iş, randevu, spor, gezi, parti vb.)
-- Hava durumu (kullanıcı söylemediyse nazikçe sor)
+- Hava durumu (bilmiyorsa nazikçe sor)
 - Varsa stil tercihi (rahat, şık, spor vb.)
 
 Kurallar:
-- Sıcak, samimi ve kısa cümlelerle konuş. Bunaltma, tek seferde tek soru sor.
-- Yeterli bilgi toplayana kadar (en az etkinlik ve hava durumu) sohbete devam et.
-- Yeterli bilgi toplandığında kullanıcıya "harika, hazırlanıyorum" gibi bir
-  şeyle sohbeti kapat ve hazir_mi alanını true yap.
-"""
+- Sıcak, samimi ve kısa cümlelerle yaz. Tek seferde tek soru sor.
+- Yeterli bilgi (en az etkinlik + hava) toplayana kadar sohbete devam et.
+- Hazır olunca "harika, hazırlanıyorum" gibi bir kapanış yap, hazir_mi = true yap.
 
-# Gemini'den hep bu şemaya uyan JSON isteyeceğiz.
-SOHBET_CIKIS_SEMASI = {
-    "type": "object",
-    "properties": {
-        "asistan_mesaji": {
-            "type": "string",
-            "description": "Kullanıcıya gösterilecek doğal dildeki yanıt",
-        },
-        "baglam": {
-            "type": "object",
-            "properties": {
-                "etkinlik": {"type": "string"},
-                "hava_durumu": {"type": "string"},
-                "stil_tercihi": {"type": "string"},
-            },
-        },
-        "hazir_mi": {
-            "type": "boolean",
-            "description": "Kombin önerisi üretmek için yeterli bilgi toplandıysa true",
-        },
-    },
-    "required": ["asistan_mesaji", "baglam", "hazir_mi"],
-}
+YANITI MUTLAKA aşağıdaki JSON formatında ver, başka hiçbir şey yazma:
+{
+  "asistan_mesaji": "...",
+  "baglam": {"etkinlik": "...", "hava_durumu": "...", "stil_tercihi": "..."},
+  "hazir_mi": false
+}"""
 
 
-def sohbet_yaniti_al(gecmis: list[dict], yeni_mesaj: str) -> dict:
+def sohbet_yaniti_al(gecmis: List[Dict], yeni_mesaj: str) -> dict:
     """
-    gecmis: [{"rol": "user"/"assistant", "mesaj": "..."}], veritabanından gelir
-    yeni_mesaj: kullanıcının az önce yazdığı mesaj
+    gecmis: [{"rol": "user"/"assistant", "mesaj": "..."}]
+    yeni_mesaj: kullanıcının yeni mesajı
 
-    Dönen değer örneği:
-    {
-        "asistan_mesaji": "Harika, peki hava nasıl orada?",
-        "baglam": {"etkinlik": "iş görüşmesi", "hava_durumu": "", "stil_tercihi": "şık"},
-        "hazir_mi": false
-    }
+    Dönen:
+    {"asistan_mesaji": "...", "baglam": {...}, "hazir_mi": bool}
     """
-    # Geçmiş mesajları Gemini'nin beklediği "contents" formatına çeviriyoruz
-    contents = []
-    for mesaj in gecmis:
-        rol = "user" if mesaj["rol"] == "user" else "model"
-        contents.append(
-            types.Content(role=rol, parts=[types.Part(text=mesaj["mesaj"])])
-        )
-    contents.append(types.Content(role="user", parts=[types.Part(text=yeni_mesaj)]))
+    messages = [{"role": "system", "content": CHATBOT_SISTEM_PROMPTU}]
+    for m in gecmis:
+        role = "user" if m["rol"] == "user" else "assistant"
+        messages.append({"role": role, "content": m["mesaj"]})
+    messages.append({"role": "user", "content": yeni_mesaj})
 
-    response = client.models.generate_content(
-        model=MODEL_NAME,
-        contents=contents,
-        config=types.GenerateContentConfig(
-            system_instruction=CHATBOT_SISTEM_PROMPTU,
-            response_mime_type="application/json",
-            response_schema=SOHBET_CIKIS_SEMASI,
-            temperature=0.7,
-        ),
-    )
+    raw = _ollama_chat(messages, temperature=0.7)
+    try:
+        result = _extract_json(raw)
+    except ValueError:
+        # JSON parse edilemezse güvenli fallback
+        result = {
+            "asistan_mesaji": raw.strip()[:500],
+            "baglam": {"etkinlik": "", "hava_durumu": "", "stil_tercihi": ""},
+            "hazir_mi": False,
+        }
 
-    return json.loads(response.text)
-
-
-# ---------- 2) Kombin Önerisi ----------
-
-KOMBIN_SISTEM_PROMPTU = """
-Sen bir moda stilistisin. Sana bir bağlam (etkinlik, hava durumu, stil
-tercihi) ve kullanıcının dolabındaki TEMİZ kıyafetlerin listesi verilecek.
-
-Görevin: Bu kıyafetler arasından, verilen bağlama en uygun KOMBİNİ seçmek.
-Sadece sana verilen kıyafet ID'lerini kullan, var olmayan kıyafet icat etme.
-Üst+alt+ayakkabı (varsa) içeren mantıklı bir kombin oluştur.
-"""
-
-KOMBIN_CIKIS_SEMASI = {
-    "type": "object",
-    "properties": {
-        "secilen_kiyafet_idleri": {
-            "type": "array",
-            "items": {"type": "integer"},
-            "description": "Önerilen kombini oluşturan kıyafetlerin ID'leri",
-        },
-        "aciklama": {
-            "type": "string",
-            "description": "Kombinin neden uygun olduğuna dair kısa, kullanıcıya gösterilecek açıklama",
-        },
-    },
-    "required": ["secilen_kiyafet_idleri", "aciklama"],
-}
+    # Zorunlu anahtarların varlığını garanti et
+    result.setdefault("asistan_mesaji", "")
+    result.setdefault("baglam", {})
+    result.setdefault("hazir_mi", False)
+    result["baglam"].setdefault("etkinlik", "")
+    result["baglam"].setdefault("hava_durumu", "")
+    result["baglam"].setdefault("stil_tercihi", "")
+    return result
 
 
-def kombin_onerisi_uret(baglam: dict, temiz_kiyafetler: list[dict]) -> dict:
+# ─────────────────────────────────────────────
+# 2) KOMBİN ÖNERİSİ
+# ─────────────────────────────────────────────
+
+KOMBIN_SISTEM_PROMPTU = """\
+Sen bir moda stilistisin. Sana bir bağlam (etkinlik, hava durumu, stil tercihi)
+ve kullanıcının dolabındaki TEMİZ kıyafetlerin listesi verilecek.
+
+Görevin: Bu kıyafetler arasından verilen bağlama en uygun KOMBİNİ seçmek.
+Sadece verilen kıyafet ID'lerini kullan; var olmayan kıyafet icat etme.
+
+YANITI MUTLAKA aşağıdaki JSON formatında ver, başka hiçbir şey yazma:
+{
+  "secilen_kiyafet_idleri": [1, 2, 3],
+  "aciklama": "Kombinin neden uygun olduğuna dair kısa açıklama"
+}"""
+
+
+def kombin_onerisi_uret(baglam: dict, temiz_kiyafetler: List[Dict]) -> dict:
     """
     baglam: {"etkinlik": "...", "hava_durumu": "...", "stil_tercihi": "..."}
-    temiz_kiyafetler: database.temiz_kiyafetleri_getir() çıktısı
+    temiz_kiyafetler: kiyafetleri_getir(sadece_temiz=True) çıktısı
 
-    Dönen değer örneği:
-    {
-        "secilen_kiyafet_idleri": [4, 7, 12],
-        "aciklama": "Hava ılık ve görüşme şık bir görünüm gerektirdiği için..."
-    }
+    Dönen:
+    {"secilen_kiyafet_idleri": [...], "aciklama": "..."}
     """
-    kiyafet_listesi_metni = json.dumps(temiz_kiyafetler, ensure_ascii=False, indent=2)
-
+    kiyafet_listesi = json.dumps(temiz_kiyafetler, ensure_ascii=False, indent=2)
     kullanici_mesaji = f"""
 BAĞLAM:
 {json.dumps(baglam, ensure_ascii=False, indent=2)}
 
 KULLANICININ TEMİZ KIYAFETLERİ:
-{kiyafet_listesi_metni}
+{kiyafet_listesi}
 
-Lütfen bu bağlama en uygun kombini, yalnızca yukarıdaki kıyafet ID'lerini
-kullanarak öner.
+Lütfen bu bağlama en uygun kombini yalnızca yukarıdaki kıyafet ID'lerini kullanarak öner.
 """
+    messages = [
+        {"role": "system", "content": KOMBIN_SISTEM_PROMPTU},
+        {"role": "user",   "content": kullanici_mesaji},
+    ]
+    raw = _ollama_chat(messages, temperature=0.8)
+    try:
+        result = _extract_json(raw)
+    except ValueError:
+        result = {
+            "secilen_kiyafet_idleri": [k["id"] for k in temiz_kiyafetler[:3]],
+            "aciklama": raw.strip()[:300] or "Kombin önerisi oluşturuldu.",
+        }
 
-    response = client.models.generate_content(
-        model=MODEL_NAME,
-        contents=kullanici_mesaji,
-        config=types.GenerateContentConfig(
-            system_instruction=KOMBIN_SISTEM_PROMPTU,
-            response_mime_type="application/json",
-            response_schema=KOMBIN_CIKIS_SEMASI,
-            temperature=0.8,
-        ),
-    )
-
-    return json.loads(response.text)
+    result.setdefault("secilen_kiyafet_idleri", [])
+    result.setdefault("aciklama", "")
+    return result

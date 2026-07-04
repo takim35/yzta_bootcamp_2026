@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import Optional, Union
 import sqlite3
 from fastapi import HTTPException
 from app.domain.schemas import UserResponse
@@ -21,7 +23,7 @@ class UserRepository:
         
         return UserResponse(**dict(user))
 
-    def update_user_profile(self, user_id: str, display_name: str | None, bio: str | None, avatar_url: str | None) -> None:
+    def update_user_profile(self, user_id: str, display_name: Optional[str], bio: Optional[str], avatar_url: Optional[str]) -> None:
         updates = []
         params = []
         if display_name is not None:

@@ -1,88 +1,91 @@
 """
-Gemini AI Servisi — Caption önerisi.
-
-Curl Örnekleri:
---------------
-# Caption önerisi al
-curl -X POST http://localhost:8000/captions/suggest \
-  -H "Content-Type: application/json" \
-  -d '{
-    "outfit_items": [
-      {"category": "üst giyim", "name": "Siyah blazer"},
-      {"category": "alt giyim", "name": "Beyaz pantolon"},
-      {"category": "ayakkabı", "name": "Kırmızı stiletto"}
-    ],
-    "style_hint": "iş kombini"
-  }'
+AI Caption Servisi — Ollama (llama3.2) kullanarak kombin caption önerisi.
+POST /captions/suggest
+POST /upload  (resim yükleme)
 """
+from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException
+import os
+import uuid
+import httpx
+from pathlib import Path
+from fastapi import APIRouter, HTTPException, UploadFile, File
+from fastapi.responses import JSONResponse
+from typing import List
+
 from app.domain.schemas import CaptionRequest, MessageResponse
-from app.core.config import settings
 
 router = APIRouter()
 
+OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
+OLLAMA_MODEL    = os.getenv("OLLAMA_MODEL", "llama3.2")
 
-async def generate_caption(outfit_items: list[dict], style_hint: str = "") -> str:
-    """
-    Gemini API kullanarak kombin için caption önerisi üretir.
+# Resim kayıt dizini
+UPLOADS_DIR = Path(__file__).resolve().parent.parent.parent / "static" / "uploads"
+UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
 
-    Args:
-        outfit_items: Kombin parçaları listesi (her biri dict: {category, name, ...})
-        style_hint: Stil ipucu (opsiyonel)
+SERVER_HOST = os.getenv("SERVER_HOST", "172.20.10.13")
+SERVER_PORT = os.getenv("SERVER_PORT", "8000")
 
-    Returns:
-        Üretilen caption string'i. Hata durumunda boş string.
-    """
-    if not settings.GEMINI_API_KEY:
-        return ""
+
+def _ollama_caption(outfit_desc: str, style_hint: str = "") -> str:
+    """Ollama ile caption üretir."""
+    prompt = (
+        f"Şu kombin için kısa ve çekici bir sosyal medya caption'ı yaz "
+        f"(Türkçe, max 200 karakter, emoji kullan):\n"
+        f"Kombin: {outfit_desc}\n"
+    )
+    if style_hint:
+        prompt += f"Stil: {style_hint}\n"
+    prompt += "Sadece caption'ı yaz, başka açıklama ekleme."
 
     try:
-        import google.generativeai as genai
-
-        genai.configure(api_key=settings.GEMINI_API_KEY)
-        model = genai.GenerativeModel("gemini-1.5-flash")
-
-        # Prompt oluştur
-        items_desc = ", ".join(
-            [f"{item.get('category', 'parça')}: {item.get('name', 'bilinmiyor')}" for item in outfit_items]
-        )
-
-        prompt = (
-            f"Bu kombin için kısa, çekici bir sosyal medya caption'ı yaz (Türkçe, max 280 karakter).\n"
-            f"Kombin parçaları: {items_desc}\n"
-        )
-        if style_hint:
-            prompt += f"Stil: {style_hint}\n"
-
-        prompt += "Sadece caption'ı yaz, başka açıklama ekleme. Emoji kullanabilirsin."
-
-        response = model.generate_content(prompt)
-        return response.text.strip()[:280]
-
+        with httpx.Client(timeout=30.0) as client:
+            resp = client.post(
+                f"{OLLAMA_BASE_URL}/api/generate",
+                json={"model": OLLAMA_MODEL, "prompt": prompt, "stream": False},
+            )
+            resp.raise_for_status()
+            return resp.json().get("response", "").strip()[:250]
     except Exception:
-        # Graceful degradation: hata olursa boş string dön
         return ""
 
 
 @router.post("/suggest", response_model=MessageResponse)
 async def suggest_caption(req: CaptionRequest):
-    """Kombin için AI destekli caption önerisi üretir."""
+    """Kombin için AI caption önerisi üretir (Ollama)."""
     try:
-        caption = await generate_caption(req.outfit_items, req.style_hint)
+        items_desc = ", ".join(
+            [f"{item.get('category', 'parça')}: {item.get('name', item.get('tur', 'bilinmiyor'))}"
+             for item in req.outfit_items]
+        ) if req.outfit_items else "Kombin"
+
+        caption = _ollama_caption(items_desc, req.style_hint or "")
 
         if not caption:
-            return MessageResponse(
-                success=True,
-                message="Caption önerisi üretilemedi (API key eksik veya hata oluştu)",
-                data={"caption": ""},
-            )
+            caption = f"✨ {items_desc} 🔥 #moda #style #ootd"
 
         return MessageResponse(
             success=True,
-            message="Caption önerisi başarıyla üretildi",
+            message="Caption önerisi üretildi",
             data={"caption": caption},
         )
-
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Caption önerisi üretilirken hata: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/upload")
+async def upload_image(file: UploadFile = File(...)):
+    """Resim yükler ve erişilebilir URL döndürür."""
+    allowed = {".jpg", ".jpeg", ".png", ".webp", ".heic"}
+    ext = Path(file.filename or "img.jpg").suffix.lower()
+    if ext not in allowed:
+        raise HTTPException(status_code=400, detail="Sadece jpg, png, webp desteklenir.")
+
+    filename = f"{uuid.uuid4()}{ext}"
+    dest = UPLOADS_DIR / filename
+    content = await file.read()
+    dest.write_bytes(content)
+
+    url = f"http://{SERVER_HOST}:{SERVER_PORT}/static/uploads/{filename}"
+    return {"url": url, "filename": filename}

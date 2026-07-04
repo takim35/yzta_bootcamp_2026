@@ -2,6 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import '../../../../features/feed/domain/models/outfit_item_model.dart';
 import '../../../../services/api_service.dart';
 
@@ -41,36 +43,36 @@ class CreatePostProvider extends ChangeNotifier {
   /// Form geçerliliği: en azından görsel seçilmiş olmalı
   bool get isFormValid => _selectedImage != null;
 
-  // ─── Mock Outfit Items ──────────────────────────────────────
+  // ─── Mock Outfit Items (UI'da gösterim için) ───────────────
   List<OutfitItem> get mockOutfitItems => const [
         OutfitItem(
           itemId: 'item-001',
-          category: 'Üst Giyim',
+          category: 'üst giyim',
           imageUrl: 'https://picsum.photos/seed/top1/200/200',
         ),
         OutfitItem(
           itemId: 'item-002',
-          category: 'Alt Giyim',
+          category: 'alt giyim',
           imageUrl: 'https://picsum.photos/seed/bottom1/200/200',
         ),
         OutfitItem(
           itemId: 'item-003',
-          category: 'Ayakkabı',
+          category: 'ayakkabı',
           imageUrl: 'https://picsum.photos/seed/shoes1/200/200',
         ),
         OutfitItem(
           itemId: 'item-004',
-          category: 'Aksesuar',
+          category: 'aksesuar',
           imageUrl: 'https://picsum.photos/seed/acc1/200/200',
         ),
         OutfitItem(
           itemId: 'item-005',
-          category: 'Dış Giyim',
+          category: 'dış giyim',
           imageUrl: 'https://picsum.photos/seed/jacket1/200/200',
         ),
         OutfitItem(
           itemId: 'item-006',
-          category: 'Çanta',
+          category: 'diğer',
           imageUrl: 'https://picsum.photos/seed/bag1/200/200',
         ),
       ];
@@ -93,6 +95,27 @@ class CreatePostProvider extends ChangeNotifier {
       _errorMessage = 'Görsel seçilirken bir hata oluştu.';
       debugPrint('Görsel seçme hatası: $e');
       notifyListeners();
+    }
+  }
+
+  // ─── Görsel Upload ──────────────────────────────────────────
+  /// Seçili görseli backend'e yükler ve URL döndürür.
+  Future<String?> _uploadImage(File file) async {
+    try {
+      final uri = Uri.parse('${ApiService.baseUrl}/captions/upload');
+      final request = http.MultipartRequest('POST', uri)
+        ..files.add(await http.MultipartFile.fromPath('file', file.path));
+      final streamed = await request.send();
+      final response = await http.Response.fromStream(streamed);
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        return data['url'] as String?;
+      }
+      debugPrint('Upload hatası: ${response.statusCode} ${response.body}');
+      return null;
+    } catch (e) {
+      debugPrint('Upload exception: $e');
+      return null;
     }
   }
 
@@ -126,22 +149,25 @@ class CreatePostProvider extends ChangeNotifier {
 
   // ─── AI Caption Önerisi ─────────────────────────────────────
   Future<void> suggestCaption() async {
-    if (_selectedOutfitItems.isEmpty) {
-      _errorMessage = 'Önce kombin parçalarını seçin.';
-      notifyListeners();
-      return;
-    }
-
     _isSuggestingCaption = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      final caption = await _api.suggestCaption(
-        outfitItems: _selectedOutfitItems,
-      );
-      _suggestedCaption = caption;
-      _caption = caption;
+      // Kombin parçası seçilmemişse genel bir moda caption'ı iste
+      final items = _selectedOutfitItems.isNotEmpty
+          ? _selectedOutfitItems
+          : <OutfitItem>[
+              const OutfitItem(itemId: '', category: 'diğer', imageUrl: ''),
+            ];
+
+      final caption = await _api.suggestCaption(outfitItems: items);
+      if (caption.isNotEmpty) {
+        _suggestedCaption = caption;
+        _caption = caption;
+      } else {
+        _errorMessage = 'AI caption üretemedi, lütfen manuel yazın.';
+      }
     } on ApiException catch (e) {
       _errorMessage = e.message;
       debugPrint('Caption önerisi hatası: ${e.message}');
@@ -167,9 +193,18 @@ class CreatePostProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Use the actual selected image path as the image URL to send to backend
-      final imageUrl = selectedImage!.path;
+      // 1. Görseli backend'e yükle
+      String? imageUrl = await _uploadImage(selectedImage!);
 
+      // Upload başarısız olursa hata göster
+      if (imageUrl == null || imageUrl.isEmpty) {
+        _isSubmitting = false;
+        _errorMessage = 'Görsel yüklenemedi. Bağlantınızı kontrol edin.';
+        notifyListeners();
+        return null;
+      }
+
+      // 2. Post oluştur
       final postId = await _api.createPost(
         userId: userId,
         imageUrl: imageUrl,

@@ -1,19 +1,23 @@
 """
 Dijital Gardrop — FastAPI ana uygulama.
-
-Lifespan event'inde veritabanını başlatır.
-CORS middleware ekler.
-Tüm router'ları dahil eder.
 """
+from __future__ import annotations
 
 from contextlib import asynccontextmanager
+from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.core.config import settings
 from app.core.database import init_db
 from app.api.routers import posts, feed, follows, users, auth, wardrobe
+from app.api.routers import likes  # beğeni/yorum router
 from app.services.gemini import router as captions_router
+
+STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
+STATIC_DIR.mkdir(exist_ok=True)
+(STATIC_DIR / "uploads").mkdir(exist_ok=True)
 
 
 @asynccontextmanager
@@ -33,27 +37,26 @@ app = FastAPI(
 # CORS Middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins_list,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# Static files
+app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+
 # Router'ları dahil et
-app.include_router(auth.router, prefix="/auth", tags=["Auth"])
-app.include_router(posts.router, prefix="/posts", tags=["Posts"])
-app.include_router(feed.router, tags=["Feed"])
-app.include_router(follows.router, tags=["Follows"])
-app.include_router(users.router, prefix="/users", tags=["Users"])
-app.include_router(wardrobe.router, prefix="/wardrobe", tags=["Wardrobe"])
-app.include_router(captions_router, prefix="/captions", tags=["Captions"])
+app.include_router(auth.router,      prefix="/auth",     tags=["Auth"])
+app.include_router(posts.router,     prefix="/posts",    tags=["Posts"])
+app.include_router(likes.router,                         tags=["Likes"])   # /posts/{id}/like + /posts/{id}/comments
+app.include_router(feed.router,                          tags=["Feed"])
+app.include_router(follows.router,                       tags=["Follows"])
+app.include_router(users.router,     prefix="/users",    tags=["Users"])
+app.include_router(wardrobe.router,  prefix="/wardrobe", tags=["Wardrobe"])
+app.include_router(captions_router,  prefix="/captions", tags=["Captions"])
 
 
 @app.get("/", tags=["Health"])
 def health_check():
-    """Sağlık kontrolü endpoint'i."""
-    return {
-        "status": "healthy",
-        "service": "dijital-gardrop-api",
-        "version": "1.0.0",
-    }
+    return {"status": "healthy", "service": "dijital-gardrop-api", "version": "1.0.0"}
