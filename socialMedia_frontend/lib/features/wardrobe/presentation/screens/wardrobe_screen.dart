@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../services/api_service.dart';
+import '../../../../features/auth/presentation/providers/auth_provider.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../../../core/localization/locale_provider.dart';
 import 'add_item_screen.dart';
 
@@ -13,74 +15,159 @@ class WardrobeScreen extends ConsumerStatefulWidget {
 
 class _WardrobeScreenState extends ConsumerState<WardrobeScreen> {
   final ApiService _apiService = ApiService();
-  final String userId = "user_123"; // Dummy user id
+  late Future<List<dynamic>> _clothesFuture;
 
-  Future<void> _refresh() async {
-    setState(() {});
+  @override
+  void initState() {
+    super.initState();
+    _loadClothes();
+  }
+
+  void _loadClothes() {
+    final userId = ref.read(authProvider).currentUserId ?? '';
+    setState(() {
+      _clothesFuture = _apiService.getClothes(userId);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final s = ref.watch(stringsProvider);
+    final userId = ref.watch(authProvider).currentUserId ?? '';
 
     return Scaffold(
+      backgroundColor: AppTheme.primaryDark,
       appBar: AppBar(
-        title: Text(s.digitalWardrobe),
+        title: Text(
+          s.digitalWardrobe,
+          style: const TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: AppTheme.primaryDark,
+        elevation: 0,
         actions: [
           IconButton(
-            icon: const Icon(Icons.add),
+            icon: const Icon(Icons.add_rounded, color: AppTheme.accentViolet, size: 28),
+            tooltip: 'Kıyafet Ekle',
             onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const AddItemScreen()),
-              ).then((_) => _refresh());
+              ).then((refreshed) {
+                if (refreshed == true) _loadClothes();
+              });
             },
-          )
+          ),
         ],
       ),
       body: FutureBuilder<List<dynamic>>(
-        future: _apiService.getClothes(userId),
+        future: _clothesFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+              child: CircularProgressIndicator(color: AppTheme.accentViolet),
+            );
           }
           if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, color: AppTheme.errorColor, size: 48),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Hata: ${snapshot.error}',
+                    style: const TextStyle(color: AppTheme.textSecondary),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  TextButton(
+                    onPressed: _loadClothes,
+                    child: const Text('Yeniden Dene', style: TextStyle(color: AppTheme.accentViolet)),
+                  ),
+                ],
+              ),
+            );
           }
 
           final clothes = snapshot.data ?? [];
           if (clothes.isEmpty) {
-            return Center(child: Text(s.noClothesFound));
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.checkroom_rounded,
+                      size: 72, color: AppTheme.accentViolet.withValues(alpha: 0.4)),
+                  const SizedBox(height: 16),
+                  Text(
+                    s.noClothesFound,
+                    style: const TextStyle(color: AppTheme.textSecondary, fontSize: 16),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Sağ üstteki + butonuyla kıyafet ekleyin',
+                    style: TextStyle(color: AppTheme.textMuted, fontSize: 13),
+                  ),
+                ],
+              ),
+            );
           }
 
           return GridView.builder(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(12),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
-              childAspectRatio: 0.8,
-              crossAxisSpacing: 8,
-              mainAxisSpacing: 8,
+              childAspectRatio: 0.78,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
             ),
             itemCount: clothes.length,
             itemBuilder: (context, index) {
               final cloth = clothes[index] as Map<String, dynamic>;
-              return Card(
+              final imageUrl = cloth['foto_url']?.toString() ?? cloth['image_url']?.toString() ?? '';
+              final tur = cloth['tur']?.toString() ?? cloth['category']?.toString() ?? 'Kıyafet';
+              final renk = cloth['renk']?.toString() ?? '';
+
+              return Container(
+                decoration: BoxDecoration(
+                  color: AppTheme.cardDark,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppTheme.dividerColor, width: 0.5),
+                ),
                 clipBehavior: Clip.antiAlias,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Expanded(
-                      child: cloth['image_url'] != null && cloth['image_url'].toString().isNotEmpty
-                          ? Image.network(cloth['image_url'], fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image, size: 50))
-                          : const Icon(Icons.checkroom, size: 50),
+                      child: imageUrl.isNotEmpty
+                          ? Image.network(
+                              imageUrl,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => const _EmptyClothIcon(),
+                            )
+                          : const _EmptyClothIcon(),
                     ),
                     Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        cloth['category'] ?? 'Unknown',
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      padding: const EdgeInsets.all(10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            tur,
+                            style: const TextStyle(
+                              color: AppTheme.textPrimary,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                            ),
+                          ),
+                          if (renk.isNotEmpty)
+                            Text(
+                              renk,
+                              style: const TextStyle(
+                                color: AppTheme.textMuted,
+                                fontSize: 12,
+                              ),
+                            ),
+                        ],
                       ),
                     ),
                   ],
@@ -89,6 +176,20 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> {
             },
           );
         },
+      ),
+    );
+  }
+}
+
+class _EmptyClothIcon extends StatelessWidget {
+  const _EmptyClothIcon();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: AppTheme.surfaceDark,
+      child: const Center(
+        child: Icon(Icons.checkroom_rounded, size: 52, color: AppTheme.textMuted),
       ),
     );
   }

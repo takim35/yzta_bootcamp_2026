@@ -116,6 +116,15 @@ class ProfileProvider extends ChangeNotifier {
     }
   }
 
+  // ─── Gönderi Sil ────────────────────────────────────────────
+  Future<void> deletePost(String postId, String userId) async {
+    await _api.deletePost(postId: postId, userId: userId);
+    // Yerel listeden hemen kaldır (UI anında güncellenir)
+    _userPosts.removeWhere((p) => p.id == postId);
+    _savedPosts.removeWhere((p) => p.id == postId);
+    notifyListeners();
+  }
+
   // ─── Temizle ────────────────────────────────────────────────
   void clear() {
     _user = null;

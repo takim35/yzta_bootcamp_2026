@@ -375,11 +375,30 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         style: ElevatedButton.styleFrom(backgroundColor: AppTheme.errorColor),
                         icon: const Icon(Icons.delete, color: Colors.white),
                         label: Text(s.isTr ? 'Sil' : 'Delete', style: const TextStyle(color: Colors.white)),
-                        onPressed: () {
+                        onPressed: () async {
                           Navigator.pop(ctx);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(s.isTr ? 'Gönderi silindi.' : 'Post deleted.')),
-                          );
+                          final userId = ref.read(authProvider).currentUserId;
+                          if (userId == null) return;
+                          try {
+                            await provider.deletePost(post.id, userId);
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(s.isTr ? 'Gönderi silindi.' : 'Post deleted.'),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                            }
+                          } catch (e) {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Silme hatası: $e'),
+                                  backgroundColor: AppTheme.errorColor,
+                                ),
+                              );
+                            }
+                          }
                         },
                       ),
                     ]

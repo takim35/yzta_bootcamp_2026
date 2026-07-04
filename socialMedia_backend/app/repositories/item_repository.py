@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import Optional
 import sqlite3
 import json
 
@@ -72,7 +74,7 @@ class ItemRepository:
             ).fetchall()
         return [dict(row) for row in rows]
 
-    def kiyafet_getir(self, kiyafet_id: int) -> dict | None:
+    def kiyafet_getir(self, kiyafet_id: int) -> Optional[dict]:
         row = self.db.execute("SELECT * FROM kiyafetler WHERE id = ?", (kiyafet_id,)).fetchone()
         return dict(row) if row else None
 

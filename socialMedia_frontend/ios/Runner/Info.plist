@@ -66,5 +66,13 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>Kıyafetlerinizin fotoğrafını çekmek için kamera erişimi gerekiyor.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Kıyafetlerinizin fotoğrafını seçmek için fotoğraf kitaplığı erişimi gerekiyor.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Fotoğrafları kitaplığınıza kaydetmek için erişim gerekiyor.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Video çekimi için mikrofon erişimi gerekiyor.</string>
 </dict>
 </plist>

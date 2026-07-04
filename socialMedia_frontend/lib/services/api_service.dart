@@ -14,7 +14,7 @@ class ApiService {
 
   /// Base URL — Bilgisayarın yerel IP adresi (telefon aynı WiFi ağındayken çalışır)
   static String get baseUrl {
-    return 'http://127.0.0.1:8000';
+    return 'http://172.20.10.13:8000';
   }
 
   final http.Client _client = http.Client();
@@ -269,6 +269,10 @@ class ApiService {
         .toList();
   }
 
+  Future<void> deletePost({required String postId, required String userId}) async {
+    await _delete('/posts/$postId?user_id=$userId', null);
+  }
+
   // ─── User Profile ──────────────────────────────────────────
   Future<UserModel> getUser(String userId) async {
     final data = await _get('/users/$userId');
@@ -390,7 +394,9 @@ class ApiService {
       body['style_hint'] = styleHint;
     }
     final data = await _post('/captions/suggest', body);
-    return data['caption'] as String? ?? '';
+    // Backend MessageResponse: {success, message, data: {caption: "..."}}
+    final nested = data['data'] as Map<String, dynamic>?;
+    return nested?['caption'] as String? ?? '';
   }
 
 
@@ -399,13 +405,26 @@ class ApiService {
     return await _getList('/wardrobe/items/$userId');
   }
 
-  Future<dynamic> addCloth(Map<String, dynamic> data) async {
-    final userId = data['user_id'];
-    return await _post('/wardrobe/items?user_id=$userId', data);
+  Future<dynamic> addCloth(String userId, Map<String, dynamic> itemData) async {
+    return await _post('/wardrobe/items?user_id=$userId', itemData);
   }
 
   Future<dynamic> chat(String userId, String message) async {
     return await _post('/wardrobe/chat', {'user_id': userId, 'mesaj': message});
+  }
+
+  Future<List<Map<String, String>>> getChatHistory(String userId) async {
+    try {
+      final data = await _getList('/wardrobe/chat/history/$userId');
+      return data
+          .map((e) => {
+                'role': (e as Map)['rol']?.toString() ?? 'user',
+                'text': e['mesaj']?.toString() ?? '',
+              })
+          .toList();
+    } catch (_) {
+      return [];
+    }
   }
 
   Future<dynamic> getOutfit(String userId, String event, String weather, String style) async {

@@ -59,11 +59,18 @@ def chat(istek: ChatIstek, db: sqlite3.Connection = Depends(get_db)):
     try:
         sonuc = gemini_client.sohbet_yaniti_al(gecmis, istek.mesaj)
     except Exception as e:
-        raise HTTPException(status_code=502, detail=f"Gemini API hatası: {e}")
+        raise HTTPException(status_code=502, detail=f"AI hatası: {e}")
         
     repo.mesaj_kaydet(istek.user_id, "user", istek.mesaj)
     repo.mesaj_kaydet(istek.user_id, "assistant", sonuc["asistan_mesaji"])
     return sonuc
+
+
+@router.get("/chat/history/{user_id}")
+def chat_history(user_id: str, db: sqlite3.Connection = Depends(get_db)):
+    """Kullanıcının sohbet geçmişini döndürür."""
+    repo = ItemRepository(db)
+    return repo.sohbet_gecmisini_getir(user_id)
 
 @router.post("/outfit/suggest")
 def kombin_oner(istek: KombinOnerIstek, db: sqlite3.Connection = Depends(get_db)):
