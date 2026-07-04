@@ -12,7 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.core.database import init_db
-from app.api.routers import posts, feed, follows, users, auth
+from app.api.routers import posts, feed, follows, users, auth, wardrobe
 from app.services.gemini import router as captions_router
 
 
@@ -45,6 +45,7 @@ app.include_router(posts.router, prefix="/posts", tags=["Posts"])
 app.include_router(feed.router, tags=["Feed"])
 app.include_router(follows.router, tags=["Follows"])
 app.include_router(users.router, prefix="/users", tags=["Users"])
+app.include_router(wardrobe.router, prefix="/wardrobe", tags=["Wardrobe"])
 app.include_router(captions_router, prefix="/captions", tags=["Captions"])
 
 

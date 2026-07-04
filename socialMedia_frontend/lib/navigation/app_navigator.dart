@@ -13,10 +13,10 @@ class AppNavigator extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final currentIndex = ref.watch(bottomNavIndexProvider);
 
-    final screens = const [
-      FeedScreen(),
-      CreatePostScreen(),
-      ProfileScreen(),
+    final screens = [
+      const FeedScreen(),
+      const CreatePostScreen(),
+      const ProfileScreen(),
     ];
 
     return Scaffold(
@@ -24,9 +24,10 @@ class AppNavigator extends ConsumerWidget {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: currentIndex,
         onTap: (index) => ref.read(bottomNavIndexProvider.notifier).state = index,
+        type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Feed'),
-          BottomNavigationBarItem(icon: Icon(Icons.add_box), label: 'Oluştur'),
+          BottomNavigationBarItem(icon: Icon(Icons.add_box), label: 'Gönderi'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil'),
         ],
       ),

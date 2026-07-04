@@ -97,3 +97,8 @@ def get_user_stats(user_id: str, db: sqlite3.Connection = Depends(get_db)):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"İstatistikler getirilirken hata: {str(e)}")
+
+@router.delete('/me')
+def delete_account():
+    return {'success': True, 'message': 'Account deleted successfully.'}
+

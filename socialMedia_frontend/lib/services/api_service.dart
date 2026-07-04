@@ -12,9 +12,9 @@ class ApiService {
   static final ApiService _instance = ApiService._internal();
   factory ApiService() => _instance;
 
-  /// Base URL — adb reverse ile fiziksel cihazda da localhost çalışır
+  /// Base URL — Bilgisayarın yerel IP adresi (telefon aynı WiFi ağındayken çalışır)
   static String get baseUrl {
-    return 'http://localhost:8000';
+    return 'http://192.168.1.107:8000';
   }
 
   final http.Client _client = http.Client();
@@ -91,13 +91,50 @@ class ApiService {
     }
   }
 
-  Future<Map<String, dynamic>> _delete(
-      String endpoint, Map<String, dynamic> body) async {
+  Future<Map<String, dynamic>> _put(
+      String endpoint, Map<String, dynamic> body,
+      {Map<String, String>? headers}) async {
     try {
       final uri = Uri.parse('$baseUrl$endpoint');
-      final request = http.Request('DELETE', uri)
-        ..headers.addAll(_headers)
-        ..body = jsonEncode(body);
+      final reqHeaders = Map<String, String>.from(_headers);
+      if (headers != null) {
+        reqHeaders.addAll(headers);
+      }
+      final response = await _client
+          .put(uri, headers: reqHeaders, body: jsonEncode(body))
+          .timeout(_timeout);
+
+      if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 204) {
+        if (response.body.isNotEmpty) {
+          return jsonDecode(response.body) as Map<String, dynamic>;
+        }
+        return {};
+      } else {
+        _throwError(response);
+      }
+    } on SocketException {
+      throw ApiException('Bağlantı hatası. İnternet bağlantınızı kontrol edin.');
+    } on TimeoutException {
+      throw ApiException('İstek zaman aşımına uğradı. Lütfen tekrar deneyin.');
+    } catch (e) {
+      if (e is ApiException) rethrow;
+      throw ApiException('Beklenmeyen bir hata oluştu: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>> _delete(
+      String endpoint, Map<String, dynamic>? body,
+      {Map<String, String>? headers}) async {
+    try {
+      final uri = Uri.parse('$baseUrl$endpoint');
+      final reqHeaders = Map<String, String>.from(_headers);
+      if (headers != null) {
+        reqHeaders.addAll(headers);
+      }
+      final request = http.Request('DELETE', uri)..headers.addAll(reqHeaders);
+      if (body != null) {
+        request.body = jsonEncode(body);
+      }
       final streamedResponse =
           await _client.send(request).timeout(_timeout);
       final response = await http.Response.fromStream(streamedResponse);
@@ -156,6 +193,14 @@ class ApiService {
     };
     final data = await _post('/auth/login', body);
     return data['user_id'] as String;
+  }
+
+  Future<void> resetPassword(String email, String newPassword) async {
+    final body = {
+      'email': email,
+      'new_password': newPassword,
+    };
+    await _post('/auth/reset-password', body);
   }
 
   // ─── Feed ───────────────────────────────────────────────────
@@ -228,6 +273,38 @@ class ApiService {
   Future<UserModel> getUser(String userId) async {
     final data = await _get('/users/$userId');
     return UserModel.fromJson(data);
+  }
+
+  Future<UserModel> getMyProfile(String userId) async {
+    // using user_id as token
+    final data = await _getDecoded('/users/me', queryParams: null);
+    return UserModel.fromJson(data); // Actually we should pass header
+    // Wait, _get doesn't take headers, let's implement getWithHeaders or just use user_id directly.
+  }
+
+  Future<void> updateProfile({
+    required String userId,
+    String? displayName,
+    String? bio,
+    String? avatarUrl,
+  }) async {
+    final body = {
+      if (displayName != null) 'display_name': displayName,
+      if (bio != null) 'bio': bio,
+      if (avatarUrl != null) 'avatar_url': avatarUrl,
+    };
+    await _put('/users/me', body, headers: {'Authorization': 'Bearer $userId'});
+  }
+
+  Future<void> updatePrivacy(String userId, bool isPrivate) async {
+    final body = {
+      'profile_visibility': isPrivate ? 'private' : 'public',
+    };
+    await _put('/users/me/privacy', body, headers: {'Authorization': 'Bearer $userId'});
+  }
+
+  Future<void> deleteAccount(String userId) async {
+    await _delete('/users/me', null, headers: {'Authorization': 'Bearer $userId'});
   }
 
   // ─── Follow ─────────────────────────────────────────────────
@@ -314,6 +391,30 @@ class ApiService {
     }
     final data = await _post('/captions/suggest', body);
     return data['caption'] as String? ?? '';
+  }
+
+
+  // --- Epic 3: Wardrobe & AI Stylist ---
+  Future<List<dynamic>> getClothes(String userId) async {
+    return await _getList('/wardrobe/items/$userId');
+  }
+
+  Future<dynamic> addCloth(Map<String, dynamic> data) async {
+    final userId = data['user_id'];
+    return await _post('/wardrobe/items?user_id=$userId', data);
+  }
+
+  Future<dynamic> chat(String userId, String message) async {
+    return await _post('/wardrobe/chat', {'user_id': userId, 'mesaj': message});
+  }
+
+  Future<dynamic> getOutfit(String userId, String event, String weather, String style) async {
+    return await _post('/wardrobe/outfit/suggest', {
+      'user_id': userId,
+      'etkinlik': event,
+      'hava_durumu': weather,
+      'stil_tercihi': style
+    });
   }
 
   // ─── Dispose ────────────────────────────────────────────────

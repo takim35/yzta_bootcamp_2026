@@ -9,6 +9,7 @@ from typing import Optional
 class Settings(BaseSettings):
     DATABASE_PATH: str = "./dijital_gardrop.db"
     GEMINI_API_KEY: Optional[str] = None
+    GEMINI_MODEL: str = "gemini-2.5-flash"
     FIREBASE_BUCKET: Optional[str] = None
     CORS_ORIGINS: str = "http://localhost:3000,http://localhost:8081"
 

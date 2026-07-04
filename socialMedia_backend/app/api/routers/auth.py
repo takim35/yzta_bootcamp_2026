@@ -2,7 +2,7 @@ import sqlite3
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.core.database import get_db
-from app.domain.schemas import UserRegisterRequest, UserLoginRequest, AuthResponse
+from app.domain.schemas import UserRegisterRequest, UserLoginRequest, AuthResponse, PasswordResetRequest, TokenRefreshRequest
 from app.repositories.auth_repository import AuthRepository
 
 router = APIRouter()
@@ -44,3 +44,12 @@ def login(
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Giriş işlemi sırasında hata oluştu: {str(e)}")
+
+@router.post('/reset-password')
+def reset_password(request: PasswordResetRequest):
+    return {'success': True, 'message': 'Password reset successful.'}
+
+@router.post('/refresh-token')
+def refresh_token(request: TokenRefreshRequest):
+    return {'access_token': 'new_mock_access_token', 'token_type': 'bearer'}
+

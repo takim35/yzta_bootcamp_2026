@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import '../core/theme/app_theme.dart';
 import '../core/localization/locale_provider.dart';
 import '../navigation/app_navigator.dart';
+import 'wardrobe/presentation/screens/wardrobe_screen.dart';
+import 'ai_stylist/presentation/screens/ai_stylist_screen.dart';
+import 'profile/presentation/screens/settings_screen.dart';
 
 class MainHomeScreen extends ConsumerWidget {
   const MainHomeScreen({super.key});
@@ -91,7 +94,7 @@ class MainHomeScreen extends ConsumerWidget {
                           ),
                         ],
                       ),
-                      // Notification bell
+                      // Settings button
                       Container(
                         width: 44,
                         height: 44,
@@ -103,10 +106,20 @@ class MainHomeScreen extends ConsumerWidget {
                             width: 1,
                           ),
                         ),
-                        child: const Icon(
-                          Icons.notifications_none_rounded,
-                          color: AppTheme.textSecondary,
-                          size: 22,
+                        child: IconButton(
+                          icon: const Icon(
+                            Icons.settings_rounded,
+                            color: AppTheme.textSecondary,
+                            size: 22,
+                          ),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const SettingsScreen(),
+                              ),
+                            );
+                          },
                         ),
                       ),
                     ],
@@ -127,10 +140,13 @@ class MainHomeScreen extends ConsumerWidget {
                           icon: Icons.checkroom_rounded,
                           title: s.wardrobe,
                           subtitle: s.wardrobeSub,
-                          color: const Color(0xFF7C3AED),
-                          onTap: () {},
-                          comingSoon: true,
-                          comingSoonLabel: s.comingSoon,
+                          color: AppTheme.accentPink,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => const WardrobeScreen()),
+                            );
+                          },
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -140,9 +156,12 @@ class MainHomeScreen extends ConsumerWidget {
                           title: s.aiStylist,
                           subtitle: s.aiStylistSub,
                           color: const Color(0xFF0EA5E9),
-                          onTap: () {},
-                          comingSoon: true,
-                          comingSoonLabel: s.comingSoon,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => const AiStylistScreen()),
+                            );
+                          },
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -326,7 +345,7 @@ class _SmallCard extends StatelessWidget {
     required this.color,
     required this.onTap,
     this.comingSoon = false,
-    required this.comingSoonLabel,
+    this.comingSoonLabel = '',
   });
 
   @override

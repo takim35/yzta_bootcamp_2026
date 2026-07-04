@@ -5,6 +5,9 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/localization/locale_provider.dart';
 import '../../../../core/localization/app_strings.dart';
 import '../../../auth/presentation/screens/login_screen.dart';
+import '../../../../services/analytics_service.dart';
+
+import 'package:permission_handler/permission_handler.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
@@ -59,6 +62,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
   void initState() {
     super.initState();
 
+    // Log first step viewed
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      AnalyticsService().logOnboardingStep(0, 'Wardrobe Intro');
+    });
+
     _floatController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 2500),
@@ -94,20 +102,77 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
 
   void _onPageChanged(int index) {
     setState(() => _currentPage = index);
+    AnalyticsService().logOnboardingStep(index, 'Step $index');
     _fadeController.reset();
     _fadeController.forward();
   }
 
+  Future<void> _showPermissionPrompt() async {
+    final s = ref.read(stringsProvider);
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppTheme.cardDark,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          s.isTr ? 'İzinler Gerekli' : 'Permissions Required',
+          style: const TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.bold),
+        ),
+        content: Text(
+          s.isTr 
+              ? 'Dijital Gardrop deneyimini tam anlamıyla yaşayabilmen için kamerana ve fotoğraf galerine erişim iznine ihtiyacımız var. (Kıyafetlerini yükleyebilmen için)' 
+              : 'To fully experience Digital Wardrobe, we need access to your camera and photo gallery. (So you can upload your clothes)',
+          style: const TextStyle(color: AppTheme.textSecondary, height: 1.4),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              AnalyticsService().logEvent('permission_prompt_skipped');
+              _finishOnboarding();
+            },
+            child: Text(s.isTr ? 'Atla' : 'Skip', style: const TextStyle(color: AppTheme.textMuted)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.accentViolet,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            onPressed: () async {
+              Navigator.pop(ctx);
+              AnalyticsService().logEvent('permission_prompt_accepted');
+              // Request permissions
+              await [
+                Permission.camera,
+                Permission.photos,
+                // On Android 13+ we need photos, but on older we need storage
+                Permission.storage,
+              ].request();
+              _finishOnboarding();
+            },
+            child: Text(s.isTr ? 'İzin Ver' : 'Allow', style: const TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _finishOnboarding() {
+    AnalyticsService().logOnboardingCompleted();
+    Navigator.of(context).pushReplacement(
+      PageRouteBuilder(
+        pageBuilder: (_, __, ___) => const LoginScreen(),
+        transitionsBuilder: (_, anim, __, child) =>
+            FadeTransition(opacity: anim, child: child),
+        transitionDuration: const Duration(milliseconds: 500),
+      ),
+    );
+  }
+
   void _onNext(List<Map<String, dynamic>> pages) {
     if (_currentPage == pages.length - 1) {
-      Navigator.of(context).pushReplacement(
-        PageRouteBuilder(
-          pageBuilder: (_, __, ___) => const LoginScreen(),
-          transitionsBuilder: (_, anim, __, child) =>
-              FadeTransition(opacity: anim, child: child),
-          transitionDuration: const Duration(milliseconds: 500),
-        ),
-      );
+      _showPermissionPrompt();
     } else {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 400),
@@ -117,14 +182,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
   }
 
   void _onSkip() {
-    Navigator.of(context).pushReplacement(
-      PageRouteBuilder(
-        pageBuilder: (_, __, ___) => const LoginScreen(),
-        transitionsBuilder: (_, anim, __, child) =>
-            FadeTransition(opacity: anim, child: child),
-        transitionDuration: const Duration(milliseconds: 400),
-      ),
-    );
+    AnalyticsService().logOnboardingSkipped(_currentPage);
+    _showPermissionPrompt();
   }
 
   @override

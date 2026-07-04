@@ -18,10 +18,10 @@ class AppStrings {
       ? 'Tüm kıyafetlerini cebinde taşı, ne giyeceğini düşünme derdinden kurtul.'
       : 'Carry your entire closet in your pocket. Never wonder what to wear again.';
 
-  String get onbARTitle => isTr ? 'AR Ayna\nDeneme Kabini' : 'AR Mirror\nTry-On';
+  String get onbARTitle => isTr ? 'Sanal\nDeneme Kabini' : 'Virtual\nTry-On';
   String get onbARSub => isTr
-      ? 'Artırılmış gerçeklik aynamızla kıyafetleri giymeden önce sanal olarak dene.'
-      : 'Try outfits virtually with our augmented reality mirror before you wear them.';
+      ? 'Sanal deneme kabinimizle kıyafetleri giymeden önce üstünde gör.'
+      : 'Try outfits virtually with our virtual try-on mirror before you wear them.';
 
   String get onbAITitle => isTr ? 'Yapay Zeka\nStilist Asistanı' : 'AI Stylist\nAssistant';
   String get onbAISub => isTr
@@ -66,7 +66,7 @@ class AppStrings {
   String get wardrobeSub => isTr ? 'Kıyafetlerini yönet' : 'Manage your clothes';
   String get aiStylist => isTr ? 'AI Stilist' : 'AI Stylist';
   String get aiStylistSub => isTr ? 'Yapay zeka önerileri' : 'AI powered looks';
-  String get arMirror => isTr ? 'AR Ayna' : 'AR Mirror';
+  String get arMirror => isTr ? 'Sanal Deneme' : 'Virtual Try On';
   String get arMirrorSub => isTr ? 'Sanal deneme kabini' : 'Virtual fitting room';
   String get social => isTr ? 'Sosyal' : 'Social';
   String get socialSub => isTr ? 'Toplulukla paylaş' : 'Share with community';
@@ -128,4 +128,11 @@ class AppStrings {
   String get viewAllComments => isTr ? ' yorumun tümünü gör' : ' view all comments';
   String get save => isTr ? 'Kaydet' : 'Save';
   String get unsave => isTr ? 'Kaydedilenlerden Çıkar' : 'Unsave';
+
+  // ── Wardrobe & AI Stylist ────────────────────────────────────
+  String get digitalWardrobe => isTr ? 'Dijital Gardırop' : 'Digital Wardrobe';
+  String get noClothesFound => isTr ? 'Henüz kıyafet yok. Biraz ekle!' : 'No clothes found. Add some!';
+  String get askForSuggestions => isTr ? 'Kombin önerisi iste...' : 'Ask for outfit suggestions...';
+  String get cannotGenerateResponse => isTr ? 'Yanıt oluşturulamadı.' : 'I could not generate a response.';
 }
+

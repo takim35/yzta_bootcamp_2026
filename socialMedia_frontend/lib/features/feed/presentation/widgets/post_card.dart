@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -133,40 +134,66 @@ class PostCard extends ConsumerWidget {
   Widget _buildImage() {
     return AspectRatio(
       aspectRatio: 4 / 5,
-      child: CachedNetworkImage(
-        imageUrl: post.imageUrl,
-        fit: BoxFit.cover,
-        placeholder: (context, url) => Container(
-          color: AppTheme.surfaceDark,
-          child: const Center(
-            child: CircularProgressIndicator(
-              color: AppTheme.accentViolet,
-              strokeWidth: 2,
-            ),
-          ),
-        ),
-        errorWidget: (context, url, error) => Container(
-          color: AppTheme.surfaceDark,
-          child: const Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.broken_image_rounded,
-                color: AppTheme.textMuted,
-                size: 48,
-              ),
-              SizedBox(height: AppTheme.spacingS),
-              Text(
-                'Görsel yüklenemedi',
-                style: TextStyle(
-                  color: AppTheme.textMuted,
-                  fontSize: 12,
+      child: post.imageUrl.startsWith('http')
+          ? CachedNetworkImage(
+              imageUrl: post.imageUrl,
+              fit: BoxFit.cover,
+              placeholder: (context, url) => Container(
+                color: AppTheme.surfaceDark,
+                child: const Center(
+                  child: CircularProgressIndicator(
+                    color: AppTheme.accentViolet,
+                    strokeWidth: 2,
+                  ),
                 ),
               ),
-            ],
-          ),
-        ),
-      ),
+              errorWidget: (context, url, error) => Container(
+                color: AppTheme.surfaceDark,
+                child: const Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.broken_image_rounded,
+                      color: AppTheme.textMuted,
+                      size: 48,
+                    ),
+                    SizedBox(height: AppTheme.spacingS),
+                    Text(
+                      'Görsel yüklenemedi',
+                      style: TextStyle(
+                        color: AppTheme.textMuted,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          : Image.file(
+              File(post.imageUrl),
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => Container(
+                color: AppTheme.surfaceDark,
+                child: const Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.broken_image_rounded,
+                      color: AppTheme.textMuted,
+                      size: 48,
+                    ),
+                    SizedBox(height: AppTheme.spacingS),
+                    Text(
+                      'Görsel bulunamadı',
+                      style: TextStyle(
+                        color: AppTheme.textMuted,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
     );
   }
 

@@ -167,9 +167,8 @@ class CreatePostProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Gerçek uygulamada önce görseli upload edip URL alacaksınız
-      // Şimdilik mock URL kullanıyoruz
-      final imageUrl = 'https://picsum.photos/seed/${DateTime.now().millisecondsSinceEpoch}/800/1000';
+      // Use the actual selected image path as the image URL to send to backend
+      final imageUrl = selectedImage!.path;
 
       final postId = await _api.createPost(
         userId: userId,

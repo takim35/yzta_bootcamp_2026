@@ -28,12 +28,12 @@ def get_feed(
     db: sqlite3.Connection = Depends(get_db),
 ):
     """
-    Takip edilen kullanıcıların VE kendi postlarını cursor-based pagination ile döndürür.
+    Takip edilen kullanıcıların postlarını cursor-based pagination ile döndürür.
 
     Visibility kuralları SQL seviyesinde:
     - public → herkese açık
     - followers → sadece takipçilere (follows tablosunda kayıt VARSA)
-    - private → sadece post sahibi görür
+    - private → feed'de GÖSTERİLMEZ
     """
     try:
         # Kullanıcı var mı?
@@ -43,7 +43,7 @@ def get_feed(
 
         # Cursor parse
         cursor_conditions = ""
-        params: list = [user_id, user_id, user_id]
+        params: list = [user_id, user_id]
 
         if cursor:
             try:
@@ -54,20 +54,22 @@ def get_feed(
                 raise HTTPException(status_code=400, detail="Geçersiz cursor formatı. Beklenen: created_at|post_id")
 
         # limit + 1 ile sonraki sayfa var mı kontrol et
-        # Kendi postlarını + takip ettiklerinin postlarını getir
         query = f"""
             SELECT p.*, u.username, u.display_name, u.avatar_url
             FROM posts p
             JOIN users u ON p.user_id = u.user_id
-            WHERE (
-              p.user_id = ?
-              OR (
-                EXISTS (SELECT 1 FROM follows WHERE follower_id = ? AND following_id = p.user_id)
-                AND p.visibility IN ('public', 'followers')
+            JOIN follows f ON f.following_id = p.user_id AND f.follower_id = ?
+            WHERE p.visibility IN ('public', 'followers')
+              AND (
+                p.visibility = 'public'
+                OR (
+                  p.visibility = 'followers'
+                  AND EXISTS (
+                    SELECT 1 FROM follows
+                    WHERE follower_id = ? AND following_id = p.user_id
+                  )
+                )
               )
-            )
-            AND p.visibility != 'private'
-            OR (p.user_id = ? AND p.visibility = 'private')
               {cursor_conditions}
             ORDER BY p.created_at DESC, p.post_id DESC
             LIMIT ?
@@ -90,20 +92,6 @@ def get_feed(
                 (row["post_id"], user_id),
             ).fetchone()
             is_liked = like_check is not None
-
-            # is_saved kontrolü
-            save_check = db.execute(
-                "SELECT 1 FROM saves WHERE post_id = ? AND user_id = ?",
-                (row["post_id"], user_id),
-            ).fetchone()
-            is_saved = save_check is not None
-
-            # comments_count
-            comment_count_row = db.execute(
-                "SELECT COUNT(*) as c FROM comments WHERE post_id = ?",
-                (row["post_id"],),
-            ).fetchone()
-            comments_count = comment_count_row["c"] if comment_count_row else 0
 
             # Outfit items
             outfit_rows = db.execute(
@@ -131,9 +119,7 @@ def get_feed(
                     visibility=row["visibility"],
                     ai_training_consent=bool(row["ai_training_consent"]),
                     likes_count=row["likes_count"],
-                    comments_count=comments_count,
                     is_liked=is_liked,
-                    is_saved=is_saved,
                     outfit_items=outfit_items,
                     created_at=row["created_at"],
                 )

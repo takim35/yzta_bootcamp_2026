@@ -190,6 +190,38 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                         children: [
                           const SizedBox(height: 16),
 
+                          // Language Selector
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              // Language Toggle
+                              GestureDetector(
+                                onTap: () {
+                                  ref.read(localeProvider.notifier).toggleLocale();
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.surfaceDark,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(color: AppTheme.dividerColor),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      const Icon(Icons.language_rounded, color: AppTheme.textSecondary, size: 16),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        ref.watch(localeProvider) == AppLocale.tr ? 'Türkçe' : 'English',
+                                        style: const TextStyle(color: AppTheme.textPrimary, fontSize: 13, fontWeight: FontWeight.w500),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 32),
+
                           // Logo
                           Center(
                             child: Container(

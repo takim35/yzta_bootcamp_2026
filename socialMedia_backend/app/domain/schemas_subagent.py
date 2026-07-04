@@ -10,42 +10,6 @@ from typing import Literal, Optional
 # Request Modelleri
 # ============================================================
 
-class UserRegisterRequest(BaseModel):
-    """Kayıt isteği."""
-    email: str
-    password: str
-
-
-class UserLoginRequest(BaseModel):
-    """Giriş isteği."""
-    email: str
-    password: str
-
-
-class AuthResponse(BaseModel):
-    """Kayıt veya Giriş başarılı olduğunda dönülecek yanıt."""
-    user_id: str
-    message: str
-
-
-class PasswordResetRequest(BaseModel):
-    """Şifre sıfırlama isteği."""
-    email: str
-    new_password: str
-
-
-class ProfileUpdateRequest(BaseModel):
-    """Profil güncelleme isteği."""
-    display_name: str | None = None
-    bio: str | None = None
-    avatar_url: str | None = None
-
-
-class PrivacySettingsRequest(BaseModel):
-    """Gizlilik ayarları güncelleme isteği."""
-    profile_visibility: Literal["public", "private"] = "public"
-
-
 class PostCreate(BaseModel):
     """Yeni post oluşturma isteği."""
     user_id: str
@@ -67,22 +31,15 @@ class LikeRequest(BaseModel):
     user_id: str
 
 
-class SaveRequest(BaseModel):
-    """Kaydetme isteği."""
-    user_id: str
-
-
-class CommentRequest(BaseModel):
-    """Yorum yapma isteği."""
-    user_id: str
-    content: str
-
-
 class CaptionRequest(BaseModel):
     """AI caption önerisi isteği."""
     outfit_items: list[dict] = Field(default_factory=list)
     style_hint: str = ""
 
+
+class TokenRefreshRequest(BaseModel):
+    """Token yenileme isteği."""
+    refresh_token: str
 
 # ============================================================
 # Response Modelleri
@@ -91,7 +48,6 @@ class CaptionRequest(BaseModel):
 class UserResponse(BaseModel):
     """Kullanıcı profil bilgisi."""
     user_id: str
-    email: str
     username: str
     display_name: str
     avatar_url: str | None = None
@@ -100,7 +56,6 @@ class UserResponse(BaseModel):
     following_count: int = 0
     created_at: str
     is_following: bool = False  # viewer bu kullanıcıyı takip ediyor mu?
-    profile_visibility: str = "public"
 
 
 class OutfitItemResponse(BaseModel):
@@ -108,17 +63,6 @@ class OutfitItemResponse(BaseModel):
     item_id: str
     category: str
     image_url: str | None = None
-
-
-class CommentResponse(BaseModel):
-    """Yorum yanıtı."""
-    comment_id: str
-    post_id: str
-    user_id: str
-    username: str
-    avatar_url: str | None = None
-    content: str
-    created_at: str
 
 
 class PostResponse(BaseModel):
@@ -133,9 +77,7 @@ class PostResponse(BaseModel):
     visibility: str = "public"
     ai_training_consent: bool = False
     likes_count: int = 0
-    comments_count: int = 0
     is_liked: bool = False  # viewer beğenmiş mi?
-    is_saved: bool = False  # viewer kaydetmiş mi?
     outfit_items: list[OutfitItemResponse] = Field(default_factory=list)
     created_at: str
 
@@ -159,11 +101,3 @@ class MessageResponse(BaseModel):
     success: bool
     message: str
     data: dict | None = None
-
-class PasswordResetRequest(BaseModel):
-    email: str
-    new_password: str
-
-class TokenRefreshRequest(BaseModel):
-    refresh_token: str
-

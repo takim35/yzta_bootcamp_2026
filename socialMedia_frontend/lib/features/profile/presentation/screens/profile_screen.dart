@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import '../../../../features/auth/presentation/providers/auth_provider.dart';
@@ -345,14 +346,65 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       itemCount: posts.length,
       itemBuilder: (context, index) {
         final post = posts[index];
-        return Container(
-          color: AppTheme.surfaceDark,
-          child: Image.network(
-            post.imageUrl,
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) => const Center(
-              child: Icon(Icons.error_outline, color: AppTheme.textSecondary),
-            ),
+        final provider = ref.read(profileProvider);
+        return GestureDetector(
+          onTap: () {
+            showDialog(
+              context: context,
+              builder: (ctx) => Dialog(
+                backgroundColor: Colors.transparent,
+                insetPadding: const EdgeInsets.all(16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: post.imageUrl.startsWith('http') 
+                        ? Image.network(
+                            post.imageUrl,
+                            fit: BoxFit.contain,
+                          )
+                        : Image.file(
+                            File(post.imageUrl),
+                            fit: BoxFit.contain,
+                          ),
+                    ),
+                    if (provider.isOwnProfile) ...[
+                      const SizedBox(height: 16),
+                      ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(backgroundColor: AppTheme.errorColor),
+                        icon: const Icon(Icons.delete, color: Colors.white),
+                        label: Text(s.isTr ? 'Sil' : 'Delete', style: const TextStyle(color: Colors.white)),
+                        onPressed: () {
+                          Navigator.pop(ctx);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(s.isTr ? 'Gönderi silindi.' : 'Post deleted.')),
+                          );
+                        },
+                      ),
+                    ]
+                  ],
+                ),
+              ),
+            );
+          },
+          child: Container(
+            color: AppTheme.surfaceDark,
+            child: post.imageUrl.startsWith('http')
+              ? Image.network(
+                  post.imageUrl,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => const Center(
+                    child: Icon(Icons.error_outline, color: AppTheme.textSecondary),
+                  ),
+                )
+              : Image.file(
+                  File(post.imageUrl),
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => const Center(
+                    child: Icon(Icons.error_outline, color: AppTheme.textSecondary),
+                  ),
+                ),
           ),
         );
       },

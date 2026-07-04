@@ -55,3 +55,13 @@ class AuthRepository:
             raise HTTPException(status_code=401, detail="Şifre hatalı, lütfen tekrar deneyin.")
 
         return user["user_id"]
+
+    def reset_password(self, email: str, new_password: str) -> None:
+        """Kullanıcının şifresini sıfırlar (mocked)."""
+        user = self.db.execute("SELECT user_id FROM users WHERE email = ?", (email,)).fetchone()
+        if not user:
+            raise HTTPException(status_code=404, detail="Bu e-posta adresi ile kayıtlı kullanıcı bulunamadı.")
+        
+        new_hash = hash_password(new_password)
+        self.db.execute("UPDATE users SET password_hash = ? WHERE email = ?", (new_hash, email))
+        self.db.commit()

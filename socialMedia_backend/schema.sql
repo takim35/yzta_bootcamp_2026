@@ -19,6 +19,8 @@ CREATE TABLE IF NOT EXISTS users (
     bio           TEXT DEFAULT NULL,
     followers_count INTEGER NOT NULL DEFAULT 0,
     following_count INTEGER NOT NULL DEFAULT 0,
+    profile_visibility TEXT NOT NULL DEFAULT 'public'
+        CHECK (profile_visibility IN ('public', 'private')),
     created_at    TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
 );
 
