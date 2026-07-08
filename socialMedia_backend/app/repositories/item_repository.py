@@ -104,6 +104,11 @@ class ItemRepository:
         self.db.commit()
         return cur.rowcount > 0
 
+    def kiyafet_sil(self, kiyafet_id: int) -> bool:
+        cur = self.db.execute("DELETE FROM kiyafetler WHERE id = ?", (kiyafet_id,))
+        self.db.commit()
+        return cur.rowcount > 0
+
     # ---------- Sohbet ve Kombin ----------
     def mesaj_kaydet(self, user_id: str, rol: str, mesaj: str):
         self.db.execute(

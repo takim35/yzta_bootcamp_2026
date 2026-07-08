@@ -14,7 +14,10 @@ class ApiService {
 
   /// Base URL — Bilgisayarın yerel IP adresi (telefon aynı WiFi ağındayken çalışır)
   static String get baseUrl {
-    return 'http://172.20.10.13:8000';
+    return const String.fromEnvironment(
+      'API_BASE_URL',
+      defaultValue: 'http://127.0.0.1:8000',
+    );
   }
 
   final http.Client _client = http.Client();
@@ -407,6 +410,14 @@ class ApiService {
 
   Future<dynamic> addCloth(String userId, Map<String, dynamic> itemData) async {
     return await _post('/wardrobe/items?user_id=$userId', itemData);
+  }
+
+  Future<dynamic> updateCloth(int itemId, Map<String, dynamic> itemData) async {
+    return await _put('/wardrobe/items/$itemId', itemData);
+  }
+
+  Future<dynamic> deleteCloth(int itemId) async {
+    return await _delete('/wardrobe/items/$itemId', null);
   }
 
   Future<dynamic> chat(String userId, String message) async {

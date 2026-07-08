@@ -51,6 +51,23 @@ def kiyafetleri_listele(user_id: str, db: sqlite3.Connection = Depends(get_db)):
     repo = ItemRepository(db)
     return repo.kiyafetleri_getir(user_id)
 
+@router.put("/items/{item_id}")
+def kiyafet_guncelle(item_id: int, istek: KiyafetEkleIstek, db: sqlite3.Connection = Depends(get_db)):
+    repo = ItemRepository(db)
+    veri = istek.model_dump(exclude_unset=True)
+    basarili = repo.kiyafet_guncelle(kiyafet_id=item_id, **veri)
+    if not basarili:
+        raise HTTPException(status_code=404, detail="Kıyafet bulunamadı veya güncellenemedi.")
+    return {"mesaj": "Kıyafet başarıyla güncellendi."}
+
+@router.delete("/items/{item_id}")
+def kiyafet_sil(item_id: int, db: sqlite3.Connection = Depends(get_db)):
+    repo = ItemRepository(db)
+    basarili = repo.kiyafet_sil(kiyafet_id=item_id)
+    if not basarili:
+        raise HTTPException(status_code=404, detail="Kıyafet bulunamadı.")
+    return {"mesaj": "Kıyafet başarıyla silindi."}
+
 @router.post("/chat")
 def chat(istek: ChatIstek, db: sqlite3.Connection = Depends(get_db)):
     repo = ItemRepository(db)

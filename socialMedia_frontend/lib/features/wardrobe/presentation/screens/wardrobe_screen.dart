@@ -5,6 +5,7 @@ import '../../../../features/auth/presentation/providers/auth_provider.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/localization/locale_provider.dart';
 import 'add_item_screen.dart';
+import 'edit_item_screen.dart';
 
 class WardrobeScreen extends ConsumerStatefulWidget {
   const WardrobeScreen({super.key});
@@ -127,50 +128,62 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> {
               final tur = cloth['tur']?.toString() ?? cloth['category']?.toString() ?? 'Kıyafet';
               final renk = cloth['renk']?.toString() ?? '';
 
-              return Container(
-                decoration: BoxDecoration(
-                  color: AppTheme.cardDark,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppTheme.dividerColor, width: 0.5),
-                ),
-                clipBehavior: Clip.antiAlias,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Expanded(
-                      child: imageUrl.isNotEmpty
-                          ? Image.network(
-                              imageUrl,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => const _EmptyClothIcon(),
-                            )
-                          : const _EmptyClothIcon(),
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => EditItemScreen(initialItem: cloth),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            tur,
-                            style: const TextStyle(
-                              color: AppTheme.textPrimary,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
-                            ),
-                          ),
-                          if (renk.isNotEmpty)
+                  ).then((refreshed) {
+                    if (refreshed == true) _loadClothes();
+                  });
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: AppTheme.cardDark,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: AppTheme.dividerColor, width: 0.5),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(
+                        child: imageUrl.isNotEmpty
+                            ? Image.network(
+                                imageUrl,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) => const _EmptyClothIcon(),
+                              )
+                            : const _EmptyClothIcon(),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
                             Text(
-                              renk,
+                              tur,
                               style: const TextStyle(
-                                color: AppTheme.textMuted,
-                                fontSize: 12,
+                                color: AppTheme.textPrimary,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
                               ),
                             ),
-                        ],
+                            if (renk.isNotEmpty)
+                              Text(
+                                renk,
+                                style: const TextStyle(
+                                  color: AppTheme.textMuted,
+                                  fontSize: 12,
+                                ),
+                              ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               );
             },

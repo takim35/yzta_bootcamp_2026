@@ -380,7 +380,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           final userId = ref.read(authProvider).currentUserId;
                           if (userId == null) return;
                           try {
-                            await provider.deletePost(post.id, userId);
+                            await provider.deletePost(post.postId, userId);
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(

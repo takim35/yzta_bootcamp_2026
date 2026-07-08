@@ -120,8 +120,8 @@ class ProfileProvider extends ChangeNotifier {
   Future<void> deletePost(String postId, String userId) async {
     await _api.deletePost(postId: postId, userId: userId);
     // Yerel listeden hemen kaldır (UI anında güncellenir)
-    _userPosts.removeWhere((p) => p.id == postId);
-    _savedPosts.removeWhere((p) => p.id == postId);
+    _userPosts.removeWhere((p) => p.postId == postId);
+    _savedPosts.removeWhere((p) => p.postId == postId);
     notifyListeners();
   }
 
