@@ -179,24 +179,36 @@ class ApiService {
     throw ApiException(message, statusCode: response.statusCode);
   }
 
-  // ─── Auth ───────────────────────────────────────────────────
-  Future<String> register(String email, String password) async {
+  // ─── Auth ──────────────────────────────────────────────────────────
+  Future<Map<String, dynamic>> register(String email, String password) async {
     final body = {
       'email': email,
       'password': password,
     };
     final data = await _post('/auth/register', body);
-    return data['user_id'] as String;
+    return data;
   }
 
-  Future<String> login(String email, String password) async {
+  Future<Map<String, dynamic>> login(String email, String password) async {
     final body = {
       'email': email,
       'password': password,
     };
     final data = await _post('/auth/login', body);
-    return data['user_id'] as String;
+    return data;
   }
+
+  Future<Map<String, dynamic>> verifyEmail(String email, String code) => 
+      _post('/auth/verify-email', {'email': email, 'code': code});
+      
+  Future<Map<String, dynamic>> setup2FA(String userId) => 
+      _get('/auth/2fa/setup/$userId');
+      
+  Future<Map<String, dynamic>> verify2FASetup(String userId, String code) => 
+      _post('/auth/2fa/verify', {'user_id': userId, 'code': code});
+      
+  Future<Map<String, dynamic>> login2FA(String userId, String code) => 
+      _post('/auth/2fa/login', {'user_id': userId, 'code': code});
 
   Future<void> resetPassword(String email, String newPassword) async {
     final body = {

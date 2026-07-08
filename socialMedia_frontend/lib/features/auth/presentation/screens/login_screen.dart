@@ -4,7 +4,9 @@ import 'dart:math' as math;
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/localization/locale_provider.dart';
 import '../../../../core/localization/app_strings.dart';
-import '../../../main_home_screen.dart';
+import 'two_factor_verify_screen.dart';
+import 'email_verification_screen.dart';
+import '../../../../features/main_home_screen.dart';
 import '../providers/auth_provider.dart';
 import 'register_screen.dart';
 
@@ -23,6 +25,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
   bool _isPasswordVisible = false;
   bool _isLoading = false;
   String? _errorMessage;
+  bool _isLogin = true;
 
   late AnimationController _bgController;
   late AnimationController _entryController;
@@ -72,30 +75,38 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     return validDomains.any((d) => email.toLowerCase().endsWith(d));
   }
 
-  Future<void> _onLoginTap() async {
+  Future<void> _submit() async {
+    FocusScope.of(context).unfocus();
     setState(() => _errorMessage = null);
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
     try {
-      await ref.read(authProvider).login(
+      final result = await ref.read(authProvider).login(
             _emailController.text.trim(),
             _passwordController.text,
           );
+          
       if (mounted) {
-        Navigator.of(context).pushReplacement(
-          PageRouteBuilder(
-            pageBuilder: (_, __, ___) => const MainHomeScreen(),
-            transitionsBuilder: (_, anim, __, child) =>
-                FadeTransition(opacity: anim, child: child),
-            transitionDuration: const Duration(milliseconds: 500),
-          ),
-        );
+        if (result['requires_2fa'] == true) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => TwoFactorVerifyScreen(userId: result['user_id'])),
+          );
+        } else {
+          Navigator.of(context).pushReplacement(
+            PageRouteBuilder(
+              pageBuilder: (_, __, ___) => const MainHomeScreen(),
+              transitionsBuilder: (_, anim, __, child) =>
+                  FadeTransition(opacity: anim, child: child),
+              transitionDuration: const Duration(milliseconds: 500),
+            ),
+          );
+        }
       }
     } catch (e) {
       final msg = e.toString().contains('ApiException')
           ? e.toString().split('ApiException: ').last.split(' (status:').first
-          : 'Login failed. Please check your credentials.';
+          : 'Giriş başarısız oldu. Lütfen bilgilerinizi kontrol edin.';
       setState(() => _errorMessage = msg);
     } finally {
       if (mounted) setState(() => _isLoading = false);

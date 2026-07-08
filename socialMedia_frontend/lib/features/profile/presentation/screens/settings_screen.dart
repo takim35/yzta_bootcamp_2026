@@ -7,6 +7,7 @@ import '../../../../services/api_service.dart';
 import '../providers/profile_provider.dart';
 import '../../../../features/auth/presentation/providers/auth_provider.dart';
 import '../../../../features/onboarding/presentation/screens/onboarding_screen.dart';
+import '../../../../features/auth/presentation/screens/two_factor_setup_screen.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -55,46 +56,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
-    }
-  }
-
-  Future<void> _logout() async {
-    final s = ref.read(stringsProvider);
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: AppTheme.cardDark,
-        title: Text(
-          s.isTr ? 'Çıkış Yap' : 'Log Out',
-          style: const TextStyle(color: AppTheme.textPrimary),
-        ),
-        content: Text(
-          s.isTr
-              ? 'Hesabınızdan çıkmak istediğinize emin misiniz?'
-              : 'Are you sure you want to log out?',
-          style: const TextStyle(color: AppTheme.textMuted),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: Text(s.isTr ? 'İptal' : 'Cancel',
-                style: const TextStyle(color: AppTheme.textMuted)),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: Text(s.isTr ? 'Çıkış' : 'Log Out',
-                style: const TextStyle(color: AppTheme.accentViolet)),
-          ),
-        ],
-      ),
-    );
-
-    if (confirm == true && mounted) {
-      ref.read(authProvider).logout();
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const OnboardingScreen()),
-        (_) => false,
-      );
     }
   }
 
@@ -155,7 +116,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final s = ref.watch(stringsProvider);
-    final locale = ref.watch(localeProvider);
 
     return Scaffold(
       backgroundColor: AppTheme.primaryDark,
@@ -172,48 +132,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           : ListView(
               padding: const EdgeInsets.all(24),
               children: [
-                // ── Dil / Language ──────────────────────────────
-                Text(
-                  s.isTr ? 'Dil' : 'Language',
-                  style: const TextStyle(
-                      color: AppTheme.accentViolet,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16),
-                ),
-                const SizedBox(height: 12),
-                Container(
-                  decoration: BoxDecoration(
-                    color: AppTheme.cardDark,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppTheme.dividerColor),
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: _LangButton(
-                          label: '🇹🇷  Türkçe',
-                          selected: locale == AppLocale.tr,
-                          onTap: () => ref
-                              .read(localeProvider.notifier)
-                              .setLocale(AppLocale.tr),
-                        ),
-                      ),
-                      Container(width: 1, height: 48, color: AppTheme.dividerColor),
-                      Expanded(
-                        child: _LangButton(
-                          label: '🇬🇧  English',
-                          selected: locale == AppLocale.en,
-                          onTap: () => ref
-                              .read(localeProvider.notifier)
-                              .setLocale(AppLocale.en),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const Divider(color: AppTheme.dividerColor, height: 48),
-
                 // ── Gizlilik ────────────────────────────────────
                 Text(
                   s.isTr ? 'Gizlilik' : 'Privacy',
@@ -252,14 +170,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // Çıkış Yap
+                // 2FA Setup
                 ListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: Text(s.isTr ? 'Çıkış Yap' : 'Log Out',
+                  title: Text(s.isTr ? 'İki Aşamalı Doğrulama (2FA)' : 'Two-Factor Authentication (2FA)',
                       style: const TextStyle(color: AppTheme.textPrimary)),
-                  trailing: const Icon(Icons.logout_rounded,
-                      color: AppTheme.accentViolet),
-                  onTap: _logout,
+                  trailing: const Icon(Icons.security_rounded, color: AppTheme.accentViolet),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const TwoFactorSetupScreen()),
+                    );
+                  },
                 ),
 
                 // Şifre Sıfırla

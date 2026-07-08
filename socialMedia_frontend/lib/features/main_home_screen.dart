@@ -5,7 +5,8 @@ import '../core/localization/locale_provider.dart';
 import '../navigation/app_navigator.dart';
 import 'wardrobe/presentation/screens/wardrobe_screen.dart';
 import 'ai_stylist/presentation/screens/ai_stylist_screen.dart';
-import 'profile/presentation/screens/settings_screen.dart';
+import 'onboarding/presentation/screens/onboarding_screen.dart';
+import 'auth/presentation/providers/auth_provider.dart';
 
 class MainHomeScreen extends ConsumerWidget {
   const MainHomeScreen({super.key});
@@ -113,12 +114,7 @@ class MainHomeScreen extends ConsumerWidget {
                             size: 22,
                           ),
                           onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const SettingsScreen(),
-                              ),
-                            );
+                            _showMainSettings(context, ref, s);
                           },
                         ),
                       ),

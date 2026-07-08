@@ -55,25 +55,34 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> login(String email, String password) async {
+  Future<Map<String, dynamic>> login(String email, String password) async {
     _setLoading(true);
     try {
-      final userId = await ApiService().login(email, password);
-      _currentUserId = userId;
-      await _saveSession(userId);
-      notifyListeners();
+      final result = await ApiService().login(email, password);
+      // If 2FA is required, don't save session yet. Let UI handle it.
+      if (result['requires_2fa'] == false) {
+        _currentUserId = result['user_id'];
+        await _saveSession(result['user_id']);
+        notifyListeners();
+      }
+      return result;
     } finally {
       _setLoading(false);
     }
   }
 
-  Future<void> register(String email, String password) async {
+  Future<void> finalizeLogin(String userId) async {
+    _currentUserId = userId;
+    await _saveSession(userId);
+    notifyListeners();
+  }
+
+  Future<Map<String, dynamic>> register(String email, String password) async {
     _setLoading(true);
     try {
-      final userId = await ApiService().register(email, password);
-      _currentUserId = userId;
-      await _saveSession(userId);
-      notifyListeners();
+      final result = await ApiService().register(email, password);
+      // Do not auto-login, wait for email verification
+      return result;
     } finally {
       _setLoading(false);
     }

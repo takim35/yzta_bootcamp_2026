@@ -71,35 +71,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ),
           backgroundColor: AppTheme.primaryDark,
           elevation: 0,
-          actions: [
-            // Language toggle button
-            IconButton(
-              icon: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppTheme.surfaceDark,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: AppTheme.dividerColor),
-                ),
-                child: Text(
-                  s.isTr ? '🇹🇷 TR' : '🇬🇧 EN',
-                  style: const TextStyle(
-                    color: AppTheme.textPrimary,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-              onPressed: () => _showLanguageDialog(context, s),
-              tooltip: s.languageTitle,
-            ),
-            // Sign out
-            IconButton(
-              icon: const Icon(Icons.logout_rounded, color: AppTheme.errorColor),
-              onPressed: () => ref.read(authProvider).logout(),
-              tooltip: s.logout,
-            ),
-          ],
         ),
         body: NestedScrollView(
           headerSliverBuilder: (context, innerBoxIsScrolled) => [
@@ -133,55 +104,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  void _showLanguageDialog(BuildContext context, AppStrings s) {
-    final locale = ref.read(localeProvider);
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: AppTheme.cardDark,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (_) => Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              s.languageTitle,
-              style: const TextStyle(
-                color: AppTheme.textPrimary,
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: 16),
-            _LangOption(
-              flag: '🇬🇧',
-              label: s.english,
-              isSelected: locale == AppLocale.en,
-              onTap: () {
-                ref.read(localeProvider.notifier).setLocale(AppLocale.en);
-                Navigator.pop(context);
-              },
-            ),
-            const SizedBox(height: 10),
-            _LangOption(
-              flag: '🇹🇷',
-              label: s.turkish,
-              isSelected: locale == AppLocale.tr,
-              onTap: () {
-                ref.read(localeProvider.notifier).setLocale(AppLocale.tr);
-                Navigator.pop(context);
-              },
-            ),
-            const SizedBox(height: 16),
-          ],
         ),
       ),
     );

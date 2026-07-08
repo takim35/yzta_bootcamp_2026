@@ -142,13 +142,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
             onPressed: () async {
               Navigator.pop(ctx);
               AnalyticsService().logEvent('permission_prompt_accepted');
-              // Request permissions
-              await [
-                Permission.camera,
-                Permission.photos,
-                // On Android 13+ we need photos, but on older we need storage
-                Permission.storage,
-              ].request();
+              // Request permissions safely for Android 13+
+              await Permission.camera.request();
+              await Permission.photos.request();
+              // Ignore storage on modern Androids to prevent freezes
+              await Permission.storage.request();
               _finishOnboarding();
             },
             child: Text(s.isTr ? 'İzin Ver' : 'Allow', style: const TextStyle(color: Colors.white)),

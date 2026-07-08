@@ -6,6 +6,7 @@ import '../../../../core/localization/app_strings.dart';
 import '../../../../services/api_service.dart';
 import '../../../main_home_screen.dart';
 import '../providers/auth_provider.dart';
+import 'email_verification_screen.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -74,9 +75,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         await authProv.register(email, password);
 
         if (mounted) {
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (_) => const MainHomeScreen()),
-            (route) => false,
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => EmailVerificationScreen(email: email)),
           );
         }
       } on ApiException catch (e) {
