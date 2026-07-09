@@ -75,8 +75,8 @@ async def suggest_caption(req: CaptionRequest):
 
 
 @router.post("/upload")
-async def upload_image(file: UploadFile = File(...)):
-    """Resim yükler ve erişilebilir URL döndürür."""
+async def upload_image(file: UploadFile = File(...), remove_bg: bool = False):
+    """Resim yükler ve erişilebilir URL döndürür. (VTON/Arka plan temizleme mock altyapısı dahil)"""
     allowed = {".jpg", ".jpeg", ".png", ".webp", ".heic"}
     ext = Path(file.filename or "img.jpg").suffix.lower()
     if ext not in allowed:
@@ -85,7 +85,14 @@ async def upload_image(file: UploadFile = File(...)):
     filename = f"{uuid.uuid4()}{ext}"
     dest = UPLOADS_DIR / filename
     content = await file.read()
+    
+    # Mock Background Removal (Rembg / VTON)
+    if remove_bg:
+        # Gerçekte burada rembg.remove() veya benzeri bir model çalışacak.
+        # Şimdilik dosyayı normal kaydediyoruz ama logluyoruz
+        print(f"[{filename}] Arka plan temizleniyor ve VTON için hazırlanıyor...")
+        
     dest.write_bytes(content)
 
     url = f"http://{SERVER_HOST}:{SERVER_PORT}/static/uploads/{filename}"
-    return {"url": url, "filename": filename}
+    return {"url": url, "filename": filename, "optimized": remove_bg}

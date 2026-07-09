@@ -145,8 +145,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
               // Request permissions safely for Android 13+
               await Permission.camera.request();
               await Permission.photos.request();
-              // Ignore storage on modern Androids to prevent freezes
-              await Permission.storage.request();
               _finishOnboarding();
             },
             child: Text(s.isTr ? 'İzin Ver' : 'Allow', style: const TextStyle(color: Colors.white)),

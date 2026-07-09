@@ -18,22 +18,32 @@ class OutfitPicker extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return SizedBox(
-      height: 130,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingL),
-        itemCount: items.length,
-        itemBuilder: (context, index) {
-          final item = items[index];
-          final isSelected = selectedItems.contains(item);
-          return _OutfitCard(
-            item: item,
-            isSelected: isSelected,
-            onTap: () => onToggle(item),
-          );
-        },
+    if (items.isEmpty) {
+      return const Center(
+        child: Text('Kıyafet bulunamadı', style: TextStyle(color: AppTheme.textMuted)),
+      );
+    }
+    
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      padding: EdgeInsets.zero,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        crossAxisSpacing: AppTheme.spacingM,
+        mainAxisSpacing: AppTheme.spacingM,
+        childAspectRatio: 0.75,
       ),
+      itemCount: items.length,
+      itemBuilder: (context, index) {
+        final item = items[index];
+        final isSelected = selectedItems.contains(item);
+        return _OutfitCard(
+          item: item,
+          isSelected: isSelected,
+          onTap: () => onToggle(item),
+        );
+      },
     );
   }
 }

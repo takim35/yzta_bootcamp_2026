@@ -28,6 +28,17 @@ class AuthResponse(BaseModel):
     """Kayıt veya Giriş başarılı olduğunda dönülecek yanıt."""
     user_id: str
     message: str
+    requires_2fa: bool = False
+
+
+class VerifyEmailRequest(BaseModel):
+    email: str
+    code: str
+
+
+class Verify2FARequest(BaseModel):
+    user_id: str
+    code: str
 
 
 class PasswordResetRequest(BaseModel):
@@ -78,6 +89,7 @@ class CommentRequest(BaseModel):
     """Yorum yapma isteği."""
     user_id: str
     content: str
+    parent_id: Optional[str] = None
 
 
 class CaptionRequest(BaseModel):
@@ -120,6 +132,10 @@ class CommentResponse(BaseModel):
     username: str
     avatar_url: Optional[str] = None
     content: str
+    parent_id: Optional[str] = None
+    likes_count: int = 0
+    is_liked: bool = False
+    replies: List['CommentResponse'] = Field(default_factory=list)
     created_at: str
 
 

@@ -18,6 +18,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   final _bioController = TextEditingController();
   final _avatarUrlController = TextEditingController();
   bool _isLoading = false;
+  bool _isPrivate = false;
 
   @override
   void initState() {
@@ -27,6 +28,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       _displayNameController.text = user.displayName;
       _bioController.text = user.bio;
       _avatarUrlController.text = user.avatarUrl;
+      _isPrivate = user.profileVisibility == 'private';
     }
   }
 
@@ -42,6 +44,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         bio: _bioController.text,
         avatarUrl: _avatarUrlController.text,
       );
+
+      await ApiService().updatePrivacy(userId, _isPrivate);
       
       // Refresh profile data
       await ref.read(profileProvider).loadProfile(userId, userId);
@@ -144,6 +148,25 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: AppTheme.accentViolet)),
               ),
               onChanged: (val) => setState(() {}),
+            ),
+            const SizedBox(height: 32),
+            const Divider(color: AppTheme.dividerColor),
+            const SizedBox(height: 16),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(s.isTr ? 'Gizli Profil' : 'Private Profile',
+                  style: const TextStyle(color: AppTheme.textPrimary)),
+              subtitle: Text(
+                s.isTr
+                    ? 'Sadece takipçilerin gönderilerini görebilir.'
+                    : 'Only followers can see your posts.',
+                style: const TextStyle(color: AppTheme.textMuted),
+              ),
+              trailing: Switch(
+                value: _isPrivate,
+                onChanged: (val) => setState(() => _isPrivate = val),
+                activeColor: AppTheme.accentViolet,
+              ),
             ),
           ],
         ),

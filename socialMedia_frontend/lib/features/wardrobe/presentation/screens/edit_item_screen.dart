@@ -243,14 +243,14 @@ class _EditItemScreenState extends ConsumerState<EditItemScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            _SectionLabel(text: 'TÃ¼r *'),
-            _DropdownField(value: _tur, items: _turler, onChanged: (v) => setState(() => _tur = v!)),
+            _SectionLabel(text: 'Tür *'),
+            _ChipsField(value: _tur, items: _turler, onChanged: (v) => setState(() => _tur = v)),
             const SizedBox(height: 16),
             _SectionLabel(text: 'Renk *'),
-            _DropdownField(value: _renk, items: _renkler, onChanged: (v) => setState(() => _renk = v!)),
+            _ChipsField(value: _renk, items: _renkler, onChanged: (v) => setState(() => _renk = v)),
             const SizedBox(height: 16),
             _SectionLabel(text: 'Mevsim'),
-            _DropdownField(value: _mevsim, items: _mevsimler, onChanged: (v) => setState(() => _mevsim = v!)),
+            _ChipsField(value: _mevsim, items: _mevsimler, onChanged: (v) => setState(() => _mevsim = v)),
             const SizedBox(height: 16),
             _SectionLabel(text: 'Marka'),
             TextField(
@@ -299,32 +299,42 @@ class _SectionLabel extends StatelessWidget {
   }
 }
 
-class _DropdownField extends StatelessWidget {
+class _ChipsField extends StatelessWidget {
   final String value;
   final List<String> items;
-  final ValueChanged<String?> onChanged;
+  final void Function(String) onChanged;
 
-  const _DropdownField({required this.value, required this.items, required this.onChanged});
+  const _ChipsField({required this.value, required this.items, required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppTheme.surfaceDark,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: value,
-          isExpanded: true,
-          dropdownColor: AppTheme.surfaceDark,
-          style: const TextStyle(color: AppTheme.textPrimary, fontSize: 16),
-          icon: const Icon(Icons.keyboard_arrow_down_rounded, color: AppTheme.textMuted),
-          items: items.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-          onChanged: onChanged,
-        ),
-      ),
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: items.map((item) {
+        final isSelected = item == value;
+        return GestureDetector(
+          onTap: () => onChanged(item),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: isSelected ? AppTheme.accentViolet : AppTheme.surfaceDark,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: isSelected ? AppTheme.accentViolet : AppTheme.dividerColor,
+              ),
+            ),
+            child: Text(
+              item,
+              style: TextStyle(
+                color: isSelected ? Colors.white : AppTheme.textPrimary,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                fontSize: 13,
+              ),
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 }

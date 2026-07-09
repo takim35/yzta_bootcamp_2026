@@ -40,8 +40,8 @@ class CreatePostProvider extends ChangeNotifier {
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
-  /// Form geçerliliği: en azından görsel seçilmiş olmalı
-  bool get isFormValid => _selectedImage != null;
+  /// Form geçerliliği: en azından görsel seçilmiş olmalı ve en az 1 kıyafet seçilmeli
+  bool get isFormValid => _selectedImage != null && _selectedOutfitItems.isNotEmpty;
 
   // ─── Mock Outfit Items (UI'da gösterim için) ───────────────
   List<OutfitItem> get mockOutfitItems => const [
@@ -183,7 +183,11 @@ class CreatePostProvider extends ChangeNotifier {
   // ─── Gönderi Paylaş ─────────────────────────────────────────
   Future<String?> submitPost(String userId) async {
     if (!isFormValid) {
-      _errorMessage = 'Lütfen bir görsel seçin.';
+      if (_selectedImage == null) {
+        _errorMessage = 'Lütfen bir görsel seçin.';
+      } else if (_selectedOutfitItems.isEmpty) {
+        _errorMessage = 'Lütfen en az 1 kombin parçası seçin.';
+      }
       notifyListeners();
       return null;
     }

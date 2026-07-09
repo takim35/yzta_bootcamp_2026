@@ -7,9 +7,11 @@ import '../../../../features/feed/domain/models/post_model.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/localization/locale_provider.dart';
 import '../../../../core/localization/app_strings.dart';
+import 'follow_list_screen.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
-  const ProfileScreen({super.key});
+  final String? userId;
+  const ProfileScreen({super.key, this.userId});
 
   @override
   ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
@@ -20,9 +22,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final userId = ref.read(authProvider).currentUserId;
-      if (userId != null && userId.isNotEmpty) {
-        ref.read(profileProvider).loadProfile(userId, userId);
+      final currentUserId = ref.read(authProvider).currentUserId;
+      final targetUserId = widget.userId ?? currentUserId;
+      if (targetUserId != null && targetUserId.isNotEmpty) {
+        ref.read(profileProvider).loadProfile(targetUserId, currentUserId ?? targetUserId);
       }
     });
   }
@@ -85,7 +88,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   tabs: [
                     const Tab(icon: Icon(Icons.grid_on_rounded)),
                     if (provider.isOwnProfile)
-                      const Tab(icon: Icon(Icons.bookmark_rounded)),
+                      const Tab(icon: Icon(Icons.auto_awesome_rounded, color: Color(0xFFFFD700))),
                   ],
                 ),
               ),
@@ -93,14 +96,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ],
           body: TabBarView(
             children: [
-              _buildPostGrid(provider.userPosts, s),
+              _buildPostGrid(
+                provider.userPosts,
+                s,
+                isLocked: !provider.isOwnProfile && user.profileVisibility == 'private' && !user.isFollowing,
+              ),
               if (provider.isOwnProfile)
                 _buildPostGrid(
                   provider.savedPosts,
                   s,
                   emptyMessage: s.isTr
-                      ? 'Henüz kaydedilmiş gönderi yok'
-                      : 'No saved posts yet',
+                      ? 'Henüz podyumlanmış gönderi yok'
+                      : 'No runway posts yet',
                 ),
             ],
           ),
@@ -151,8 +158,32 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     _buildStatColumn(provider.postCount, s.posts),
-                    _buildStatColumn(user.followersCount, s.followers),
-                    _buildStatColumn(user.followingCount, s.following),
+                    _buildStatColumn(
+                      user.followersCount,
+                      s.followers,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => FollowListScreen(
+                            userId: user.userId,
+                            initialTabIndex: 0,
+                          ),
+                        ),
+                      ),
+                    ),
+                    _buildStatColumn(
+                      user.followingCount,
+                      s.following,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => FollowListScreen(
+                            userId: user.userId,
+                            initialTabIndex: 1,
+                          ),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -240,7 +271,28 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   Widget _buildPostGrid(List<PostModel> posts, AppStrings s,
-      {String? emptyMessage}) {
+      {String? emptyMessage, bool isLocked = false}) {
+    if (isLocked) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.lock_outline_rounded, size: 48, color: AppTheme.textMuted),
+            const SizedBox(height: 12),
+            Text(
+              s.isTr ? 'Bu profil gizlidir' : 'This profile is private',
+              style: const TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              s.isTr ? 'Gönderilerini görmek için takip et.' : 'Follow to see their posts.',
+              style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
+            ),
+          ],
+        ),
+      );
+    }
+
     if (posts.isEmpty) {
       return Center(
         child: Column(
@@ -352,10 +404,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
-  Widget _buildStatColumn(int count, String label) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
+  Widget _buildStatColumn(int count, String label, {VoidCallback? onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
         Text(
           count.toString(),
           style: const TextStyle(
@@ -372,6 +427,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ),
         ),
       ],
+    ),
     );
   }
 }

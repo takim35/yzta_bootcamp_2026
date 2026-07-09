@@ -21,6 +21,10 @@ CREATE TABLE IF NOT EXISTS users (
     following_count INTEGER NOT NULL DEFAULT 0,
     profile_visibility TEXT NOT NULL DEFAULT 'public'
         CHECK (profile_visibility IN ('public', 'private')),
+    is_verified INTEGER NOT NULL DEFAULT 0,
+    verification_code TEXT DEFAULT NULL,
+    two_factor_secret TEXT DEFAULT NULL,
+    two_factor_enabled INTEGER NOT NULL DEFAULT 0,
     created_at    TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
 );
 
@@ -40,6 +44,7 @@ CREATE TABLE IF NOT EXISTS posts (
     ai_training_consent  INTEGER NOT NULL DEFAULT 0
         CHECK (ai_training_consent IN (0, 1)),
     likes_count          INTEGER NOT NULL DEFAULT 0,
+    comments_count       INTEGER NOT NULL DEFAULT 0,
     created_at           TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
@@ -136,17 +141,35 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_export_post
 -- 7. COMMENTS
 -- ============================================================
 CREATE TABLE IF NOT EXISTS comments (
-    comment_id TEXT PRIMARY KEY,
-    post_id    TEXT NOT NULL,
-    user_id    TEXT NOT NULL,
-    content    TEXT NOT NULL,
-    created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+    comment_id  TEXT PRIMARY KEY,
+    post_id     TEXT NOT NULL,
+    user_id     TEXT NOT NULL,
+    content     TEXT NOT NULL,
+    parent_id   TEXT DEFAULT NULL,
+    likes_count INTEGER NOT NULL DEFAULT 0,
+    created_at  TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
     FOREIGN KEY (post_id) REFERENCES posts(post_id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (parent_id) REFERENCES comments(comment_id) ON DELETE CASCADE
 );
 
 CREATE INDEX IF NOT EXISTS idx_comments_post
     ON comments(post_id, created_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_comments_parent
+    ON comments(parent_id);
+
+-- ============================================================
+-- 7.1. COMMENT_LIKES
+-- ============================================================
+CREATE TABLE IF NOT EXISTS comment_likes (
+    comment_id TEXT NOT NULL,
+    user_id    TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+    PRIMARY KEY (comment_id, user_id),
+    FOREIGN KEY (comment_id) REFERENCES comments(comment_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
 
 -- ============================================================
 -- 8. SAVES (Bookmarks)

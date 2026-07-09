@@ -2,11 +2,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import '../core/theme/app_theme.dart';
 import '../core/localization/locale_provider.dart';
+import '../core/localization/app_strings.dart';
 import '../navigation/app_navigator.dart';
 import 'wardrobe/presentation/screens/wardrobe_screen.dart';
 import 'ai_stylist/presentation/screens/ai_stylist_screen.dart';
 import 'onboarding/presentation/screens/onboarding_screen.dart';
 import 'auth/presentation/providers/auth_provider.dart';
+import 'profile/presentation/providers/profile_provider.dart';
+import 'profile/presentation/screens/settings_screen.dart';
 
 class MainHomeScreen extends ConsumerWidget {
   const MainHomeScreen({super.key});
@@ -71,18 +74,20 @@ class MainHomeScreen extends ConsumerWidget {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          ShaderMask(
-                            shaderCallback: (bounds) =>
-                                AppTheme.primaryGradient.createShader(bounds),
-                            child: const Text(
-                              'SPOT',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 32,
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: 4,
-                              ),
-                            ),
+                          Consumer(
+                            builder: (context, ref, child) {
+                              final user = ref.watch(profileProvider).user;
+                              final displayName = user?.displayName ?? 'Kullanıcı';
+                              return Text(
+                                '${s.homeWelcomeBack}$displayName 👋',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: -0.5,
+                                ),
+                              );
+                            },
                           ),
                           const SizedBox(height: 4),
                           Text(
@@ -114,14 +119,81 @@ class MainHomeScreen extends ConsumerWidget {
                             size: 22,
                           ),
                           onPressed: () {
-                            _showMainSettings(context, ref, s);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => const SettingsScreen()),
+                            );
                           },
                         ),
                       ),
                     ],
                   ),
 
-                  const SizedBox(height: 36),
+                  const SizedBox(height: 32),
+
+                  // ── What to wear today? (Dynamic Suggestion) ──
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const AiStylistScreen()),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: AppTheme.cardDark,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: AppTheme.accentViolet.withValues(alpha: 0.3), width: 1.5),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppTheme.accentViolet.withValues(alpha: 0.1),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: AppTheme.accentViolet.withValues(alpha: 0.15),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.wb_sunny_rounded, color: Colors.orangeAccent, size: 28),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  s.homeWhatToWear,
+                                  style: const TextStyle(
+                                    color: AppTheme.textPrimary,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  s.homeWhatToWearSub,
+                                  style: const TextStyle(
+                                    color: AppTheme.textSecondary,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Icon(Icons.arrow_forward_ios_rounded, color: AppTheme.textMuted, size: 16),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 24),
 
                   // ── Featured Card (Social — tappable) ────────
                   _FeaturedCard(s: s),
@@ -203,6 +275,7 @@ class MainHomeScreen extends ConsumerWidget {
       ),
     );
   }
+
 }
 
 // ── Featured Social Card ────────────────────────────────────────

@@ -446,7 +446,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
 
   Widget _buildSignInButton(AppStrings s) {
     return GestureDetector(
-      onTap: _isLoading ? null : _onLoginTap,
+      onTap: _isLoading ? null : _submit,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         height: 54,

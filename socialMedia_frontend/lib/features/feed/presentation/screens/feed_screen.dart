@@ -6,6 +6,7 @@ import '../../../../features/feed/presentation/widgets/shimmer_loading.dart';
 import '../../../../features/feed/presentation/widgets/empty_state.dart';
 import '../../../../features/auth/presentation/providers/auth_provider.dart';
 import '../../../../features/feed/presentation/widgets/comments_bottom_sheet.dart';
+import '../../../../features/feed/presentation/screens/search_screen.dart';
 import '../../../../core/theme/app_theme.dart';
 
 class FeedScreen extends ConsumerStatefulWidget {
@@ -145,6 +146,19 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
       backgroundColor: AppTheme.primaryDark,
       elevation: 0,
       actions: [
+        IconButton(
+          icon: const Icon(
+            Icons.search_rounded,
+            color: AppTheme.textPrimary,
+          ),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const SearchScreen()),
+            );
+          },
+          tooltip: 'Ara',
+        ),
         IconButton(
           icon: const Icon(
             Icons.notifications_outlined,

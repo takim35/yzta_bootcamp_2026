@@ -376,24 +376,45 @@ class ApiService {
     await _delete('/posts/$postId/save?user_id=$userId', {});
   }
 
-  // ─── Comments ───────────────────────────────────────────────
+  // ══════════════════════════════════════════════════════════════
+  // Comments
+  // ══════════════════════════════════════════════════════════════
   Future<String> addComment({
     required String postId,
     required String userId,
     required String content,
+    String? parentId,
   }) async {
     final data = await _post('/posts/$postId/comments', {
       'user_id': userId,
       'content': content,
+      if (parentId != null) 'parent_id': parentId,
     });
     return data['data']['comment_id'] as String;
   }
 
-  Future<List<CommentModel>> getComments(String postId) async {
-    final data = await _getList('/posts/$postId/comments');
-    return data
-        .map((e) => CommentModel.fromJson(e as Map<String, dynamic>))
-        .toList();
+  Future<List<CommentModel>> getComments(String postId, {String? userId}) async {
+    final url = userId != null ? '/posts/$postId/comments?user_id=$userId' : '/posts/$postId/comments';
+    final data = await _get(url);
+    if (data is List) {
+      final list = data as List<dynamic>;
+      return list.map((e) => CommentModel.fromJson(e as Map<String, dynamic>)).toList();
+    }
+    return [];
+  }
+
+  Future<void> likeComment({
+    required String commentId,
+    required String userId,
+  }) async {
+    await _post('/comments/$commentId/like', {'user_id': userId});
+  }
+
+  Future<void> unlikeComment({
+    required String commentId,
+    required String userId,
+  }) async {
+    await _delete('/comments/$commentId/like?user_id=$userId', {});
   }
 
   // ─── Caption Suggestion ────────────────────────────────────
@@ -457,6 +478,14 @@ class ApiService {
       'hava_durumu': weather,
       'stil_tercihi': style
     });
+  }
+
+  Future<List<dynamic>> searchUsers(String query, {String? viewerId}) async {
+    String endpoint = '/search?query=$query';
+    if (viewerId != null) {
+      endpoint += '&viewer_id=$viewerId';
+    }
+    return await _getList(endpoint);
   }
 
   // ─── Dispose ────────────────────────────────────────────────

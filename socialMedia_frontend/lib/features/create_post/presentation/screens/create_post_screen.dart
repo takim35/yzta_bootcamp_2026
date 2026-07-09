@@ -76,14 +76,14 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // ─── Section 1: Görsel Seçimi ─────────────────
-                _buildSectionTitle('📸 Görsel'),
+                _buildSectionTitle('Görsel Seçimi'),
                 const SizedBox(height: AppTheme.spacingM),
                 _buildImagePicker(provider),
 
                 const SizedBox(height: AppTheme.spacingXL),
 
                 // ─── Section 2: Kombin Parçaları ──────────────
-                _buildSectionTitle('👗 Kombin Parçaları'),
+                _buildSectionTitle('Kombin Parçaları'),
                 const SizedBox(height: AppTheme.spacingM),
                 OutfitPicker(
                   items: provider.mockOutfitItems,
@@ -94,14 +94,14 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                 const SizedBox(height: AppTheme.spacingXL),
 
                 // ─── Section 3: Caption ───────────────────────
-                _buildSectionTitle('✏️ Açıklama'),
+                _buildSectionTitle('Açıklama'),
                 const SizedBox(height: AppTheme.spacingM),
                 _buildCaptionField(provider),
 
                 const SizedBox(height: AppTheme.spacingXL),
 
                 // ─── Section 4: Gizlilik ──────────────────────
-                _buildSectionTitle('🔐 Gizlilik'),
+                _buildSectionTitle('Gizlilik'),
                 const SizedBox(height: AppTheme.spacingM),
                 VisibilitySelector(
                   currentValue: provider.visibility,

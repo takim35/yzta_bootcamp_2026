@@ -54,7 +54,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
   }
 
   Future<String?> _uploadImage(File file) async {
-    final uri = Uri.parse('${ApiService.baseUrl}/captions/upload');
+    final uri = Uri.parse('${ApiService.baseUrl}/captions/upload?remove_bg=true');
     final request = http.MultipartRequest('POST', uri)
       ..files.add(await http.MultipartFile.fromPath('file', file.path));
     final streamed = await request.send();
@@ -222,30 +222,30 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
 
             // ── Kategori ────────────────────────────────
             _SectionLabel(text: 'Tür *'),
-            _DropdownField(
+            _ChipsField(
               value: _tur,
               items: _turler,
-              onChanged: (v) => setState(() => _tur = v!),
+              onChanged: (v) => setState(() => _tur = v),
             ),
 
             const SizedBox(height: 16),
 
             // ── Renk ────────────────────────────────────
             _SectionLabel(text: 'Renk *'),
-            _DropdownField(
+            _ChipsField(
               value: _renk,
               items: _renkler,
-              onChanged: (v) => setState(() => _renk = v!),
+              onChanged: (v) => setState(() => _renk = v),
             ),
 
             const SizedBox(height: 16),
 
             // ── Mevsim ──────────────────────────────────
             _SectionLabel(text: 'Mevsim'),
-            _DropdownField(
+            _ChipsField(
               value: _mevsim,
               items: _mevsimler,
-              onChanged: (v) => setState(() => _mevsim = v!),
+              onChanged: (v) => setState(() => _mevsim = v),
             ),
 
             const SizedBox(height: 16),
@@ -301,33 +301,42 @@ class _SectionLabel extends StatelessWidget {
   }
 }
 
-class _DropdownField extends StatelessWidget {
+class _ChipsField extends StatelessWidget {
   final String value;
   final List<String> items;
-  final void Function(String?) onChanged;
+  final void Function(String) onChanged;
 
-  const _DropdownField({required this.value, required this.items, required this.onChanged});
+  const _ChipsField({required this.value, required this.items, required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      decoration: BoxDecoration(
-        color: AppTheme.surfaceDark,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.dividerColor),
-      ),
-      child: DropdownButton<String>(
-        value: value,
-        isExpanded: true,
-        underline: const SizedBox(),
-        dropdownColor: AppTheme.cardDark,
-        style: const TextStyle(color: AppTheme.textPrimary, fontSize: 15),
-        items: items
-            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-            .toList(),
-        onChanged: onChanged,
-      ),
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: items.map((item) {
+        final isSelected = item == value;
+        return GestureDetector(
+          onTap: () => onChanged(item),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: isSelected ? AppTheme.accentViolet : AppTheme.surfaceDark,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: isSelected ? AppTheme.accentViolet : AppTheme.dividerColor,
+              ),
+            ),
+            child: Text(
+              item,
+              style: TextStyle(
+                color: isSelected ? Colors.white : AppTheme.textPrimary,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                fontSize: 13,
+              ),
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 }

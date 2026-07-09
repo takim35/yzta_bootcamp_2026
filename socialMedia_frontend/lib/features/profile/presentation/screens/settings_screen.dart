@@ -8,6 +8,7 @@ import '../providers/profile_provider.dart';
 import '../../../../features/auth/presentation/providers/auth_provider.dart';
 import '../../../../features/onboarding/presentation/screens/onboarding_screen.dart';
 import '../../../../features/auth/presentation/screens/two_factor_setup_screen.dart';
+import '../../../../features/auth/presentation/screens/forgot_password_screen.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -132,29 +133,43 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           : ListView(
               padding: const EdgeInsets.all(24),
               children: [
-                // ── Gizlilik ────────────────────────────────────
+                // Removed Privacy Section from here
+
+                const SizedBox(height: 16),
+                
+                // ── Genel ───────────────────────────────────────
                 Text(
-                  s.isTr ? 'Gizlilik' : 'Privacy',
+                  s.isTr ? 'Genel' : 'General',
                   style: const TextStyle(
                       color: AppTheme.accentViolet,
                       fontWeight: FontWeight.bold,
                       fontSize: 16),
                 ),
                 const SizedBox(height: 16),
+                
+                // Dil Ayarı
                 ListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: Text(s.isTr ? 'Gizli Profil' : 'Private Profile',
+                  title: Text(s.isTr ? 'Uygulama Dili' : 'App Language',
                       style: const TextStyle(color: AppTheme.textPrimary)),
-                  subtitle: Text(
-                    s.isTr
-                        ? 'Sadece takipçilerin gönderilerini görebilir.'
-                        : 'Only followers can see your posts.',
-                    style: const TextStyle(color: AppTheme.textMuted),
-                  ),
-                  trailing: Switch(
-                    value: _isPrivate,
-                    onChanged: _updatePrivacy,
-                    activeColor: AppTheme.accentViolet,
+                  subtitle: Row(
+                    children: [
+                      Expanded(
+                        child: _LangButton(
+                          label: '🇹🇷 Türkçe',
+                          selected: ref.watch(localeProvider) == AppLocale.tr,
+                          onTap: () => ref.read(localeProvider.notifier).setLocale(AppLocale.tr),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _LangButton(
+                          label: '🇬🇧 English',
+                          selected: ref.watch(localeProvider) == AppLocale.en,
+                          onTap: () => ref.read(localeProvider.notifier).setLocale(AppLocale.en),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
 
@@ -192,15 +207,30 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   trailing: const Icon(Icons.arrow_forward_ios,
                       size: 16, color: AppTheme.textMuted),
                   onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                          content: Text(s.isTr
-                              ? 'Şifre sıfırlama bağlantısı e-postanıza gönderildi.'
-                              : 'Password reset link sent to your email.')),
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const ForgotPasswordScreen()),
                     );
                   },
                 ),
 
+                // Çıkış Yap
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(s.isTr ? 'Çıkış Yap' : 'Log Out',
+                      style: const TextStyle(color: AppTheme.errorColor)),
+                  trailing: const Icon(Icons.logout_rounded,
+                      color: AppTheme.errorColor),
+                  onTap: () {
+                    ref.read(authProvider).logout();
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (_) => const OnboardingScreen()),
+                      (_) => false,
+                    );
+                  },
+                ),
+
+                const Divider(color: AppTheme.dividerColor, height: 48),
                 // Hesabı Sil
                 ListTile(
                   contentPadding: EdgeInsets.zero,
