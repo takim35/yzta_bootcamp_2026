@@ -11,7 +11,7 @@ from fastapi.staticfiles import StaticFiles
 
 from app.core.config import settings
 from app.core.database import init_db
-from app.api.routers import posts, feed, follows, users, auth, wardrobe, search
+from app.api.routers import posts, feed, follows, users, auth, wardrobe, search, notifications
 from app.api.routers import likes  # beğeni/yorum router
 from app.services.gemini import router as captions_router
 
@@ -56,6 +56,7 @@ app.include_router(users.router,     prefix="/users",    tags=["Users"])
 app.include_router(wardrobe.router,  prefix="/wardrobe", tags=["Wardrobe"])
 app.include_router(search.router,    prefix="/search",   tags=["Search"])
 app.include_router(captions_router,  prefix="/captions", tags=["Captions"])
+app.include_router(notifications.router, prefix="/notifications", tags=["Notifications"])
 
 
 @app.get("/", tags=["Health"])

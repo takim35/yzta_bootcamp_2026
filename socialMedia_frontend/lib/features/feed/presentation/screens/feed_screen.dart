@@ -7,6 +7,9 @@ import '../../../../features/feed/presentation/widgets/empty_state.dart';
 import '../../../../features/auth/presentation/providers/auth_provider.dart';
 import '../../../../features/feed/presentation/widgets/comments_bottom_sheet.dart';
 import '../../../../features/feed/presentation/screens/search_screen.dart';
+import '../../../../features/profile/presentation/screens/profile_screen.dart';
+import '../../../../features/notifications/presentation/screens/notifications_screen.dart';
+import '../../../../services/api_service.dart';
 import '../../../../core/theme/app_theme.dart';
 
 class FeedScreen extends ConsumerStatefulWidget {
@@ -18,15 +21,28 @@ class FeedScreen extends ConsumerStatefulWidget {
 
 class _FeedScreenState extends ConsumerState<FeedScreen> {
   late ScrollController _scrollController;
+  int _unreadCount = 0;
 
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController()..addListener(_onScroll);
+    _fetchUnreadCount();
     // İlk yükleme
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(feedProvider).loadFeed();
     });
+  }
+
+  Future<void> _fetchUnreadCount() async {
+    final userId = ref.read(authProvider).currentUserId;
+    if (userId == null) return;
+    try {
+      final count = await ApiService().getUnreadNotificationCount(userId: userId);
+      if (mounted) {
+        setState(() => _unreadCount = count);
+      }
+    } catch (_) {}
   }
 
   @override
@@ -115,7 +131,12 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                     );
                   },
                   onUserTap: (userId) {
-                    debugPrint('Profil sayfasına git: $userId');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ProfileScreen(userId: userId),
+                      ),
+                    );
                   },
                 );
               },
@@ -160,11 +181,28 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
           tooltip: 'Ara',
         ),
         IconButton(
-          icon: const Icon(
-            Icons.notifications_outlined,
-            color: AppTheme.textPrimary,
-          ),
-          onPressed: () {},
+          icon: _unreadCount > 0
+              ? Badge(
+                  label: Text(
+                    _unreadCount > 9 ? '9+' : _unreadCount.toString(),
+                    style: const TextStyle(fontSize: 10, color: Colors.white),
+                  ),
+                  child: const Icon(Icons.notifications_outlined, color: AppTheme.textPrimary),
+                )
+              : const Icon(
+                  Icons.notifications_outlined,
+                  color: AppTheme.textPrimary,
+                ),
+          onPressed: () {
+            // Bildirimler tıklandığında sayacı sıfırlayalım UI'da, sonra sayfaya gidelim
+            setState(() => _unreadCount = 0);
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const NotificationsScreen()),
+            ).then((_) {
+              _fetchUnreadCount();
+            });
+          },
           tooltip: 'Bildirimler',
         ),
       ],

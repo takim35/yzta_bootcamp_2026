@@ -21,6 +21,7 @@ dependencies:
   riverpod: 2.4.9
   permission_handler: ^11.3.0
   shared_preferences: ^2.2.2
+  qr_flutter: ^4.1.0
 
 dev_dependencies:
   flutter_test:

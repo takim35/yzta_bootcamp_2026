@@ -9,7 +9,7 @@ import os
 import uuid
 import httpx
 from pathlib import Path
-from fastapi import APIRouter, HTTPException, UploadFile, File
+from fastapi import APIRouter, HTTPException, UploadFile, File, Request
 from fastapi.responses import JSONResponse
 from typing import List
 
@@ -75,8 +75,8 @@ async def suggest_caption(req: CaptionRequest):
 
 
 @router.post("/upload")
-async def upload_image(file: UploadFile = File(...), remove_bg: bool = False):
-    """Resim yükler ve erişilebilir URL döndürür. (VTON/Arka plan temizleme mock altyapısı dahil)"""
+async def upload_image(request: Request, file: UploadFile = File(...), remove_bg: bool = False):
+    """Resim yükler ve erişilebilir URL döndürür."""
     allowed = {".jpg", ".jpeg", ".png", ".webp", ".heic"}
     ext = Path(file.filename or "img.jpg").suffix.lower()
     if ext not in allowed:
@@ -94,5 +94,6 @@ async def upload_image(file: UploadFile = File(...), remove_bg: bool = False):
         
     dest.write_bytes(content)
 
-    url = f"http://{SERVER_HOST}:{SERVER_PORT}/static/uploads/{filename}"
+    base_url = str(request.base_url).rstrip("/")
+    url = f"{base_url}/static/uploads/{filename}"
     return {"url": url, "filename": filename, "optimized": remove_bg}

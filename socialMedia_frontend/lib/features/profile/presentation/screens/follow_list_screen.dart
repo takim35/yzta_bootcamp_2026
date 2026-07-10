@@ -35,13 +35,12 @@ class _FollowListScreenState extends ConsumerState<FollowListScreen> with Single
 
   Future<void> _loadData() async {
     try {
-      // Mock implementation: using search API for now to simulate users list
-      // In a real app, we would have /followers and /following endpoints
-      final users = await _api.searchUsers('');
+      final followers = await _api.getFollowers(widget.userId);
+      final following = await _api.getFollowing(widget.userId);
       
       setState(() {
-        _followers = users;
-        _following = users;
+        _followers = followers;
+        _following = following;
         _isLoading = false;
       });
     } catch (e) {

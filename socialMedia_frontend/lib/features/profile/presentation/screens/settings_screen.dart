@@ -24,9 +24,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   @override
   void initState() {
     super.initState();
-    final user = ref.read(profileProvider).user;
-    if (user != null) {
-      // profileVisibility alanı genişletildiğinde buradan okunacak
+    final currentUserId = ref.read(authProvider).currentUserId;
+    if (currentUserId != null) {
+      final user = ref.read(profileProvider(currentUserId)).user;
+      if (user != null) {
+        // profileVisibility alanı genişletildiğinde buradan okunacak
+      }
     }
   }
 

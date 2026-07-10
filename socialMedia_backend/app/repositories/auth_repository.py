@@ -17,12 +17,23 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     sha256_hash = hashlib.sha256(plain_password.encode('utf-8')).hexdigest().encode('utf-8')
     return bcrypt.checkpw(sha256_hash, hashed_password.encode('utf-8'))
 
+def validate_password_strength(password: str) -> None:
+    """Şifre güçlülük kontrolü: en az 6 karakter, 1 harf, 1 rakam."""
+    if len(password) < 6:
+        raise HTTPException(status_code=400, detail="Şifre en az 6 karakter olmalıdır.")
+    if not any(c.isalpha() for c in password):
+        raise HTTPException(status_code=400, detail="Şifre en az bir harf içermelidir.")
+    if not any(c.isdigit() for c in password):
+        raise HTTPException(status_code=400, detail="Şifre en az bir rakam içermelidir.")
+
 class AuthRepository:
     def __init__(self, db: sqlite3.Connection):
         self.db = db
 
     def register_user(self, email: str, password: str) -> str:
         """Yeni bir kullanıcı oluşturur ve veritabanına kaydeder."""
+        validate_password_strength(password)
+        
         # Email kontrolü
         existing_user = self.db.execute("SELECT user_id FROM users WHERE email = ?", (email,)).fetchone()
         if existing_user:
@@ -74,7 +85,9 @@ class AuthRepository:
         }
 
     def reset_password(self, email: str, new_password: str) -> None:
-        """Kullanıcının şifresini sıfırlar (mocked)."""
+        """Kullanıcının şifresini sıfırlar."""
+        validate_password_strength(new_password)
+        
         user = self.db.execute("SELECT user_id FROM users WHERE email = ?", (email,)).fetchone()
         if not user:
             raise HTTPException(status_code=404, detail="Bu e-posta adresi ile kayıtlı kullanıcı bulunamadı.")

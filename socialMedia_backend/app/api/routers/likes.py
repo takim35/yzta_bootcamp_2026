@@ -18,6 +18,7 @@ from typing import Optional
 
 from app.core.database import get_db
 from app.domain.schemas import MessageResponse
+from app.api.routers.notifications import create_notification
 
 router = APIRouter()
 
@@ -30,7 +31,8 @@ class LikeRequest(BaseModel):
 # ─── Comment Models ───────────────────────────────────────────
 class CommentRequest(BaseModel):
     user_id: str
-    text: str
+    content: str
+    parent_id: Optional[str] = None
 
 
 # ══════════════════════════════════════════════════════════════
@@ -54,6 +56,12 @@ def like_post(post_id: str, req: LikeRequest, db: sqlite3.Connection = Depends(g
 
         db.execute("INSERT INTO likes (post_id, user_id) VALUES (?, ?)", (post_id, req.user_id))
         db.execute("UPDATE posts SET likes_count = likes_count + 1 WHERE post_id = ?", (post_id,))
+
+        # Bildirim gönder
+        post_owner = db.execute("SELECT user_id FROM posts WHERE post_id = ?", (post_id,)).fetchone()
+        if post_owner:
+            create_notification(db, post_owner['user_id'], req.user_id, 'like', post_id=post_id)
+
         db.commit()
 
         return MessageResponse(success=True, message="Beğeni eklendi")
@@ -124,6 +132,12 @@ def add_comment(post_id: str, req: CommentRequest, db: sqlite3.Connection = Depe
             )
         except Exception:
             pass
+
+        # Bildirim gönder
+        post_owner = db.execute("SELECT user_id FROM posts WHERE post_id = ?", (post_id,)).fetchone()
+        if post_owner:
+            create_notification(db, post_owner['user_id'], req.user_id, 'comment', post_id=post_id, comment_id=comment_id)
+
         db.commit()
 
         return {"success": True, "data": {"comment_id": comment_id}}

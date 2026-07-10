@@ -44,36 +44,36 @@ class CreatePostProvider extends ChangeNotifier {
   bool get isFormValid => _selectedImage != null && _selectedOutfitItems.isNotEmpty;
 
   // ─── Mock Outfit Items (UI'da gösterim için) ───────────────
-  List<OutfitItem> get mockOutfitItems => const [
+  List<OutfitItem> get mockOutfitItems => [
         OutfitItem(
           itemId: 'item-001',
           category: 'üst giyim',
-          imageUrl: 'https://picsum.photos/seed/top1/200/200',
+          imageUrl: '${ApiService.baseUrl}/static/categories/top_pixel_1783723682362.png',
         ),
         OutfitItem(
           itemId: 'item-002',
           category: 'alt giyim',
-          imageUrl: 'https://picsum.photos/seed/bottom1/200/200',
+          imageUrl: '${ApiService.baseUrl}/static/categories/bottom_pixel_1783723690417.png',
         ),
         OutfitItem(
           itemId: 'item-003',
           category: 'ayakkabı',
-          imageUrl: 'https://picsum.photos/seed/shoes1/200/200',
+          imageUrl: '${ApiService.baseUrl}/static/categories/shoes_pixel_1783723697523.png',
         ),
         OutfitItem(
           itemId: 'item-004',
           category: 'aksesuar',
-          imageUrl: 'https://picsum.photos/seed/acc1/200/200',
+          imageUrl: '${ApiService.baseUrl}/static/categories/accessory_pixel_1783723705293.png',
         ),
         OutfitItem(
           itemId: 'item-005',
           category: 'dış giyim',
-          imageUrl: 'https://picsum.photos/seed/jacket1/200/200',
+          imageUrl: '${ApiService.baseUrl}/static/categories/jacket_pixel_1783723717704.png',
         ),
         OutfitItem(
           itemId: 'item-006',
           category: 'diğer',
-          imageUrl: 'https://picsum.photos/seed/bag1/200/200',
+          imageUrl: '${ApiService.baseUrl}/static/categories/bag_pixel_1783723727046.png',
         ),
       ];
 

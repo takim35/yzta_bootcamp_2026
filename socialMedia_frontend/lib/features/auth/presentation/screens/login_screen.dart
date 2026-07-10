@@ -6,6 +6,7 @@ import '../../../../core/localization/locale_provider.dart';
 import '../../../../core/localization/app_strings.dart';
 import 'two_factor_verify_screen.dart';
 import 'email_verification_screen.dart';
+import 'forgot_password_screen.dart';
 import '../../../../features/main_home_screen.dart';
 import '../providers/auth_provider.dart';
 import 'register_screen.dart';
@@ -354,7 +355,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                           Align(
                             alignment: Alignment.centerRight,
                             child: TextButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (_) => const ForgotPasswordScreen(),
+                                  ),
+                                );
+                              },
                               child: Text(
                                 s.forgotPassword,
                                 style: const TextStyle(

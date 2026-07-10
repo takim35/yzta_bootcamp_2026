@@ -76,7 +76,9 @@ class MainHomeScreen extends ConsumerWidget {
                         children: [
                           Consumer(
                             builder: (context, ref, child) {
-                              final user = ref.watch(profileProvider).user;
+                              final currentUserId = ref.watch(authProvider).currentUserId;
+                              if (currentUserId == null) return const SizedBox.shrink();
+                              final user = ref.watch(profileProvider(currentUserId)).user;
                               final displayName = user?.displayName ?? 'Kullanıcı';
                               return Text(
                                 '${s.homeWelcomeBack}$displayName 👋',

@@ -239,6 +239,23 @@ class ApiService {
     return (posts: posts, nextCursor: nextCursor);
   }
 
+  // ─── Upload Image ───────────────────────────────────────────
+  Future<String> uploadImage(File file) async {
+    final uri = Uri.parse('$baseUrl/captions/upload');
+    final request = http.MultipartRequest('POST', uri)
+      ..files.add(await http.MultipartFile.fromPath('file', file.path));
+    final streamed = await request.send();
+    final response = await http.Response.fromStream(streamed);
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      return data['url'] as String;
+    }
+    throw ApiException(
+      'Resim yüklenemedi. (status: ${response.statusCode})',
+      statusCode: response.statusCode,
+    );
+  }
+
   // ─── Create Post ───────────────────────────────────────────
   Future<String> createPost({
     required String userId,
@@ -395,12 +412,8 @@ class ApiService {
 
   Future<List<CommentModel>> getComments(String postId, {String? userId}) async {
     final url = userId != null ? '/posts/$postId/comments?user_id=$userId' : '/posts/$postId/comments';
-    final data = await _get(url);
-    if (data is List) {
-      final list = data as List<dynamic>;
-      return list.map((e) => CommentModel.fromJson(e as Map<String, dynamic>)).toList();
-    }
-    return [];
+    final data = await _getList(url);
+    return data.map((e) => CommentModel.fromJson(e as Map<String, dynamic>)).toList();
   }
 
   Future<void> likeComment({
@@ -486,6 +499,36 @@ class ApiService {
       endpoint += '&viewer_id=$viewerId';
     }
     return await _getList(endpoint);
+  }
+
+  Future<List<dynamic>> getFollowers(String userId) async {
+    return await _getList('/users/$userId/followers');
+  }
+
+  Future<List<dynamic>> getFollowing(String userId) async {
+    return await _getList('/users/$userId/following');
+  }
+
+  // ─── Notifications ──────────────────────────────────────────
+  Future<List<Map<String, dynamic>>> getNotifications({
+    required String userId,
+    int limit = 50,
+  }) async {
+    final data = await _getList('/notifications?user_id=$userId&limit=$limit');
+    return data.cast<Map<String, dynamic>>();
+  }
+
+  Future<int> getUnreadNotificationCount({required String userId}) async {
+    final data = await _get('/notifications/unread-count?user_id=$userId');
+    return data['count'] as int? ?? 0;
+  }
+
+  Future<void> markNotificationRead(String notificationId) async {
+    await _put('/notifications/$notificationId/read', {});
+  }
+
+  Future<void> markAllNotificationsRead({required String userId}) async {
+    await _put('/notifications/read-all?user_id=$userId', {});
   }
 
   // ─── Dispose ────────────────────────────────────────────────

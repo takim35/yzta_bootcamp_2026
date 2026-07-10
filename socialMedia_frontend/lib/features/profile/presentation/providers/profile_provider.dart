@@ -4,7 +4,7 @@ import '../../../../features/feed/domain/models/post_model.dart';
 import '../../../../features/profile/domain/models/user_model.dart';
 import '../../../../services/api_service.dart';
 
-final profileProvider = ChangeNotifierProvider((ref) => ProfileProvider());
+final profileProvider = ChangeNotifierProvider.family.autoDispose<ProfileProvider, String>((ref, userId) => ProfileProvider());
 
 class ProfileProvider extends ChangeNotifier {
   final ApiService _api = ApiService();

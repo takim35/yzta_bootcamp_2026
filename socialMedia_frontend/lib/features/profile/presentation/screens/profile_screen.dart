@@ -8,6 +8,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/localization/locale_provider.dart';
 import '../../../../core/localization/app_strings.dart';
 import 'follow_list_screen.dart';
+import 'edit_profile_screen.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   final String? userId;
@@ -25,14 +26,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       final currentUserId = ref.read(authProvider).currentUserId;
       final targetUserId = widget.userId ?? currentUserId;
       if (targetUserId != null && targetUserId.isNotEmpty) {
-        ref.read(profileProvider).loadProfile(targetUserId, currentUserId ?? targetUserId);
+        ref.read(profileProvider(targetUserId)).loadProfile(targetUserId, currentUserId ?? targetUserId);
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final provider = ref.watch(profileProvider);
+    final currentUserId = ref.watch(authProvider).currentUserId;
+    final targetUserId = widget.userId ?? currentUserId;
+    if (targetUserId == null) return const SizedBox.shrink();
+
+    final provider = ref.watch(profileProvider(targetUserId));
     final s = ref.watch(stringsProvider);
 
     if (provider.isLoading) {
@@ -99,12 +104,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               _buildPostGrid(
                 provider.userPosts,
                 s,
+                targetUserId,
                 isLocked: !provider.isOwnProfile && user.profileVisibility == 'private' && !user.isFollowing,
               ),
               if (provider.isOwnProfile)
                 _buildPostGrid(
                   provider.savedPosts,
                   s,
+                  targetUserId,
                   emptyMessage: s.isTr
                       ? 'Henüz podyumlanmış gönderi yok'
                       : 'No runway posts yet',
@@ -120,157 +127,222 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     return Padding(
       padding: const EdgeInsets.all(AppTheme.spacingL),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Row(
-            children: [
-              // Avatar with gradient ring
-              Container(
-                width: 84,
-                height: 84,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: AppTheme.primaryGradient,
-                ),
-                padding: const EdgeInsets.all(2),
-                child: Container(
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppTheme.surfaceDark,
-                  ),
-                  child: CircleAvatar(
-                    radius: 38,
-                    backgroundColor: AppTheme.cardDark,
-                    backgroundImage: user.avatarUrl.isNotEmpty
-                        ? NetworkImage(user.avatarUrl)
-                        : null,
-                    child: user.avatarUrl.isEmpty
-                        ? const Icon(Icons.person,
-                            size: 40, color: AppTheme.textSecondary)
-                        : null,
-                  ),
-                ),
+          // Glassmorphism Profile Card
+          Container(
+            padding: const EdgeInsets.all(AppTheme.spacingL),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  AppTheme.surfaceDark.withValues(alpha: 0.8),
+                  AppTheme.cardDark.withValues(alpha: 0.9),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
-              const SizedBox(width: AppTheme.spacingL),
-              // Stats
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildStatColumn(provider.postCount, s.posts),
-                    _buildStatColumn(
-                      user.followersCount,
-                      s.followers,
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => FollowListScreen(
-                            userId: user.userId,
-                            initialTabIndex: 0,
-                          ),
-                        ),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: AppTheme.accentViolet.withValues(alpha: 0.3),
+                width: 1,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: AppTheme.accentViolet.withValues(alpha: 0.1),
+                  blurRadius: 20,
+                  spreadRadius: 2,
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Avatar with gradient ring
+                Container(
+                  width: 96,
+                  height: 96,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: AppTheme.primaryGradient,
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppTheme.accentPurple.withValues(alpha: 0.4),
+                        blurRadius: 15,
+                        offset: const Offset(0, 4),
                       ),
+                    ],
+                  ),
+                  padding: const EdgeInsets.all(3),
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppTheme.surfaceDark,
                     ),
-                    _buildStatColumn(
-                      user.followingCount,
-                      s.following,
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => FollowListScreen(
-                            userId: user.userId,
-                            initialTabIndex: 1,
-                          ),
-                        ),
+                    child: CircleAvatar(
+                      radius: 44,
+                      backgroundColor: AppTheme.cardDark,
+                      backgroundImage: user.avatarUrl.isNotEmpty
+                          ? NetworkImage(user.avatarUrl)
+                          : null,
+                      child: user.avatarUrl.isEmpty
+                          ? const Icon(Icons.person,
+                              size: 44, color: AppTheme.textSecondary)
+                          : null,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppTheme.spacingM),
+                // Display name
+                Text(
+                  user.displayName.isNotEmpty ? user.displayName : user.username,
+                  style: const TextStyle(
+                    color: AppTheme.textPrimary,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                // Email
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.email_outlined,
+                        size: 14, color: AppTheme.textMuted),
+                    const SizedBox(width: 4),
+                    Text(
+                      user.email,
+                      style: const TextStyle(
+                        color: AppTheme.textSecondary,
+                        fontSize: 14,
                       ),
                     ),
                   ],
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppTheme.spacingM),
-          // Display name
-          Text(
-            user.displayName.isNotEmpty ? user.displayName : user.username,
-            style: const TextStyle(
-              color: AppTheme.textPrimary,
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-            ),
-          ),
-          const SizedBox(height: AppTheme.spacingXS),
-          // Email
-          Row(
-            children: [
-              const Icon(Icons.email_outlined,
-                  size: 13, color: AppTheme.textMuted),
-              const SizedBox(width: 4),
-              Text(
-                user.email,
-                style: const TextStyle(
-                  color: AppTheme.textSecondary,
-                  fontSize: 13,
-                ),
-              ),
-            ],
-          ),
-          if (user.bio.isNotEmpty) ...[
-            const SizedBox(height: AppTheme.spacingS),
-            Text(
-              user.bio,
-              style: const TextStyle(
-                color: AppTheme.textPrimary,
-                fontSize: 14,
-                height: 1.4,
-              ),
-            ),
-          ],
-          const SizedBox(height: AppTheme.spacingL),
-          // Action buttons
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () {},
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppTheme.textPrimary,
-                    side: const BorderSide(color: AppTheme.dividerColor),
-                    padding:
-                        const EdgeInsets.symmetric(vertical: AppTheme.spacingS),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                if (user.bio.isNotEmpty) ...[
+                  const SizedBox(height: AppTheme.spacingM),
+                  Text(
+                    user.bio,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: AppTheme.textPrimary,
+                      fontSize: 15,
+                      height: 1.4,
                     ),
                   ),
-                  child: Text(s.editProfile,
-                      style: const TextStyle(fontSize: 13)),
-                ),
-              ),
-              const SizedBox(width: AppTheme.spacingS),
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () {},
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppTheme.textPrimary,
-                    side: const BorderSide(color: AppTheme.dividerColor),
-                    padding:
-                        const EdgeInsets.symmetric(vertical: AppTheme.spacingS),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+                ],
+                const SizedBox(height: AppTheme.spacingL),
+                // Stats
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryDark.withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                  child: Text(s.shareProfile,
-                      style: const TextStyle(fontSize: 13)),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildStatColumn(provider.postCount, s.posts),
+                      _buildStatColumn(
+                        user.followersCount,
+                        s.followers,
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => FollowListScreen(
+                              userId: user.userId,
+                              initialTabIndex: 0,
+                            ),
+                          ),
+                        ),
+                      ),
+                      _buildStatColumn(
+                        user.followingCount,
+                        s.following,
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => FollowListScreen(
+                              userId: user.userId,
+                              initialTabIndex: 1,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: AppTheme.spacingL),
+                // Action buttons
+                if (provider.isOwnProfile)
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => const EditProfileScreen()),
+                            );
+                          },
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppTheme.textPrimary,
+                            side: const BorderSide(color: AppTheme.dividerColor),
+                            padding: const EdgeInsets.symmetric(vertical: AppTheme.spacingS),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          child: Text(s.editProfile, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                        ),
+                      ),
+                      const SizedBox(width: AppTheme.spacingS),
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () {},
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppTheme.textPrimary,
+                            side: const BorderSide(color: AppTheme.dividerColor),
+                            padding: const EdgeInsets.symmetric(vertical: AppTheme.spacingS),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          child: Text(s.shareProfile, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                        ),
+                      ),
+                    ],
+                  )
+                else
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () => provider.toggleFollow(),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: user.isFollowing ? AppTheme.surfaceDark : AppTheme.accentViolet,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: AppTheme.spacingS),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              side: user.isFollowing ? const BorderSide(color: AppTheme.dividerColor) : BorderSide.none,
+                            ),
+                            elevation: user.isFollowing ? 0 : 2,
+                          ),
+                          child: Text(user.isFollowing ? 'Takibi Bırak' : 'Takip Et', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                        ),
+                      ),
+                    ],
+                  ),
+              ],
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildPostGrid(List<PostModel> posts, AppStrings s,
+  Widget _buildPostGrid(List<PostModel> posts, AppStrings s, String targetUserId,
       {String? emptyMessage, bool isLocked = false}) {
     if (isLocked) {
       return Center(
@@ -320,7 +392,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       itemCount: posts.length,
       itemBuilder: (context, index) {
         final post = posts[index];
-        final provider = ref.read(profileProvider);
+        final provider = ref.read(profileProvider(targetUserId));
         return GestureDetector(
           onTap: () {
             showDialog(
