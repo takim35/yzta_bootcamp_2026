@@ -4,6 +4,7 @@ Likes & Comments Router
 Endpoints:
   POST   /posts/{post_id}/like              - Beğen
   DELETE /posts/{post_id}/like?user_id=...  - Beğeniyi kaldır
+  GET    /posts/{post_id}/likes             - Beğenenleri listele
   POST   /posts/{post_id}/comments          - Yorum ekle
   GET    /posts/{post_id}/comments          - Yorumları listele
 """
@@ -74,31 +75,54 @@ def like_post(post_id: str, req: LikeRequest, db: sqlite3.Connection = Depends(g
 @router.delete("/posts/{post_id}/like", response_model=MessageResponse)
 def unlike_post(
     post_id: str,
-    user_id: str = Query(..., description="Beğeniyi kaldıran kullanıcı ID"),
+    user_id: str = Query(..., description="Beğeniyi kaldıran kullanıcının ID'si"),
     db: sqlite3.Connection = Depends(get_db),
 ):
-    """Bir postun beğenisini kaldırır. user_id query param olarak alınır."""
+    """Bir postun beğenisini kaldırır."""
     try:
+        post = db.execute("SELECT post_id FROM posts WHERE post_id = ?", (post_id,)).fetchone()
+        if not post:
+            raise HTTPException(status_code=404, detail="Post bulunamadı")
+
         existing = db.execute(
             "SELECT 1 FROM likes WHERE post_id = ? AND user_id = ?",
             (post_id, user_id),
         ).fetchone()
         if not existing:
-            # Zaten beğenilmemiş - 404 yerine başarılı döndür (idempotent)
-            return MessageResponse(success=True, message="Beğeni zaten yoktu")
+            raise HTTPException(status_code=404, detail="Beğeni bulunamadı")
 
         db.execute("DELETE FROM likes WHERE post_id = ? AND user_id = ?", (post_id, user_id))
         db.execute(
             "UPDATE posts SET likes_count = MAX(0, likes_count - 1) WHERE post_id = ?",
-            (post_id,),
+            (post_id,)
         )
         db.commit()
-
-        return MessageResponse(success=True, message="Beğeni kaldırıldı")
+        return MessageResponse(success=True, message="Beğeni başarıyla kaldırıldı.")
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Beğeni kaldırılırken hata: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/posts/{post_id}/likes")
+def get_post_likers(post_id: str, db: sqlite3.Connection = Depends(get_db)):
+    """Bir postu beğenen kullanıcıları listeler."""
+    try:
+        post = db.execute("SELECT post_id FROM posts WHERE post_id = ?", (post_id,)).fetchone()
+        if not post:
+            raise HTTPException(status_code=404, detail="Post bulunamadı")
+
+        likers = db.execute('''
+            SELECT u.user_id, u.username, u.avatar_url, u.display_name 
+            FROM likes l
+            JOIN users u ON l.user_id = u.user_id
+            WHERE l.post_id = ?
+        ''', (post_id,)).fetchall()
+        
+        return [dict(l) for l in likers]
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 # ══════════════════════════════════════════════════════════════

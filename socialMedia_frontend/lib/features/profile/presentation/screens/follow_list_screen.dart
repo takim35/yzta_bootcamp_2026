@@ -5,21 +5,30 @@ import '../../../../services/api_service.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import 'profile_screen.dart';
 
-class FollowListScreen extends ConsumerStatefulWidget {
+class FollowListBottomSheet extends ConsumerStatefulWidget {
   final String userId;
-  final int initialTabIndex; // 0 for Followers, 1 for Following
+  final int initialTabIndex;
 
-  const FollowListScreen({
+  const FollowListBottomSheet({
     super.key,
     required this.userId,
     this.initialTabIndex = 0,
   });
 
+  static void show(BuildContext context, {required String userId, int initialTabIndex = 0}) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => FollowListBottomSheet(userId: userId, initialTabIndex: initialTabIndex),
+    );
+  }
+
   @override
-  ConsumerState<FollowListScreen> createState() => _FollowListScreenState();
+  ConsumerState<FollowListBottomSheet> createState() => _FollowListBottomSheetState();
 }
 
-class _FollowListScreenState extends ConsumerState<FollowListScreen> with SingleTickerProviderStateMixin {
+class _FollowListBottomSheetState extends ConsumerState<FollowListBottomSheet> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final ApiService _api = ApiService();
   bool _isLoading = true;
@@ -57,6 +66,7 @@ class _FollowListScreenState extends ConsumerState<FollowListScreen> with Single
   }
 
   void _navigateToProfile(String userId) {
+    Navigator.pop(context);
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -67,33 +77,49 @@ class _FollowListScreenState extends ConsumerState<FollowListScreen> with Single
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppTheme.primaryDark,
-      appBar: AppBar(
-        backgroundColor: AppTheme.primaryDark,
-        elevation: 0,
-        title: const Text('Bağlantılar', style: TextStyle(color: AppTheme.textPrimary)),
-        iconTheme: const IconThemeData(color: AppTheme.textPrimary),
-        bottom: TabBar(
-          controller: _tabController,
-          indicatorColor: AppTheme.accentViolet,
-          labelColor: AppTheme.textPrimary,
-          unselectedLabelColor: AppTheme.textMuted,
-          tabs: const [
-            Tab(text: 'Takipçiler'),
-            Tab(text: 'Takip Edilenler'),
-          ],
-        ),
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.7,
+      decoration: BoxDecoration(
+        color: AppTheme.primaryDark,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: AppTheme.accentViolet))
-          : TabBarView(
-              controller: _tabController,
-              children: [
-                _buildUserList(_followers),
-                _buildUserList(_following),
-              ],
+      child: Column(
+        children: [
+          Center(
+            child: Container(
+              margin: const EdgeInsets.only(top: 12, bottom: 8),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.white24,
+                borderRadius: BorderRadius.circular(2),
+              ),
             ),
+          ),
+          TabBar(
+            controller: _tabController,
+            indicatorColor: AppTheme.accentViolet,
+            labelColor: AppTheme.textPrimary,
+            unselectedLabelColor: AppTheme.textMuted,
+            tabs: const [
+              Tab(text: 'Takipçiler'),
+              Tab(text: 'Takip Edilenler'),
+            ],
+          ),
+          const Divider(color: AppTheme.dividerColor, height: 1),
+          Expanded(
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator(color: AppTheme.accentViolet))
+                : TabBarView(
+                    controller: _tabController,
+                    children: [
+                      _buildUserList(_followers),
+                      _buildUserList(_following),
+                    ],
+                  ),
+          ),
+        ],
+      ),
     );
   }
 

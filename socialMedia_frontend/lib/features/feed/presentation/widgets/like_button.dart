@@ -6,12 +6,14 @@ class LikeButton extends ConsumerStatefulWidget {
   final bool isLiked;
   final int likesCount;
   final VoidCallback onToggle;
+  final VoidCallback? onLikersTap;
 
   const LikeButton({
     super.key,
     required this.isLiked,
     required this.likesCount,
     required this.onToggle,
+    this.onLikersTap,
   });
 
   @override
@@ -52,20 +54,20 @@ class _LikeButtonState extends ConsumerState<LikeButton>
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
-      label: widget.isLiked ? 'Beğeniyi kaldır' : 'Beğen',
-      child: InkWell(
-        onTap: _handleTap,
-        borderRadius: BorderRadius.circular(AppTheme.radiusRound),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppTheme.spacingS,
-            vertical: AppTheme.spacingXS,
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AnimatedBuilder(
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Semantics(
+          label: widget.isLiked ? 'Beğeniyi kaldır' : 'Beğen',
+          child: InkWell(
+            onTap: _handleTap,
+            borderRadius: BorderRadius.circular(AppTheme.radiusRound),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppTheme.spacingS,
+                vertical: AppTheme.spacingXS,
+              ),
+              child: AnimatedBuilder(
                 animation: _scaleAnimation,
                 builder: (context, child) {
                   return Transform.scale(
@@ -95,8 +97,15 @@ class _LikeButtonState extends ConsumerState<LikeButton>
                   ),
                 ),
               ),
-              const SizedBox(width: AppTheme.spacingXS),
-              AnimatedSwitcher(
+            ),
+          ),
+        ),
+        if (widget.onLikersTap != null)
+          GestureDetector(
+            onTap: widget.onLikersTap,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: AppTheme.spacingXS),
+              child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 200),
                 child: Text(
                   _formatCount(widget.likesCount),
@@ -110,10 +119,27 @@ class _LikeButtonState extends ConsumerState<LikeButton>
                   ),
                 ),
               ),
-            ],
+            ),
+          )
+        else
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: AppTheme.spacingXS),
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 200),
+              child: Text(
+                _formatCount(widget.likesCount),
+                key: ValueKey(widget.likesCount),
+                style: TextStyle(
+                  color: widget.isLiked
+                      ? AppTheme.accentPink
+                      : AppTheme.textSecondary,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
           ),
-        ),
-      ),
+      ],
     );
   }
 

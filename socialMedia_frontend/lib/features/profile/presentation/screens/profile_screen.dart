@@ -7,6 +7,9 @@ import '../../../../features/feed/domain/models/post_model.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/localization/locale_provider.dart';
 import '../../../../core/localization/app_strings.dart';
+import '../../../../features/feed/presentation/widgets/empty_state.dart';
+import '../../../../features/feed/presentation/widgets/shimmer_loading.dart';
+import '../../../../core/widgets/custom_shimmer.dart';
 import 'follow_list_screen.dart';
 import 'edit_profile_screen.dart';
 
@@ -20,14 +23,19 @@ class ProfileScreen extends ConsumerStatefulWidget {
 
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   @override
+  Future<void> _loadProfile() async {
+    final currentUserId = ref.read(authProvider).currentUserId;
+    final targetUserId = widget.userId ?? currentUserId;
+    if (targetUserId != null && targetUserId.isNotEmpty) {
+      await ref.read(profileProvider(targetUserId)).loadProfile(targetUserId, currentUserId ?? targetUserId);
+    }
+  }
+
+  @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final currentUserId = ref.read(authProvider).currentUserId;
-      final targetUserId = widget.userId ?? currentUserId;
-      if (targetUserId != null && targetUserId.isNotEmpty) {
-        ref.read(profileProvider(targetUserId)).loadProfile(targetUserId, currentUserId ?? targetUserId);
-      }
+      _loadProfile();
     });
   }
 
@@ -40,11 +48,20 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final provider = ref.watch(profileProvider(targetUserId));
     final s = ref.watch(stringsProvider);
 
-    if (provider.isLoading) {
-      return const Scaffold(
+    if (provider.isLoading && provider.user == null) {
+      return Scaffold(
         backgroundColor: AppTheme.primaryDark,
-        body: Center(
-          child: CircularProgressIndicator(color: AppTheme.accentViolet),
+        body: SafeArea(
+          child: Column(
+            children: [
+              const SizedBox(height: 32),
+              const CustomShimmer(width: 100, height: 100, isCircle: true),
+              const SizedBox(height: 16),
+              const CustomShimmer(width: 150, height: 24, borderRadius: 8),
+              const SizedBox(height: 32),
+              Expanded(child: const ProfileGridShimmer()),
+            ],
+          ),
         ),
       );
     }
@@ -80,8 +97,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           backgroundColor: AppTheme.primaryDark,
           elevation: 0,
         ),
-        body: NestedScrollView(
-          headerSliverBuilder: (context, innerBoxIsScrolled) => [
+        body: RefreshIndicator(
+          onRefresh: _loadProfile,
+          color: AppTheme.accentViolet,
+          backgroundColor: AppTheme.surfaceDark,
+          child: NestedScrollView(
+            headerSliverBuilder: (context, innerBoxIsScrolled) => [
             SliverToBoxAdapter(child: _buildHeader(user, provider, s)),
             SliverPersistentHeader(
               pinned: true,
@@ -91,7 +112,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   labelColor: AppTheme.textPrimary,
                   unselectedLabelColor: AppTheme.textMuted,
                   tabs: [
-                    const Tab(icon: Icon(Icons.grid_on_rounded)),
+                    const Tab(icon: Icon(Icons.style_rounded)),
                     if (provider.isOwnProfile)
                       const Tab(icon: Icon(Icons.auto_awesome_rounded, color: Color(0xFFFFD700))),
                   ],
@@ -113,14 +134,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   s,
                   targetUserId,
                   emptyMessage: s.isTr
-                      ? 'Henüz podyumlanmış gönderi yok'
-                      : 'No runway posts yet',
+                      ? 'Henüz Podyumda gönderi yok'
+                      : 'No Podium posts yet',
                 ),
             ],
           ),
         ),
       ),
-    );
+    ));
   }
 
   Widget _buildHeader(dynamic user, ProfileProvider provider, AppStrings s) {
@@ -246,27 +267,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       _buildStatColumn(
                         user.followersCount,
                         s.followers,
-                        onTap: () => Navigator.push(
+                        onTap: () => FollowListBottomSheet.show(
                           context,
-                          MaterialPageRoute(
-                            builder: (_) => FollowListScreen(
-                              userId: user.userId,
-                              initialTabIndex: 0,
-                            ),
-                          ),
+                          userId: user.userId,
+                          initialTabIndex: 0,
                         ),
                       ),
                       _buildStatColumn(
                         user.followingCount,
                         s.following,
-                        onTap: () => Navigator.push(
+                        onTap: () => FollowListBottomSheet.show(
                           context,
-                          MaterialPageRoute(
-                            builder: (_) => FollowListScreen(
-                              userId: user.userId,
-                              initialTabIndex: 1,
-                            ),
-                          ),
+                          userId: user.userId,
+                          initialTabIndex: 1,
                         ),
                       ),
                     ],
@@ -321,7 +334,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           onPressed: () => provider.toggleFollow(),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: user.isFollowing ? AppTheme.surfaceDark : AppTheme.accentViolet,
-                            foregroundColor: Colors.white,
+                            foregroundColor: AppTheme.textPrimary,
                             padding: const EdgeInsets.symmetric(vertical: AppTheme.spacingS),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
@@ -419,8 +432,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       const SizedBox(height: 16),
                       ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(backgroundColor: AppTheme.errorColor),
-                        icon: const Icon(Icons.delete, color: Colors.white),
-                        label: Text(s.isTr ? 'Sil' : 'Delete', style: const TextStyle(color: Colors.white)),
+                        icon: const Icon(Icons.delete, color: AppTheme.textPrimary),
+                        label: Text(s.isTr ? 'Sil' : 'Delete', style: const TextStyle(color: AppTheme.textPrimary)),
                         onPressed: () async {
                           Navigator.pop(ctx);
                           final userId = ref.read(authProvider).currentUserId;

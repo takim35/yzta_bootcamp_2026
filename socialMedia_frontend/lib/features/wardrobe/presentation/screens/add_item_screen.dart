@@ -273,9 +273,9 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                 ),
                 child: _isLoading
-                    ? const CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
+                    ? const CircularProgressIndicator(color: AppTheme.textPrimary, strokeWidth: 2)
                     : const Text('Kıyafeti Ekle',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
               ),
             ),
 
@@ -329,7 +329,7 @@ class _ChipsField extends StatelessWidget {
             child: Text(
               item,
               style: TextStyle(
-                color: isSelected ? Colors.white : AppTheme.textPrimary,
+                color: isSelected ? AppTheme.textPrimary : AppTheme.textPrimary,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 fontSize: 13,
               ),

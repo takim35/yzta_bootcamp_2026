@@ -158,7 +158,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.w800,
-            color: Colors.white,
+            color: AppTheme.textPrimary,
             letterSpacing: -0.5,
           ),
           semanticsLabel: 'Spot Online ana sayfa',
@@ -185,7 +185,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
               ? Badge(
                   label: Text(
                     _unreadCount > 9 ? '9+' : _unreadCount.toString(),
-                    style: const TextStyle(fontSize: 10, color: Colors.white),
+                    style: const TextStyle(fontSize: 10, color: AppTheme.textPrimary),
                   ),
                   child: const Icon(Icons.notifications_outlined, color: AppTheme.textPrimary),
                 )

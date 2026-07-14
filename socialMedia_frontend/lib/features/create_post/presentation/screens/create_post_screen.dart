@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../features/create_post/presentation/providers/create_post_provider.dart';
 import '../../../../features/auth/presentation/providers/auth_provider.dart';
+import '../../../../features/feed/presentation/providers/feed_provider.dart';
 import '../../../../features/create_post/presentation/widgets/visibility_selector.dart';
 import '../../../../features/create_post/presentation/widgets/outfit_picker.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -464,6 +465,8 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
       provider.clearForm();
       // Yönlendirmeyi değiştir: Ana sayfa navigasyonundan pop yapmak yerine tab indeksini 0 (Feed) yap
       ref.read(bottomNavIndexProvider.notifier).state = 0;
+      // Yeni gönderiyi anında akışta görmek için beslemeyi (feed) yenile
+      ref.read(feedProvider).refresh();
     }
   }
 }

@@ -378,6 +378,11 @@ class ApiService {
     await _delete('/posts/$postId/like?user_id=$userId', {});
   }
 
+  Future<List<Map<String, dynamic>>> getPostLikers(String postId) async {
+    final response = await _getList('/posts/$postId/likes');
+    return response.map((item) => item as Map<String, dynamic>).toList();
+  }
+
   // ─── Save ───────────────────────────────────────────────────
   Future<void> savePost({
     required String postId,

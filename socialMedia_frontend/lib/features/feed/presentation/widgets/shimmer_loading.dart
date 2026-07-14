@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
-import 'package:shimmer/shimmer.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/custom_shimmer.dart';
 
 /// Feed için shimmer skeleton placeholder
 class FeedShimmer extends ConsumerWidget {
@@ -11,16 +11,12 @@ class FeedShimmer extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Shimmer.fromColors(
-      baseColor: AppTheme.cardDark,
-      highlightColor: AppTheme.dividerColor,
-      child: ListView.builder(
-        physics: const NeverScrollableScrollPhysics(),
-        shrinkWrap: true,
-        padding: const EdgeInsets.symmetric(vertical: AppTheme.spacingS),
-        itemCount: itemCount,
-        itemBuilder: (context, index) => const _FeedCardShimmer(),
-      ),
+    return ListView.builder(
+      physics: const NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
+      padding: const EdgeInsets.symmetric(vertical: AppTheme.spacingS),
+      itemCount: itemCount,
+      itemBuilder: (context, index) => const _FeedCardShimmer(),
     );
   }
 }
@@ -48,37 +44,26 @@ class _FeedCardShimmer extends ConsumerWidget {
             child: Row(
               children: [
                 // Avatar
-                Container(
+                const CustomShimmer(
                   width: 36,
                   height: 36,
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                  ),
+                  isCircle: true,
                 ),
                 const SizedBox(width: AppTheme.spacingM),
                 // Username + time
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
+                    CustomShimmer(
                       width: 100,
                       height: 12,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius:
-                            BorderRadius.circular(AppTheme.radiusSmall),
-                      ),
+                      borderRadius: AppTheme.radiusSmall,
                     ),
                     const SizedBox(height: 6),
-                    Container(
+                    CustomShimmer(
                       width: 60,
                       height: 10,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius:
-                            BorderRadius.circular(AppTheme.radiusSmall),
-                      ),
+                      borderRadius: AppTheme.radiusSmall,
                     ),
                   ],
                 ),
@@ -86,10 +71,12 @@ class _FeedCardShimmer extends ConsumerWidget {
             ),
           ),
           // ─── Image Shimmer ──────────────────────────────────
-          AspectRatio(
+          const AspectRatio(
             aspectRatio: 4 / 5,
-            child: Container(
-              color: Colors.white,
+            child: CustomShimmer(
+              width: double.infinity,
+              height: double.infinity,
+              borderRadius: 0,
             ),
           ),
           // ─── Actions Shimmer ────────────────────────────────
@@ -100,45 +87,30 @@ class _FeedCardShimmer extends ConsumerWidget {
               children: [
                 Row(
                   children: [
-                    Container(
+                    const CustomShimmer(
                       width: 24,
                       height: 24,
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                      ),
+                      isCircle: true,
                     ),
                     const SizedBox(width: AppTheme.spacingS),
-                    Container(
+                    CustomShimmer(
                       width: 30,
                       height: 12,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius:
-                            BorderRadius.circular(AppTheme.radiusSmall),
-                      ),
+                      borderRadius: AppTheme.radiusSmall,
                     ),
                   ],
                 ),
                 const SizedBox(height: AppTheme.spacingM),
-                Container(
+                CustomShimmer(
                   width: double.infinity,
                   height: 12,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius:
-                        BorderRadius.circular(AppTheme.radiusSmall),
-                  ),
+                  borderRadius: AppTheme.radiusSmall,
                 ),
                 const SizedBox(height: 6),
-                Container(
+                CustomShimmer(
                   width: 200,
                   height: 12,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius:
-                        BorderRadius.circular(AppTheme.radiusSmall),
-                  ),
+                  borderRadius: AppTheme.radiusSmall,
                 ),
               ],
             ),
@@ -157,22 +129,20 @@ class ProfileGridShimmer extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Shimmer.fromColors(
-      baseColor: AppTheme.cardDark,
-      highlightColor: AppTheme.dividerColor,
-      child: GridView.builder(
-        physics: const NeverScrollableScrollPhysics(),
-        shrinkWrap: true,
-        padding: const EdgeInsets.all(2),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          crossAxisSpacing: 2,
-          mainAxisSpacing: 2,
-        ),
-        itemCount: itemCount,
-        itemBuilder: (context, index) => Container(
-          color: Colors.white,
-        ),
+    return GridView.builder(
+      physics: const NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
+      padding: const EdgeInsets.all(2),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        crossAxisSpacing: 2,
+        mainAxisSpacing: 2,
+      ),
+      itemCount: itemCount,
+      itemBuilder: (context, index) => const CustomShimmer(
+        width: double.infinity,
+        height: double.infinity,
+        borderRadius: 0,
       ),
     );
   }

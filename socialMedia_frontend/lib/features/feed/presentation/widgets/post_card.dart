@@ -6,6 +6,7 @@ import '../../../../features/feed/domain/models/post_model.dart';
 import '../../../../features/shared/presentation/screens/image_viewer_screen.dart';
 import '../../../../core/theme/app_theme.dart';
 import 'like_button.dart';
+import 'likers_bottom_sheet.dart';
 
 class PostCard extends ConsumerWidget {
   final PostModel post;
@@ -153,6 +154,18 @@ class PostCard extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             ListTile(
+              leading: const Icon(Icons.favorite_border_rounded, color: AppTheme.accentPink),
+              title: const Text('İlgileniyorum', style: TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.bold)),
+              subtitle: const Text('Bu tarz kombinleri daha çok göreceksiniz.', style: TextStyle(color: AppTheme.textMuted, fontSize: 12)),
+              onTap: () {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('İlgi alanlarınıza eklendi! ✨')),
+                );
+              },
+            ),
+            const Divider(color: AppTheme.dividerColor, height: 1),
+            ListTile(
               leading: const Icon(Icons.visibility_off_outlined, color: AppTheme.textPrimary),
               title: const Text('İlgilenmiyorum', style: TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.bold)),
               subtitle: const Text('Bu tür gönderileri daha az göreceksiniz.', style: TextStyle(color: AppTheme.textMuted, fontSize: 12)),
@@ -270,6 +283,7 @@ class PostCard extends ConsumerWidget {
                     isLiked: post.isLiked,
                     likesCount: post.likesCount,
                     onToggle: () => onLike(post.postId),
+                    onLikersTap: () => LikersBottomSheet.show(context, postId: post.postId),
                   ),
                   const SizedBox(width: AppTheme.spacingM),
                   GestureDetector(
@@ -308,7 +322,7 @@ class PostCard extends ConsumerWidget {
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
                 onPressed: () => onSave?.call(post.postId),
-                tooltip: post.isSaved ? 'Podyumlananlardan Çıkar' : 'Podyuma Çıkar',
+                tooltip: post.isSaved ? 'Podyum\'dan Çıkar' : 'Podyuma Çıkar',
               ),
             ],
           ),

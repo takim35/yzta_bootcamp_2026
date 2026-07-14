@@ -327,7 +327,7 @@ class _ChipsField extends StatelessWidget {
             child: Text(
               item,
               style: TextStyle(
-                color: isSelected ? Colors.white : AppTheme.textPrimary,
+                color: isSelected ? AppTheme.textPrimary : AppTheme.textPrimary,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 fontSize: 13,
               ),

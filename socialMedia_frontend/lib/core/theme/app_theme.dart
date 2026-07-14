@@ -1,19 +1,24 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  // Colors
-  static const Color primaryDark = Color(0xFF0D0D1A);
-  static const Color surfaceDark = Color(0xFF1A1A2E);
-  static const Color cardDark = Color(0xFF16213E);
-  static const Color accentViolet = Color(0xFF8A2BE2);
-  static const Color accentPurple = Color(0xFF9370DB);
-  static const Color accentPink = Color(0xFFFF69B4);
-  static const Color textPrimary = Colors.white;
-  static const Color textSecondary = Colors.white70;
-  static const Color textMuted = Colors.white54;
-  static const Color dividerColor = Colors.white12;
-  static const Color errorColor = Colors.redAccent;
-  static const Color successColor = Colors.greenAccent;
+  // Pastel Disco Vibe Colors (Soft & Harmonized)
+  static const Color primaryDark = Color(0xFF1E1A29); // Yumuşak koyu pastel mor/gri
+  static const Color surfaceDark = Color(0xFF2A233A); // Daha açık yüzey
+  static const Color cardDark = Color(0xFF362E49); // Kart arka planı
+  
+  // Pastel Disko Renkleri
+  static const Color accentViolet = Color(0xFFDDB8F7); // Pastel Menekşe
+  static const Color accentPurple = Color(0xFFCBA1EB); // Pastel Mor
+  static const Color accentPink = Color(0xFFFFB3D9); // Pastel Disko Pembesi
+  static const Color accentCyan = Color(0xFFA3FFF0); // Pastel Spot Turkuaz
+  static const Color accentGold = Color(0xFFFFEBB3); // Pastel Spot Altın
+  
+  static const Color textPrimary = Color(0xFFF7F3FC); // Kırık beyaz pastel
+  static const Color textSecondary = Color(0xFFD9D4E6);
+  static const Color textMuted = Color(0xFFA5A0B5);
+  static const Color dividerColor = Color(0x30FFFFFF);
+  static const Color errorColor = Color(0xFFFF99AA); // Pastel kırmızı/pembe
+  static const Color successColor = Color(0xFF99FFCC); // Pastel yeşil
 
   // Spacing
   static const double spacingXS = 4.0;

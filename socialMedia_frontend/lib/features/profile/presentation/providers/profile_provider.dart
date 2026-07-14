@@ -3,11 +3,62 @@ import 'package:flutter/foundation.dart';
 import '../../../../features/feed/domain/models/post_model.dart';
 import '../../../../features/profile/domain/models/user_model.dart';
 import '../../../../services/api_service.dart';
+import '../../../../core/events/post_events.dart';
+import 'dart:async';
 
 final profileProvider = ChangeNotifierProvider.family.autoDispose<ProfileProvider, String>((ref, userId) => ProfileProvider());
 
 class ProfileProvider extends ChangeNotifier {
   final ApiService _api = ApiService();
+  StreamSubscription? _postEventSub;
+
+  ProfileProvider() {
+    _postEventSub = PostEventBus().stream.listen(_onPostEvent);
+  }
+
+  void _onPostEvent(PostUpdateEvent event) {
+    bool updated = false;
+
+    // Update in userPosts
+    final index1 = _userPosts.indexWhere((p) => p.postId == event.postId);
+    if (index1 != -1) {
+      _userPosts[index1] = _userPosts[index1].copyWith(
+        isLiked: event.isLiked ?? _userPosts[index1].isLiked,
+        likesCount: event.likesCount ?? _userPosts[index1].likesCount,
+        isSaved: event.isSaved ?? _userPosts[index1].isSaved,
+        commentsCount: event.commentsCount ?? _userPosts[index1].commentsCount,
+      );
+      updated = true;
+    }
+
+    // Update in savedPosts
+    final index2 = _savedPosts.indexWhere((p) => p.postId == event.postId);
+    if (index2 != -1) {
+      _savedPosts[index2] = _savedPosts[index2].copyWith(
+        isLiked: event.isLiked ?? _savedPosts[index2].isLiked,
+        likesCount: event.likesCount ?? _savedPosts[index2].likesCount,
+        isSaved: event.isSaved ?? _savedPosts[index2].isSaved,
+        commentsCount: event.commentsCount ?? _savedPosts[index2].commentsCount,
+      );
+      
+      // If it was unsaved, maybe remove it from savedPosts? 
+      // It's safer to remove it from saved posts if we are in own profile
+      if (event.isSaved == false && isOwnProfile) {
+        _savedPosts.removeAt(index2);
+      }
+      updated = true;
+    }
+
+    if (updated) {
+      notifyListeners();
+    }
+  }
+
+  @override
+  void dispose() {
+    _postEventSub?.cancel();
+    super.dispose();
+  }
 
   UserModel? _user;
   UserModel? get user => _user;
@@ -135,5 +186,75 @@ class ProfileProvider extends ChangeNotifier {
     _isLoading = false;
     _hasError = false;
     notifyListeners();
+  }
+
+  // Like Toggle
+  Future<void> toggleLike(String postId, String userId) async {
+    // Find post
+    PostModel? post;
+    int index1 = _userPosts.indexWhere((p) => p.postId == postId);
+    int index2 = _savedPosts.indexWhere((p) => p.postId == postId);
+
+    if (index1 != -1) post = _userPosts[index1];
+    else if (index2 != -1) post = _savedPosts[index2];
+
+    if (post == null) return;
+
+    final wasLiked = post.isLiked;
+    final newLikesCount = wasLiked ? post.likesCount - 1 : post.likesCount + 1;
+
+    // We don't need to manually update local lists here because we broadcast an event
+    // and the event listener will update the local lists.
+    PostEventBus().broadcast(PostUpdateEvent(
+      postId: postId,
+      isLiked: !wasLiked,
+      likesCount: newLikesCount,
+    ));
+
+    try {
+      if (wasLiked) {
+        await _api.unlikePost(postId: postId, userId: userId);
+      } else {
+        await _api.likePost(postId: postId, userId: userId);
+      }
+    } catch (e) {
+      debugPrint('Beğeni hatası (Profil): $e');
+    }
+  }
+
+  // Save Toggle
+  Future<void> toggleSave(String postId, String userId) async {
+    PostModel? post;
+    int index1 = _userPosts.indexWhere((p) => p.postId == postId);
+    int index2 = _savedPosts.indexWhere((p) => p.postId == postId);
+
+    if (index1 != -1) post = _userPosts[index1];
+    else if (index2 != -1) post = _savedPosts[index2];
+
+    if (post == null) return;
+
+    final wasSaved = post.isSaved;
+
+    PostEventBus().broadcast(PostUpdateEvent(
+      postId: postId,
+      isSaved: !wasSaved,
+    ));
+
+    try {
+      if (wasSaved) {
+        await _api.unsavePost(postId: postId, userId: userId);
+      } else {
+        await _api.savePost(postId: postId, userId: userId);
+      }
+    } catch (e) {
+      debugPrint('Kaydetme hatası (Profil): $e');
+    }
+  }
+
+  void updateCommentsCount(String postId, int count) {
+    PostEventBus().broadcast(PostUpdateEvent(
+      postId: postId,
+      commentsCount: count,
+    ));
   }
 }

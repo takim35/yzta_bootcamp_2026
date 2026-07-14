@@ -48,32 +48,32 @@ class CreatePostProvider extends ChangeNotifier {
         OutfitItem(
           itemId: 'item-001',
           category: 'üst giyim',
-          imageUrl: '${ApiService.baseUrl}/static/categories/top_pixel_1783723682362.png',
+          imageUrl: '${ApiService.baseUrl}/static/categories/miyazaki_top.png',
         ),
         OutfitItem(
           itemId: 'item-002',
           category: 'alt giyim',
-          imageUrl: '${ApiService.baseUrl}/static/categories/bottom_pixel_1783723690417.png',
+          imageUrl: '${ApiService.baseUrl}/static/categories/miyazaki_bottom.png',
         ),
         OutfitItem(
           itemId: 'item-003',
           category: 'ayakkabı',
-          imageUrl: '${ApiService.baseUrl}/static/categories/shoes_pixel_1783723697523.png',
+          imageUrl: '${ApiService.baseUrl}/static/categories/miyazaki_shoes.png',
         ),
         OutfitItem(
           itemId: 'item-004',
           category: 'aksesuar',
-          imageUrl: '${ApiService.baseUrl}/static/categories/accessory_pixel_1783723705293.png',
+          imageUrl: '${ApiService.baseUrl}/static/categories/miyazaki_accessory.png',
         ),
         OutfitItem(
           itemId: 'item-005',
           category: 'dış giyim',
-          imageUrl: '${ApiService.baseUrl}/static/categories/jacket_pixel_1783723717704.png',
+          imageUrl: '${ApiService.baseUrl}/static/categories/miyazaki_jacket.png',
         ),
         OutfitItem(
           itemId: 'item-006',
           category: 'diğer',
-          imageUrl: '${ApiService.baseUrl}/static/categories/bag_pixel_1783723727046.png',
+          imageUrl: '${ApiService.baseUrl}/static/categories/miyazaki_bag.png',
         ),
       ];
 

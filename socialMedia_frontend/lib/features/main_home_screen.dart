@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import '../core/theme/app_theme.dart';
 import '../core/localization/locale_provider.dart';
+import '../services/api_service.dart';
 import '../core/localization/app_strings.dart';
 import '../navigation/app_navigator.dart';
 import 'wardrobe/presentation/screens/wardrobe_screen.dart';
@@ -11,11 +12,27 @@ import 'auth/presentation/providers/auth_provider.dart';
 import 'profile/presentation/providers/profile_provider.dart';
 import 'profile/presentation/screens/settings_screen.dart';
 
-class MainHomeScreen extends ConsumerWidget {
+class MainHomeScreen extends ConsumerStatefulWidget {
   const MainHomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MainHomeScreen> createState() => _MainHomeScreenState();
+}
+
+class _MainHomeScreenState extends ConsumerState<MainHomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final currentUserId = ref.read(authProvider).currentUserId;
+      if (currentUserId != null) {
+        ref.read(profileProvider(currentUserId)).loadProfile(currentUserId, currentUserId);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final s = ref.watch(stringsProvider);
     final size = MediaQuery.of(context).size;
 
@@ -34,8 +51,8 @@ class MainHomeScreen extends ConsumerWidget {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppTheme.accentViolet.withValues(alpha: 0.15),
-                    AppTheme.accentViolet.withValues(alpha: 0),
+                    AppTheme.accentPurple.withValues(alpha: 0.15),
+                    AppTheme.accentPurple.withValues(alpha: 0),
                   ],
                 ),
               ),
@@ -83,7 +100,7 @@ class MainHomeScreen extends ConsumerWidget {
                               return Text(
                                 '${s.homeWelcomeBack}$displayName 👋',
                                 style: const TextStyle(
-                                  color: Colors.white,
+                                  color: AppTheme.textPrimary,
                                   fontSize: 22,
                                   fontWeight: FontWeight.w800,
                                   letterSpacing: -0.5,
@@ -210,7 +227,7 @@ class MainHomeScreen extends ConsumerWidget {
                           icon: Icons.checkroom_rounded,
                           title: s.wardrobe,
                           subtitle: s.wardrobeSub,
-                          color: AppTheme.accentPink,
+                          color: AppTheme.accentCyan,
                           onTap: () {
                             Navigator.push(
                               context,
@@ -225,7 +242,7 @@ class MainHomeScreen extends ConsumerWidget {
                           icon: Icons.auto_awesome_rounded,
                           title: s.aiStylist,
                           subtitle: s.aiStylistSub,
-                          color: const Color(0xFF0EA5E9),
+                          color: AppTheme.accentGold,
                           onTap: () {
                             Navigator.push(
                               context,
@@ -240,7 +257,7 @@ class MainHomeScreen extends ConsumerWidget {
                           icon: Icons.camera_enhance_rounded,
                           title: s.arMirror,
                           subtitle: s.arMirrorSub,
-                          color: const Color(0xFFDB2777),
+                          color: AppTheme.accentPink,
                           onTap: () {},
                           comingSoon: true,
                           comingSoonLabel: s.comingSoon,
@@ -311,15 +328,15 @@ class _FeaturedCard extends ConsumerWidget {
       child: Container(
         height: 160,
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
+          gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFF7C3AED), Color(0xFFDB2777)],
+            colors: [AppTheme.accentPurple, AppTheme.accentPink],
           ),
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF7C3AED).withValues(alpha: 0.4),
+              color: AppTheme.accentPurple.withValues(alpha: 0.4),
               blurRadius: 24,
               offset: const Offset(0, 8),
             ),
@@ -334,7 +351,7 @@ class _FeaturedCard extends ConsumerWidget {
               child: Icon(
                 Icons.diversity_3_rounded,
                 size: 140,
-                color: Colors.white.withValues(alpha: 0.08),
+                color: AppTheme.textPrimary.withValues(alpha: 0.08),
               ),
             ),
             Padding(
@@ -345,12 +362,12 @@ class _FeaturedCard extends ConsumerWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.2),
+                      color: AppTheme.textPrimary.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: const Icon(
                       Icons.public_rounded,
-                      color: Colors.white,
+                      color: AppTheme.textPrimary,
                       size: 22,
                     ),
                   ),
@@ -358,7 +375,7 @@ class _FeaturedCard extends ConsumerWidget {
                   Text(
                     s.social,
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: AppTheme.textPrimary,
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
                       letterSpacing: -0.3,
@@ -368,7 +385,7 @@ class _FeaturedCard extends ConsumerWidget {
                   Text(
                     s.socialSub,
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.75),
+                      color: AppTheme.textPrimary.withValues(alpha: 0.75),
                       fontSize: 13,
                     ),
                   ),
@@ -382,12 +399,12 @@ class _FeaturedCard extends ConsumerWidget {
               child: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
+                  color: AppTheme.textPrimary.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Icon(
                   Icons.arrow_forward_rounded,
-                  color: Colors.white,
+                  color: AppTheme.textPrimary,
                   size: 18,
                 ),
               ),
@@ -489,13 +506,29 @@ class _SmallCard extends StatelessWidget {
 }
 
 // ── Quick Stats Row ────────────────────────────────────────────
-class _StatsRow extends StatelessWidget {
+class _StatsRow extends ConsumerWidget {
   final dynamic s;
   const _StatsRow({required this.s});
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authProv = ref.watch(authProvider);
+    final userId = authProv.currentUserId;
+    if (userId == null) return const SizedBox.shrink();
+
+    final profileProv = ref.watch(profileProvider(userId));
+    final user = profileProv.user;
+
+    final String followersCount = user?.followersCount.toString() ?? '0';
+    final String postsCount = profileProv.userPosts.length.toString();
+    
+    // We can use a FutureBuilder for wardrobe count since it's not in profile provider
+    return FutureBuilder<List<dynamic>>(
+      future: ApiService().getClothes(userId),
+      builder: (context, snapshot) {
+        final wardrobeCount = snapshot.hasData ? snapshot.data!.length.toString() : '0';
+
+        return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppTheme.cardDark,
@@ -506,26 +539,28 @@ class _StatsRow extends StatelessWidget {
         children: [
           _StatItem(
             icon: Icons.checkroom_rounded,
-            value: '0',
+            value: wardrobeCount,
             label: s.wardrobe,
             color: const Color(0xFF7C3AED),
           ),
           _Divider(),
           _StatItem(
-            icon: Icons.favorite_rounded,
-            value: '0',
+            icon: Icons.style_rounded,
+            value: postsCount,
             label: s.navFeed,
             color: const Color(0xFFDB2777),
           ),
           _Divider(),
           _StatItem(
             icon: Icons.people_alt_rounded,
-            value: '0',
+            value: followersCount,
             label: s.followers,
             color: const Color(0xFF0EA5E9),
           ),
         ],
       ),
+    );
+      },
     );
   }
 }

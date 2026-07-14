@@ -81,7 +81,7 @@ class EmptyState extends ConsumerWidget {
                       child: Text(
                         actionLabel!,
                         style: const TextStyle(
-                          color: Colors.white,
+                          color: AppTheme.textPrimary,
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                         ),

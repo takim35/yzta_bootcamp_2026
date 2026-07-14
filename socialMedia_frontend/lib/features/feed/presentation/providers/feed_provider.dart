@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../features/feed/domain/models/post_model.dart';
 import '../../../../services/api_service.dart';
+import '../../../../core/events/post_events.dart';
+import 'dart:async';
 
 import '../../../../features/auth/presentation/providers/auth_provider.dart';
 
@@ -14,8 +16,30 @@ final feedProvider = ChangeNotifierProvider((ref) {
 class FeedProvider extends ChangeNotifier {
   final ApiService _api = ApiService();
   final String currentUserId;
+  late final StreamSubscription _postEventSub;
 
-  FeedProvider({required this.currentUserId});
+  FeedProvider({required this.currentUserId}) {
+    _postEventSub = PostEventBus().stream.listen(_onPostEvent);
+  }
+
+  void _onPostEvent(PostUpdateEvent event) {
+    final index = _posts.indexWhere((p) => p.postId == event.postId);
+    if (index != -1) {
+      _posts[index] = _posts[index].copyWith(
+        isLiked: event.isLiked ?? _posts[index].isLiked,
+        likesCount: event.likesCount ?? _posts[index].likesCount,
+        isSaved: event.isSaved ?? _posts[index].isSaved,
+        commentsCount: event.commentsCount ?? _posts[index].commentsCount,
+      );
+      notifyListeners();
+    }
+  }
+
+  @override
+  void dispose() {
+    _postEventSub.cancel();
+    super.dispose();
+  }
 
   List<PostModel> _posts = [];
   List<PostModel> get posts => _posts;
@@ -109,11 +133,18 @@ class FeedProvider extends ChangeNotifier {
     final wasLiked = post.isLiked;
 
     // Optimistic update
+    final newLikesCount = wasLiked ? post.likesCount - 1 : post.likesCount + 1;
     _posts[index] = post.copyWith(
       isLiked: !wasLiked,
-      likesCount: wasLiked ? post.likesCount - 1 : post.likesCount + 1,
+      likesCount: newLikesCount,
     );
     notifyListeners();
+
+    PostEventBus().broadcast(PostUpdateEvent(
+      postId: postId,
+      isLiked: !wasLiked,
+      likesCount: newLikesCount,
+    ));
 
     try {
       if (wasLiked) {
@@ -141,6 +172,11 @@ class FeedProvider extends ChangeNotifier {
     _posts[index] = post.copyWith(isSaved: !wasSaved);
     notifyListeners();
 
+    PostEventBus().broadcast(PostUpdateEvent(
+      postId: postId,
+      isSaved: !wasSaved,
+    ));
+
     try {
       if (wasSaved) {
         await _api.unsavePost(postId: postId, userId: currentUserId);
@@ -160,5 +196,10 @@ class FeedProvider extends ChangeNotifier {
     if (index == -1) return;
     _posts[index] = _posts[index].copyWith(commentsCount: count);
     notifyListeners();
+
+    PostEventBus().broadcast(PostUpdateEvent(
+      postId: postId,
+      commentsCount: count,
+    ));
   }
 }
