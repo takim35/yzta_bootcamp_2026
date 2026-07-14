@@ -15,7 +15,12 @@ class FeedProvider extends ChangeNotifier {
   final ApiService _api = ApiService();
   final String currentUserId;
 
-  FeedProvider({required this.currentUserId});
+  FeedProvider({required this.currentUserId}) {
+    // Provider oluşturulunca hemen yüklemeye başla — ekran açılana kadar veri hazır olur
+    if (currentUserId.isNotEmpty) {
+      loadFeed();
+    }
+  }
 
   List<PostModel> _posts = [];
   List<PostModel> get posts => _posts;

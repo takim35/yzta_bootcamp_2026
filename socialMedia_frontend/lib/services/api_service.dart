@@ -14,11 +14,11 @@ class ApiService {
 
   /// Base URL — Bilgisayarın yerel IP adresi (telefon aynı WiFi ağındayken çalışır)
   static String get baseUrl {
-    return 'http://172.20.10.13:8000';
+    return 'http://10.5.5.30:8000';
   }
 
   final http.Client _client = http.Client();
-  static const Duration _timeout = Duration(seconds: 15);
+  static const Duration _timeout = Duration(seconds: 30); // Ollama AI çağrıları için daha uzun
 
   // ─── Headers ────────────────────────────────────────────────
   Map<String, String> get _headers => {
@@ -280,10 +280,9 @@ class ApiService {
   }
 
   Future<UserModel> getMyProfile(String userId) async {
-    // using user_id as token
-    final data = await _getDecoded('/users/me', queryParams: null);
-    return UserModel.fromJson(data); // Actually we should pass header
-    // Wait, _get doesn't take headers, let's implement getWithHeaders or just use user_id directly.
+    // /users/me endpoint'i yok — doğrudan /users/{id} kullan
+    final data = await _get('/users/$userId');
+    return UserModel.fromJson(data);
   }
 
   Future<void> updateProfile({
@@ -351,14 +350,30 @@ class ApiService {
     required String postId,
     required String userId,
   }) async {
-    await _post('/posts/$postId/save', {'user_id': userId});
+    // Backend: POST /posts/{post_id}/save?user_id=...
+    final uri = Uri.parse('$baseUrl/posts/$postId/save').replace(
+      queryParameters: {'user_id': userId},
+    );
+    final response = await _client.post(uri, headers: _headers).timeout(_timeout);
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      _throwError(response);
+    }
   }
 
   Future<void> unsavePost({
     required String postId,
     required String userId,
   }) async {
-    await _delete('/posts/$postId/save?user_id=$userId', {});
+    // Backend: DELETE /posts/{post_id}/save?user_id=...
+    final uri = Uri.parse('$baseUrl/posts/$postId/save').replace(
+      queryParameters: {'user_id': userId},
+    );
+    final request = http.Request('DELETE', uri)..headers.addAll(_headers);
+    final streamed = await _client.send(request).timeout(_timeout);
+    final response = await http.Response.fromStream(streamed);
+    if (response.statusCode != 200) {
+      _throwError(response);
+    }
   }
 
   // ─── Comments ───────────────────────────────────────────────
@@ -367,11 +382,13 @@ class ApiService {
     required String userId,
     required String content,
   }) async {
+    // Backend 'text' field bekliyor ('content' değil)
     final data = await _post('/posts/$postId/comments', {
       'user_id': userId,
-      'content': content,
+      'text': content,
     });
-    return data['data']['comment_id'] as String;
+    // Backend: {success: true, data: {comment_id: "..."}}
+    return data['data']?['comment_id'] as String? ?? '';
   }
 
   Future<List<CommentModel>> getComments(String postId) async {
@@ -385,6 +402,7 @@ class ApiService {
   Future<String> suggestCaption({
     required List<OutfitItem> outfitItems,
     String? styleHint,
+    String? imageUrl,  // Yüklenen görselin URL'si (Gemini Vision için)
   }) async {
     final body = <String, dynamic>{
       'outfit_items':
@@ -393,11 +411,15 @@ class ApiService {
     if (styleHint != null && styleHint.isNotEmpty) {
       body['style_hint'] = styleHint;
     }
+    if (imageUrl != null && imageUrl.isNotEmpty) {
+      body['image_url'] = imageUrl;  // Görsel URL'sini backend'e gönder
+    }
     final data = await _post('/captions/suggest', body);
     // Backend MessageResponse: {success, message, data: {caption: "..."}}
     final nested = data['data'] as Map<String, dynamic>?;
     return nested?['caption'] as String? ?? '';
   }
+
 
 
   // --- Epic 3: Wardrobe & AI Stylist ---

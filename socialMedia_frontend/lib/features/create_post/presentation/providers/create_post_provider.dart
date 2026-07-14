@@ -154,14 +154,26 @@ class CreatePostProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Kombin parçası seçilmemişse genel bir moda caption'ı iste
+      // 1) Seçili görseli backend'e yükle — URL al (Gemini Vision için)
+      String? uploadedImageUrl;
+      if (_selectedImage != null) {
+        uploadedImageUrl = await _uploadImage(_selectedImage!);
+        debugPrint('Görsel yüklendi: $uploadedImageUrl');
+      }
+
+      // 2) Kombin parçası seçilmemişse genel bir moda caption'ı iste
       final items = _selectedOutfitItems.isNotEmpty
           ? _selectedOutfitItems
           : <OutfitItem>[
               const OutfitItem(itemId: '', category: 'diğer', imageUrl: ''),
             ];
 
-      final caption = await _api.suggestCaption(outfitItems: items);
+      // 3) Caption önerisi al — görsel URL'siyle birlikte
+      final caption = await _api.suggestCaption(
+        outfitItems: items,
+        imageUrl: uploadedImageUrl,  // Görsel URL'si Gemini Vision'a gönderilecek
+      );
+
       if (caption.isNotEmpty) {
         _suggestedCaption = caption;
         _caption = caption;
@@ -179,6 +191,7 @@ class CreatePostProvider extends ChangeNotifier {
     _isSuggestingCaption = false;
     notifyListeners();
   }
+
 
   // ─── Gönderi Paylaş ─────────────────────────────────────────
   Future<String?> submitPost(String userId) async {

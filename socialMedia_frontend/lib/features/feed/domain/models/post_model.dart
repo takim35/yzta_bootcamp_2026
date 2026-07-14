@@ -32,11 +32,15 @@ class PostModel {
     required this.createdAt,
   });
 
+  /// Kısa alias — profile_screen ve provider'lar post.id kullanıyor
+  String get id => postId;
+
   /// Zaman farkını Türkçe olarak döndürür
   String get timeAgo {
     timeago.setLocaleMessages('tr', timeago.TrMessages());
     return timeago.format(createdAt, locale: 'tr');
   }
+
 
   factory PostModel.fromJson(Map<String, dynamic> json) {
     return PostModel(

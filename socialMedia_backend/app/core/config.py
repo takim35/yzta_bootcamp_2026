@@ -12,6 +12,8 @@ class Settings(BaseSettings):
     GEMINI_MODEL: str = "gemini-2.5-flash"
     FIREBASE_BUCKET: Optional[str] = None
     CORS_ORIGINS: str = "http://localhost:3000,http://localhost:8081"
+    SERVER_HOST: str = "localhost"
+    SERVER_PORT: str = "8000"
 
     @property
     def cors_origins_list(self) -> list[str]:

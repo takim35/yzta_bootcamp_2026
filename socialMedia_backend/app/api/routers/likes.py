@@ -30,7 +30,7 @@ class LikeRequest(BaseModel):
 # ─── Comment Models ───────────────────────────────────────────
 class CommentRequest(BaseModel):
     user_id: str
-    text: str
+    content: str
 
 
 # ══════════════════════════════════════════════════════════════
@@ -114,7 +114,7 @@ def add_comment(post_id: str, req: CommentRequest, db: sqlite3.Connection = Depe
                 comment_id TEXT PRIMARY KEY,
                 post_id    TEXT NOT NULL,
                 user_id    TEXT NOT NULL,
-                text       TEXT NOT NULL,
+                content    TEXT NOT NULL,
                 created_at TEXT NOT NULL,
                 FOREIGN KEY (post_id) REFERENCES posts(post_id),
                 FOREIGN KEY (user_id) REFERENCES users(user_id)
@@ -122,8 +122,8 @@ def add_comment(post_id: str, req: CommentRequest, db: sqlite3.Connection = Depe
         """)
 
         db.execute(
-            "INSERT INTO comments (comment_id, post_id, user_id, text, created_at) VALUES (?,?,?,?,?)",
-            (comment_id, post_id, req.user_id, req.text, now),
+            "INSERT INTO comments (comment_id, post_id, user_id, content, created_at) VALUES (?,?,?,?,?)",
+            (comment_id, post_id, req.user_id, req.content, now),
         )
         try:
             db.execute(
@@ -150,12 +150,12 @@ def get_comments(post_id: str, db: sqlite3.Connection = Depends(get_db)):
                 comment_id TEXT PRIMARY KEY,
                 post_id    TEXT NOT NULL,
                 user_id    TEXT NOT NULL,
-                text       TEXT NOT NULL,
+                content    TEXT NOT NULL,
                 created_at TEXT NOT NULL
             )
         """)
         rows = db.execute(
-            """SELECT c.comment_id, c.user_id, u.username, c.text, c.created_at
+            """SELECT c.comment_id, c.user_id, u.username, c.content, c.created_at
                FROM comments c
                LEFT JOIN users u ON c.user_id = u.user_id
                WHERE c.post_id = ?
@@ -168,7 +168,7 @@ def get_comments(post_id: str, db: sqlite3.Connection = Depends(get_db)):
                 "comment_id": r[0],
                 "user_id": r[1],
                 "username": r[2] or "Bilinmeyen",
-                "text": r[3],
+                "content": r[3],
                 "created_at": r[4],
             }
             for r in rows

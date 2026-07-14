@@ -84,6 +84,7 @@ class CaptionRequest(BaseModel):
     """AI caption önerisi isteği."""
     outfit_items: List[Dict] = Field(default_factory=list)
     style_hint: str = ""
+    image_url: Optional[str] = None  # Görsel URL'si — Gemini Vision için
 
 
 # ============================================================
