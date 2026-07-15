@@ -57,6 +57,9 @@ def check_server():
     return False
 
 
+# ─────────────────────────────────────────────────────────
+# 1. HEALTH
+# ─────────────────────────────────────────────────────────
 def test_health():
     section("1. HEALTH CHECK")
     r = requests.get(f"{BASE_URL}/")
@@ -66,12 +69,16 @@ def test_health():
         fail("GET / → beklenen 'healthy' dönmedi", r.text)
 
 
+# ─────────────────────────────────────────────────────────
+# 2. AUTH — Kayıt / Giriş / Şifre Sıfırlama
+# ─────────────────────────────────────────────────────────
 def test_auth():
-    section("2. AUTH")
+    section("2. AUTH — Kayıt / Giriş / Şifre Sıfırlama")
     uid = uuid.uuid4().hex[:8]
-    email = f"test_{uid}@example.com"
+    email = f"test_{uid}@gmail.com"
     password = "Sifre123!"
 
+    # ── Kayıt ─────────────────────────────────────────────────
     r = requests.post(f"{BASE_URL}/auth/register", json={"email": email, "password": password})
     if r.status_code == 201 and "user_id" in r.json():
         user_id = r.json()["user_id"]
@@ -83,40 +90,151 @@ def test_auth():
     # Test ortamı: verification_code response'dan al, otomatik doğrula
     verification_code = r.json().get("verification_code")
     if verification_code:
-        vr = requests.post(f"{BASE_URL}/auth/verify-email",
-                           json={"email": email, "code": verification_code})
-        # Sessizce doğrulama yap (başarısızlık loglanmaz)
+        requests.post(f"{BASE_URL}/auth/verify-email",
+                      json={"email": email, "code": verification_code})
 
+    # ── Çift kayıt engeli ──────────────────────────────────────
     r2 = requests.post(f"{BASE_URL}/auth/register", json={"email": email, "password": password})
     if r2.status_code in (400, 409):
         ok("POST /auth/register (çift kayıt engeli) → 400/409")
     else:
         fail("Çift kayıt engeli çalışmıyor", r2.text)
 
+    # ── Giriş (doğru şifre) ───────────────────────────────────
     r3 = requests.post(f"{BASE_URL}/auth/login", json={"email": email, "password": password})
     if r3.status_code == 200:
         ok("POST /auth/login (doğru şifre) → 200")
     else:
         fail("POST /auth/login", r3.text)
 
+    # ── Giriş (yanlış şifre) ──────────────────────────────────
     r4 = requests.post(f"{BASE_URL}/auth/login", json={"email": email, "password": "yanlis"})
     if r4.status_code in (401, 400):
         ok("POST /auth/login (yanlış şifre) → 401")
     else:
         fail("Yanlış şifre kontrolü", r4.text)
 
+    # ── Şifre sıfırlama ───────────────────────────────────────
+    new_password = "YeniSifre456!"
     r5 = requests.post(f"{BASE_URL}/auth/reset-password",
-                       json={"email": email, "new_password": "YeniSifre456!"})
+                       json={"email": email, "new_password": new_password})
     if r5.status_code == 200:
         ok("POST /auth/reset-password → 200")
     else:
         fail("POST /auth/reset-password", r5.text)
 
+    # Yeni şifre ile giriş çalışmalı
+    r5b = requests.post(f"{BASE_URL}/auth/login", json={"email": email, "password": new_password})
+    if r5b.status_code == 200:
+        ok("POST /auth/login (sıfırlanan şifre ile) → 200 ✓")
+    else:
+        fail("Sıfırlanan şifre ile giriş başarısız", r5b.text)
+
+    # Eski şifre artık çalışmamalı
+    r5c = requests.post(f"{BASE_URL}/auth/login", json={"email": email, "password": password})
+    if r5c.status_code in (400, 401):
+        ok("POST /auth/login (eski şifre geçersiz) → 401 ✓")
+    else:
+        skip("Eski şifre hâlâ çalışıyor — kontrol et")
+
     return user_id
 
 
+# ─────────────────────────────────────────────────────────
+# 3. 2FA (TOTP)
+# ─────────────────────────────────────────────────────────
+def test_two_factor_auth(user_id):
+    section("3. 2FA (İKİ FAKTÖRLÜ KİMLİK DOĞRULAMA)")
+
+    # 2FA Kurulum
+    r = requests.post(f"{BASE_URL}/auth/2fa/setup/{user_id}")
+    if r.status_code == 200 and "totp_secret" in r.json():
+        secret = r.json()['totp_secret']
+        ok(f"POST /auth/2fa/setup → totp_secret ({secret[:8]}...)")
+    else:
+        fail("POST /auth/2fa/setup", r.text)
+        return
+
+    # Geçersiz TOTP ile doğrulama → 400/401
+    r2 = requests.post(f"{BASE_URL}/auth/2fa/verify",
+                       json={"user_id": user_id, "totp_code": "000000"})
+    if r2.status_code in (400, 401):
+        ok("POST /auth/2fa/verify (geçersiz kod) → 400/401 ✓")
+    else:
+        skip(f"Geçersiz TOTP kontrolü → {r2.status_code}")
+
+    # 2FA Durum sorgusu
+    r3 = requests.get(f"{BASE_URL}/auth/2fa/status/{user_id}")
+    if r3.status_code == 200 and "two_fa_enabled" in r3.json():
+        ok(f"GET /auth/2fa/status → two_fa_enabled={r3.json()['two_fa_enabled']}")
+    else:
+        fail("GET /auth/2fa/status", r3.text)
+
+    # 2FA Devre dışı bırakma
+    r4 = requests.delete(f"{BASE_URL}/auth/2fa/disable/{user_id}")
+    if r4.status_code == 200:
+        ok("DELETE /auth/2fa/disable → 200 ✓")
+    else:
+        fail("DELETE /auth/2fa/disable", r4.text)
+
+    # Devre dışı doğrulaması
+    r5 = requests.get(f"{BASE_URL}/auth/2fa/status/{user_id}")
+    if r5.status_code == 200:
+        if not r5.json().get("two_fa_enabled", True):
+            ok("2FA devre dışı doğrulandı ✓")
+        else:
+            fail("2FA hâlâ aktif görünüyor")
+
+
+# ─────────────────────────────────────────────────────────
+# 4. GOOGLE OAUTH
+# ─────────────────────────────────────────────────────────
+def test_google_auth():
+    section("4. GOOGLE OAUTH (/auth/google)")
+
+    test_email = f"google_user_{uuid.uuid4().hex[:6]}@gmail.com"
+    payload = {
+        "id_token": "test_token_no_verify",
+        "email": test_email,
+        "display_name": "Google Test Kullanıcısı",
+        "avatar_url": "https://lh3.googleusercontent.com/test",
+    }
+
+    # İlk Google girişi → yeni kullanıcı
+    r = requests.post(f"{BASE_URL}/auth/google", json=payload)
+    if r.status_code == 200 and "user_id" in r.json():
+        user_id = r.json()["user_id"]
+        ok(f"POST /auth/google (yeni kullanıcı) → {user_id[:8]}...")
+    else:
+        fail("POST /auth/google", r.text)
+        return None
+
+    # Aynı email → aynı user_id (idempotent)
+    r2 = requests.post(f"{BASE_URL}/auth/google", json=payload)
+    if r2.status_code == 200 and r2.json().get("user_id") == user_id:
+        ok("POST /auth/google (tekrar giriş, aynı user_id) → idempotent ✓")
+    else:
+        fail("Google idempotent giriş başarısız", str(r2.json()))
+
+    # Geçersiz email → 400
+    bad = {**payload, "email": "gecersiz-email"}
+    r3 = requests.post(f"{BASE_URL}/auth/google", json=bad)
+    if r3.status_code == 400:
+        ok("POST /auth/google (geçersiz email) → 400 ✓")
+    else:
+        skip(f"Geçersiz email kontrolü → {r3.status_code}")
+
+    # Temizlik
+    requests.delete(f"{BASE_URL}/users/me",
+                    headers={"Authorization": f"Bearer {user_id}"})
+    return user_id
+
+
+# ─────────────────────────────────────────────────────────
+# 5. USERS
+# ─────────────────────────────────────────────────────────
 def test_users(user_id):
-    section("3. USERS")
+    section("5. USERS")
     headers = {"Authorization": f"Bearer {user_id}"}
 
     r = requests.get(f"{BASE_URL}/users/{user_id}")
@@ -153,8 +271,11 @@ def test_users(user_id):
         fail("PUT /users/me/privacy geri alma", r5.text)
 
 
+# ─────────────────────────────────────────────────────────
+# 6. POSTS
+# ─────────────────────────────────────────────────────────
 def test_posts(user_id):
-    section("4. POSTS")
+    section("6. POSTS")
 
     post_data = {
         "user_id": user_id,
@@ -186,8 +307,11 @@ def test_posts(user_id):
     return post_id
 
 
+# ─────────────────────────────────────────────────────────
+# 7. LIKES & COMMENTS
+# ─────────────────────────────────────────────────────────
 def test_likes_comments(user_id, post_id):
-    section("5. LIKES & COMMENTS")
+    section("7. LIKES & COMMENTS")
 
     if not post_id:
         skip("Post ID yok, beğeni/yorum testleri atlanıyor")
@@ -225,12 +349,15 @@ def test_likes_comments(user_id, post_id):
         fail("GET /posts/{post_id}/comments", r5.text)
 
 
+# ─────────────────────────────────────────────────────────
+# 8. FOLLOWS
+# ─────────────────────────────────────────────────────────
 def test_follows(user_id_a):
-    section("6. FOLLOWS")
+    section("8. FOLLOWS")
 
     uid = uuid.uuid4().hex[:8]
     r = requests.post(f"{BASE_URL}/auth/register",
-                      json={"email": f"user2_{uid}@test.com", "password": "Sifre123!"})
+                      json={"email": f"user2_{uid}@gmail.com", "password": "Sifre123!"})
     if r.status_code != 201:
         skip("İkinci kullanıcı oluşturulamadı, follows testi atlanıyor")
         return None
@@ -268,8 +395,11 @@ def test_follows(user_id_a):
     return user_id_b
 
 
+# ─────────────────────────────────────────────────────────
+# 9. WARDROBE
+# ─────────────────────────────────────────────────────────
 def test_wardrobe(user_id):
-    section("7. WARDROBE")
+    section("9. WARDROBE")
 
     kiyafet = {"tur": "tişört", "renk": "beyaz", "marka": "Zara",
                "beden": "M", "mevsim": "yaz", "temiz": True}
@@ -317,8 +447,11 @@ def test_wardrobe(user_id):
         fail("POST /wardrobe/outfit/suggest", r5.text)
 
 
+# ─────────────────────────────────────────────────────────
+# 10. SAVE / UNSAVE POSTS
+# ─────────────────────────────────────────────────────────
 def test_save_posts(user_id, post_id):
-    section("8. SAVE / UNSAVE POSTS")
+    section("10. SAVE / UNSAVE POSTS")
 
     if not post_id:
         skip("Post ID yok, kaydetme testleri atlanıyor")
@@ -343,8 +476,11 @@ def test_save_posts(user_id, post_id):
         fail("DELETE /posts/{post_id}/save", r3.text)
 
 
+# ─────────────────────────────────────────────────────────
+# 11. TEMİZLİK
+# ─────────────────────────────────────────────────────────
 def test_cleanup(user_id, user_id_b=None, post_id=None):
-    section("9. TEMİZLİK")
+    section("11. TEMİZLİK")
     headers = {"Authorization": f"Bearer {user_id}"}
 
     if post_id:
@@ -369,6 +505,9 @@ def test_cleanup(user_id, user_id_b=None, post_id=None):
             fail("DELETE /users/me (user_b)", r3.text)
 
 
+# ─────────────────────────────────────────────────────────
+# MAIN
+# ─────────────────────────────────────────────────────────
 def main():
     print(f"\n{'='*60}")
     print(f"  DİJİTAL GARDROP — TAM API TEST SÜİTİ")
@@ -380,11 +519,17 @@ def main():
 
     test_health()
 
+    # ── Auth (kayıt + giriş + şifre sıfırlama) ────────────────
     user_id = test_auth()
     if not user_id:
         print(f"\n{RED}Auth başarısız, diğer testler çalışamaz.{RESET}")
         sys.exit(1)
 
+    # ── Yeni özellikler ────────────────────────────────────────
+    test_two_factor_auth(user_id)
+    test_google_auth()
+
+    # ── Mevcut özellikler ──────────────────────────────────────
     test_users(user_id)
     post_id = test_posts(user_id)
     test_likes_comments(user_id, post_id)

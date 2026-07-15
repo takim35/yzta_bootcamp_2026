@@ -14,7 +14,17 @@ class ApiService {
 
   /// Base URL — Bilgisayarın yerel IP adresi (telefon aynı WiFi ağındayken çalışır)
   static String get baseUrl {
-    return 'http://10.5.5.30:8000';
+    return 'http://10.5.5.11:8000';
+  }
+
+  /// Veritabanında kayıtlı localhost/127.0.0.1 URL'lerini sunucu IP'sine çevirir.
+  /// iPhone'dan erişim için gerekli.
+  static String fixImageUrl(String? url) {
+    if (url == null || url.isEmpty) return '';
+    return url
+        .replaceAll('http://localhost:8000', baseUrl)
+        .replaceAll('http://127.0.0.1:8000', baseUrl)
+        .replaceAll('https://localhost:8000', baseUrl);
   }
 
   final http.Client _client = http.Client();
@@ -201,6 +211,22 @@ class ApiService {
       'new_password': newPassword,
     };
     await _post('/auth/reset-password', body);
+  }
+
+  Future<String> loginWithGoogle({
+    required String idToken,
+    required String email,
+    required String displayName,
+    String? avatarUrl,
+  }) async {
+    final body = {
+      'id_token': idToken,
+      'email': email,
+      'display_name': displayName,
+      if (avatarUrl != null) 'avatar_url': avatarUrl,
+    };
+    final data = await _post('/auth/google', body);
+    return data['user_id'] as String;
   }
 
   // ─── Feed ───────────────────────────────────────────────────
@@ -456,6 +482,37 @@ class ApiService {
       'hava_durumu': weather,
       'stil_tercihi': style
     });
+  }
+
+  // ─── 2FA Yardımcı Metodları ────────────────────────────────
+  /// 2FA setup/verify için POST isteği — Map döner
+  Future<Map<String, dynamic>> post2FA(String endpoint, Map<String, dynamic> body) async {
+    return await _post(endpoint, body);
+  }
+
+  /// 2FA disable için DELETE isteği
+  Future<void> delete2FA(String endpoint) async {
+    try {
+      final uri = Uri.parse('$baseUrl$endpoint');
+      final request = http.Request('DELETE', uri)..headers.addAll(_headers);
+      final streamed = await _client.send(request).timeout(_timeout);
+      final response = await http.Response.fromStream(streamed);
+      if (response.statusCode != 200) {
+        _throwError(response);
+      }
+    } on SocketException {
+      throw ApiException('Bağlantı hatası. İnternet bağlantınızı kontrol edin.');
+    } on TimeoutException {
+      throw ApiException('İstek zaman aşımına uğradı.');
+    } catch (e) {
+      if (e is ApiException) rethrow;
+      throw ApiException('Beklenmeyen hata: $e');
+    }
+  }
+
+  /// 2FA status için GET isteği — Map döner
+  Future<Map<String, dynamic>> get2FAStatus(String endpoint) async {
+    return await _get(endpoint);
   }
 
   // ─── Dispose ────────────────────────────────────────────────

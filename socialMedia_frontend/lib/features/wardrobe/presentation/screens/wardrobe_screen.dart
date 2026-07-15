@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../services/api_service.dart';
+import '../../../../services/notification_service.dart';
 import '../../../../features/auth/presentation/providers/auth_provider.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/localization/locale_provider.dart';
@@ -26,7 +27,11 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> {
   void _loadClothes() {
     final userId = ref.read(authProvider).currentUserId ?? '';
     setState(() {
-      _clothesFuture = _apiService.getClothes(userId);
+      _clothesFuture = _apiService.getClothes(userId).then((clothes) {
+        // Temiz kıyafet sayısını kontrol et, az kalırsa bildirim gönder
+        NotificationService().checkLowClothesCount(clothes);
+        return clothes;
+      });
     });
   }
 

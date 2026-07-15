@@ -97,6 +97,29 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     }
   }
 
+  Future<void> _onGoogleSignIn() async {
+    setState(() {
+      _errorMessage = null;
+      _isLoading = true;
+    });
+    try {
+      final success = await ref.read(authProvider).loginWithGoogle();
+      if (success && mounted) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const MainHomeScreen()),
+          (route) => false,
+        );
+      }
+    } catch (e) {
+      final msg = e.toString().contains('ApiException')
+          ? e.toString().split('ApiException: ').last.split(' (status:').first
+          : 'Google ile giriş başarısız oldu.';
+      if (mounted) setState(() => _errorMessage = msg);
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final s = ref.watch(stringsProvider);
@@ -235,7 +258,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     },
                   ),
                   const SizedBox(height: AppTheme.spacingXXL),
-                  
+
+                  // Kayıt butonu
                   GestureDetector(
                     onTap: _isLoading ? null : _onRegisterTap,
                     child: Container(
@@ -272,6 +296,57 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // ── Google ile Kayıt ──────────────────────────
+                  GestureDetector(
+                    onTap: _isLoading ? null : _onGoogleSignIn,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      height: 52,
+                      decoration: BoxDecoration(
+                        color: AppTheme.surfaceDark,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: AppTheme.dividerColor,
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 22,
+                            height: 22,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: const Center(
+                              child: Text(
+                                'G',
+                                style: TextStyle(
+                                  color: Color(0xFF4285F4),
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            s.isTr ? 'Google ile Devam Et' : 'Continue with Google',
+                            style: const TextStyle(
+                              color: AppTheme.textPrimary,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),

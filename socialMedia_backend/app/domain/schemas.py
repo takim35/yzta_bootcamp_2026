@@ -166,3 +166,39 @@ class MessageResponse(BaseModel):
 
 class TokenRefreshRequest(BaseModel):
     refresh_token: str
+
+
+# ============================================================
+# 2FA Şemaları
+# ============================================================
+
+class TwoFASetupResponse(BaseModel):
+    """2FA kurulum yanıtı — OTP URI ve secret döner."""
+    secret: str
+    otpauth_uri: str
+    message: str
+
+
+class TwoFAVerifyRequest(BaseModel):
+    """2FA kodu doğrulama isteği."""
+    user_id: str
+    code: str
+
+
+class TwoFALoginRequest(BaseModel):
+    """Login sırasında 2FA kodu doğrulama."""
+    user_id: str
+    code: str
+
+
+class TwoFAStatusResponse(BaseModel):
+    """Kullanıcının 2FA durumu."""
+    user_id: str
+    two_fa_enabled: bool
+
+
+class PasswordResetWithTokenRequest(BaseModel):
+    """Token tabanlı şifre sıfırlama (gelecek için hazır)."""
+    email: str
+    new_password: str
+    confirm_password: str

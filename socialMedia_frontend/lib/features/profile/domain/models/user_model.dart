@@ -1,3 +1,5 @@
+import '../../../../services/api_service.dart';
+
 class UserModel {
   final String userId;
   final String email;
@@ -27,7 +29,7 @@ class UserModel {
       email: json['email'] as String? ?? '',
       username: json['username'] as String? ?? '',
       displayName: json['display_name'] as String? ?? '',
-      avatarUrl: json['avatar_url'] as String? ?? '',
+      avatarUrl: ApiService.fixImageUrl(json['avatar_url'] as String?),
       bio: json['bio'] as String? ?? '',
       followersCount: json['followers_count'] as int? ?? 0,
       followingCount: json['following_count'] as int? ?? 0,

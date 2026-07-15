@@ -7,6 +7,7 @@ import '../../../../core/localization/app_strings.dart';
 import '../../../main_home_screen.dart';
 import '../providers/auth_provider.dart';
 import 'register_screen.dart';
+import 'forgot_password_screen.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -97,6 +98,33 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
           ? e.toString().split('ApiException: ').last.split(' (status:').first
           : 'Login failed. Please check your credentials.';
       setState(() => _errorMessage = msg);
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _onGoogleSignIn() async {
+    setState(() {
+      _errorMessage = null;
+      _isLoading = true;
+    });
+    try {
+      final success = await ref.read(authProvider).loginWithGoogle();
+      if (success && mounted) {
+        Navigator.of(context).pushReplacement(
+          PageRouteBuilder(
+            pageBuilder: (_, __, ___) => const MainHomeScreen(),
+            transitionsBuilder: (_, anim, __, child) =>
+                FadeTransition(opacity: anim, child: child),
+            transitionDuration: const Duration(milliseconds: 500),
+          ),
+        );
+      }
+    } catch (e) {
+      final msg = e.toString().contains('ApiException')
+          ? e.toString().split('ApiException: ').last.split(' (status:').first
+          : 'Google ile giriş başarısız oldu.';
+      if (mounted) setState(() => _errorMessage = msg);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -343,7 +371,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                           Align(
                             alignment: Alignment.centerRight,
                             child: TextButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (_) => const ForgotPasswordScreen(),
+                                  ),
+                                );
+                              },
                               child: Text(
                                 s.forgotPassword,
                                 style: const TextStyle(
@@ -359,7 +393,59 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                           // Sign in button
                           _buildSignInButton(s),
 
-                          const SizedBox(height: 32),
+                          const SizedBox(height: 28),
+
+                          // ── Google Sign-In Butonu ───────────
+                          GestureDetector(
+                            onTap: _isLoading ? null : _onGoogleSignIn,
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              height: 52,
+                              decoration: BoxDecoration(
+                                color: AppTheme.surfaceDark,
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                  color: AppTheme.dividerColor,
+                                  width: 1.5,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  // Google 'G' ikonu
+                                  Container(
+                                    width: 22,
+                                    height: 22,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: const Center(
+                                      child: Text(
+                                        'G',
+                                        style: TextStyle(
+                                          color: Color(0xFF4285F4),
+                                          fontWeight: FontWeight.w900,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Text(
+                                    s.isTr ? 'Google ile Giriş Yap' : 'Continue with Google',
+                                    style: const TextStyle(
+                                      color: AppTheme.textPrimary,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(height: 24),
 
                           // Divider
                           Row(

@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../services/api_service.dart';
+import '../../../../services/google_auth_service.dart';
 
 final authProvider = ChangeNotifierProvider((ref) => AuthProvider());
 
@@ -79,6 +80,26 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  /// Google ile giriş yap / kayıt ol
+  /// null döner: kullanıcı dialogu kapattı
+  /// exception: gerçek hata
+  Future<bool> loginWithGoogle() async {
+    _setLoading(true);
+    try {
+      final userId = await GoogleAuthService().signIn();
+      if (userId == null) {
+        // Kullanıcı iptal etti
+        return false;
+      }
+      _currentUserId = userId;
+      await _saveSession(userId);
+      notifyListeners();
+      return true;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
   void _setLoading(bool value) {
     _isLoading = value;
     notifyListeners();
@@ -87,6 +108,10 @@ class AuthProvider extends ChangeNotifier {
   Future<void> logout() async {
     _currentUserId = null;
     await _clearSession();
+    // Google oturumunu da kapat
+    try {
+      await GoogleAuthService().signOut();
+    } catch (_) {}
     notifyListeners();
   }
 }

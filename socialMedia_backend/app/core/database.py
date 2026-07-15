@@ -68,7 +68,7 @@ def get_db() -> Generator[sqlite3.Connection, None, None]:
 
 
 def init_db() -> None:
-    """schema.sql dosyasını çalıştırarak tabloları oluşturur."""
+    """schema.sql dosyasını çalıştırarak tabloları oluşturur, ardından migration uygular."""
     if not SCHEMA_PATH.exists():
         raise FileNotFoundError(f"Schema dosyası bulunamadı: {SCHEMA_PATH}")
 
@@ -77,5 +77,22 @@ def init_db() -> None:
     try:
         conn.executescript(schema_sql)
         conn.commit()
+
+        # ── Migration: 2FA kolonları ────────────────────────────
+        # Mevcut veritabanlarında bu kolonlar yoksa ekler (idempotent)
+        existing_cols = {
+            row[1] for row in conn.execute("PRAGMA table_info(users)").fetchall()
+        }
+        migrations = []
+        if "totp_secret" not in existing_cols:
+            migrations.append("ALTER TABLE users ADD COLUMN totp_secret TEXT DEFAULT NULL")
+        if "two_fa_enabled" not in existing_cols:
+            migrations.append("ALTER TABLE users ADD COLUMN two_fa_enabled INTEGER NOT NULL DEFAULT 0")
+
+        for migration in migrations:
+            conn.execute(migration)
+        if migrations:
+            conn.commit()
+
     finally:
         conn.close()

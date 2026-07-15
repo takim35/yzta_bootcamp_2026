@@ -109,7 +109,8 @@ class CreatePostProvider extends ChangeNotifier {
       final response = await http.Response.fromStream(streamed);
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
-        return data['url'] as String?;
+        final rawUrl = data['url'] as String?;
+        return ApiService.fixImageUrl(rawUrl); // localhost → gerçek IP
       }
       debugPrint('Upload hatası: ${response.statusCode} ${response.body}');
       return null;
