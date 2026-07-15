@@ -6,25 +6,27 @@ import '../features/feed/domain/models/post_model.dart';
 import '../features/feed/domain/models/comment_model.dart';
 import '../features/profile/domain/models/user_model.dart';
 import '../features/feed/domain/models/outfit_item_model.dart';
+import '../core/config/app_config.dart';
 
 class ApiService {
   ApiService._internal();
   static final ApiService _instance = ApiService._internal();
   factory ApiService() => _instance;
 
-  /// Base URL — Bilgisayarın yerel IP adresi (telefon aynı WiFi ağındayken çalışır)
-  static String get baseUrl {
-    return 'http://10.5.5.11:8000';
-  }
+  /// Base URL — AppConfig üzerinden platform-bağımsız olarak belirlenir.
+  /// Override için: flutter run --dart-define=API_HOST=192.168.1.100
+  static String get baseUrl => AppConfig.baseUrl;
 
-  /// Veritabanında kayıtlı localhost/127.0.0.1 URL'lerini sunucu IP'sine çevirir.
-  /// iPhone'dan erişim için gerekli.
+  /// Veritabanında kayıtlı localhost/127.0.0.1/eski-IP URL'lerini
+  /// güncel sunucu adresiyle değiştirir. iOS/Android/Windows uyumlu.
   static String fixImageUrl(String? url) {
     if (url == null || url.isEmpty) return '';
+    // Bilinen tüm local adres varyantlarını AppConfig.baseUrl ile değiştir
     return url
-        .replaceAll('http://localhost:8000', baseUrl)
-        .replaceAll('http://127.0.0.1:8000', baseUrl)
-        .replaceAll('https://localhost:8000', baseUrl);
+        .replaceAllMapped(
+          RegExp(r'https?://(localhost|127\.0\.0\.1|10\.0\.2\.2|10\.5\.5\.\d+):8000'),
+          (_) => AppConfig.baseUrl,
+        );
   }
 
   final http.Client _client = http.Client();

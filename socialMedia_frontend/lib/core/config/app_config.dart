@@ -1,0 +1,49 @@
+/// Uygulama yapılandırması — Platform bağımsız, ortam değişkeni destekli.
+///
+/// Kullanım:
+///   flutter run --dart-define=API_HOST=192.168.1.100
+///   flutter run --dart-define=API_HOST=10.5.5.11
+///   flutter run --dart-define=API_HOST=localhost   (emülatör için)
+///
+/// Varsayılan: Android emülatör için 10.0.2.2, iOS/fiziksel cihaz için localhost
+library app_config;
+
+import 'dart:io';
+
+class AppConfig {
+  AppConfig._();
+
+  /// --dart-define=API_HOST=... ile override edilebilir.
+  /// Belirtilmezse platforma göre otomatik seçilir.
+  static const String _definedHost = String.fromEnvironment(
+    'API_HOST',
+    defaultValue: '',
+  );
+
+  static const int _definedPort = int.fromEnvironment(
+    'API_PORT',
+    defaultValue: 8000,
+  );
+
+  /// Backend'in çalıştığı host
+  static String get apiHost {
+    if (_definedHost.isNotEmpty) return _definedHost;
+
+    // Ortam değişkeni tanımlanmamışsa platforma göre varsayılan
+    try {
+      if (Platform.isAndroid) {
+        // Android emülatörde host makinesi 10.0.2.2'dir
+        return '10.0.2.2';
+      }
+    } catch (_) {
+      // Platform.isAndroid web'de exception fırlatır — ignore
+    }
+    // iOS fiziksel cihaz / diğer platformlar için localhost
+    return 'localhost';
+  }
+
+  static int get apiPort => _definedPort;
+
+  /// Tam backend URL'si
+  static String get baseUrl => 'http://$apiHost:$apiPort';
+}
