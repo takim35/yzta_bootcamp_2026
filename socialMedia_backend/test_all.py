@@ -146,39 +146,39 @@ def test_auth():
 def test_two_factor_auth(user_id):
     section("3. 2FA (İKİ FAKTÖRLÜ KİMLİK DOĞRULAMA)")
 
-    # 2FA Kurulum
-    r = requests.post(f"{BASE_URL}/auth/2fa/setup/{user_id}")
-    if r.status_code == 200 and "totp_secret" in r.json():
-        secret = r.json()['totp_secret']
-        ok(f"POST /auth/2fa/setup → totp_secret ({secret[:8]}...)")
+    # 2FA Kurulum — user_id query param olarak gönderilir
+    r = requests.post(f"{BASE_URL}/auth/2fa/setup", params={"user_id": user_id})
+    if r.status_code == 200 and "secret" in r.json():
+        secret = r.json()['secret']
+        ok(f"POST /auth/2fa/setup → secret ({secret[:8]}...)")
     else:
         fail("POST /auth/2fa/setup", r.text)
         return
 
     # Geçersiz TOTP ile doğrulama → 400/401
     r2 = requests.post(f"{BASE_URL}/auth/2fa/verify",
-                       json={"user_id": user_id, "totp_code": "000000"})
+                       json={"user_id": user_id, "code": "000000"})
     if r2.status_code in (400, 401):
         ok("POST /auth/2fa/verify (geçersiz kod) → 400/401 ✓")
     else:
         skip(f"Geçersiz TOTP kontrolü → {r2.status_code}")
 
-    # 2FA Durum sorgusu
-    r3 = requests.get(f"{BASE_URL}/auth/2fa/status/{user_id}")
+    # 2FA Durum sorgusu — user_id query param
+    r3 = requests.get(f"{BASE_URL}/auth/2fa/status", params={"user_id": user_id})
     if r3.status_code == 200 and "two_fa_enabled" in r3.json():
         ok(f"GET /auth/2fa/status → two_fa_enabled={r3.json()['two_fa_enabled']}")
     else:
         fail("GET /auth/2fa/status", r3.text)
 
-    # 2FA Devre dışı bırakma
-    r4 = requests.delete(f"{BASE_URL}/auth/2fa/disable/{user_id}")
+    # 2FA Devre dışı bırakma — user_id query param
+    r4 = requests.delete(f"{BASE_URL}/auth/2fa/disable", params={"user_id": user_id})
     if r4.status_code == 200:
         ok("DELETE /auth/2fa/disable → 200 ✓")
     else:
         fail("DELETE /auth/2fa/disable", r4.text)
 
-    # Devre dışı doğrulaması
-    r5 = requests.get(f"{BASE_URL}/auth/2fa/status/{user_id}")
+    # Devre dışı doğrulaması — user_id query param
+    r5 = requests.get(f"{BASE_URL}/auth/2fa/status", params={"user_id": user_id})
     if r5.status_code == 200:
         if not r5.json().get("two_fa_enabled", True):
             ok("2FA devre dışı doğrulandı ✓")

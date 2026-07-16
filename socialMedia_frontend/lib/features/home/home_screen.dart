@@ -1,14 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
-import '../core/theme/app_theme.dart';
-import '../core/localization/locale_provider.dart';
-import '../navigation/app_navigator.dart';
-import 'wardrobe/presentation/screens/wardrobe_screen.dart';
-import 'ai_stylist/presentation/screens/ai_stylist_screen.dart';
-import 'profile/presentation/screens/settings_screen.dart';
+import '../../core/theme/app_theme.dart';
+import '../../core/localization/locale_provider.dart';
+import '../../core/navigation/app_navigator.dart';
+import '../wardrobe/presentation/screens/wardrobe_screen.dart';
+import '../wardrobe/presentation/screens/ai_stylist_screen.dart';
+import '../profile/presentation/screens/settings_screen.dart';
 
-class MainHomeScreen extends ConsumerWidget {
-  const MainHomeScreen({super.key});
+class HomeScreen extends ConsumerWidget {
+  const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

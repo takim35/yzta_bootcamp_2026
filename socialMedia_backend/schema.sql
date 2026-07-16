@@ -162,3 +162,79 @@ CREATE TABLE IF NOT EXISTS saves (
 
 CREATE INDEX IF NOT EXISTS idx_saves_user
     ON saves(user_id, created_at DESC);
+
+-- ============================================================
+-- 9. KIYAFETLER (Wardrobe Items)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS kiyafetler (
+    id               INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id          TEXT    NOT NULL,
+    tur              TEXT    NOT NULL,
+    renk             TEXT    NOT NULL,
+    marka            TEXT    DEFAULT NULL,
+    beden            TEXT    DEFAULT NULL,
+    kumas            TEXT    DEFAULT NULL,
+    kesim            TEXT    DEFAULT NULL,
+    yaka_tipi        TEXT    DEFAULT NULL,
+    kol_tipi         TEXT    DEFAULT NULL,
+    desen            TEXT    DEFAULT 'düz',
+    mevsim           TEXT    DEFAULT 'tüm sezon',
+    stil_etiketi     TEXT    DEFAULT NULL,
+    kullanim_sikligi TEXT    DEFAULT NULL,
+    kombin_notu      TEXT    DEFAULT NULL,
+    temiz            INTEGER NOT NULL DEFAULT 1
+        CHECK (temiz IN (0, 1)),
+    foto_url         TEXT    DEFAULT NULL,
+    olusturulma_tarihi TEXT  NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_kiyafetler_user
+    ON kiyafetler(user_id);
+
+CREATE INDEX IF NOT EXISTS idx_kiyafetler_user_temiz
+    ON kiyafetler(user_id, temiz);
+
+-- ============================================================
+-- 10. KATEGORİLER (Wardrobe Category Values)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS kategoriler (
+    id    INTEGER PRIMARY KEY AUTOINCREMENT,
+    tip   TEXT NOT NULL,
+    deger TEXT NOT NULL,
+    UNIQUE (tip, deger)
+);
+
+CREATE INDEX IF NOT EXISTS idx_kategoriler_tip
+    ON kategoriler(tip);
+
+-- ============================================================
+-- 11. SOHBET_GECMİSİ (AI Chat History)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS sohbet_gecmisi (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id    TEXT NOT NULL,
+    rol        TEXT NOT NULL CHECK (rol IN ('user', 'assistant')),
+    icerik     TEXT NOT NULL,
+    tarih      TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_sohbet_user
+    ON sohbet_gecmisi(user_id, tarih DESC);
+
+-- ============================================================
+-- 12. KOMBİN_ONERİLERİ (Outfit Suggestions)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS kombin_onerileri (
+    id             INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id        TEXT    NOT NULL,
+    baglam_json    TEXT    NOT NULL,
+    kiyafet_idleri TEXT    NOT NULL,   -- JSON array
+    aciklama       TEXT    DEFAULT NULL,
+    olusturulma    TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_kombin_user
+    ON kombin_onerileri(user_id, olusturulma DESC);

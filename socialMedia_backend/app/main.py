@@ -13,7 +13,7 @@ from app.core.config import settings
 from app.core.database import init_db
 from app.api.routers import posts, feed, follows, users, auth, wardrobe
 from app.api.routers import likes  # beğeni/yorum router
-from app.services.gemini import router as captions_router
+from app.services.ollama_caption_service import router as captions_router
 
 STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
 STATIC_DIR.mkdir(exist_ok=True)

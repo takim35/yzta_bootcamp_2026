@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
-import '../features/feed/presentation/screens/feed_screen.dart';
-import '../features/create_post/presentation/screens/create_post_screen.dart';
-import '../features/profile/presentation/screens/profile_screen.dart';
+import '../../features/feed/presentation/screens/feed_screen.dart';
+import '../../features/create_post/presentation/screens/create_post_screen.dart';
+import '../../features/profile/presentation/screens/profile_screen.dart';
 
 final bottomNavIndexProvider = StateProvider<int>((ref) => 0);
 

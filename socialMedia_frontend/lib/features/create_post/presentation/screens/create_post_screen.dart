@@ -6,7 +6,7 @@ import '../../../../features/auth/presentation/providers/auth_provider.dart';
 import '../../../../features/create_post/presentation/widgets/visibility_selector.dart';
 import '../../../../features/create_post/presentation/widgets/outfit_picker.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../navigation/app_navigator.dart';
+import '../../../../core/navigation/app_navigator.dart';
 
 class CreatePostScreen extends ConsumerStatefulWidget {
   const CreatePostScreen({super.key});

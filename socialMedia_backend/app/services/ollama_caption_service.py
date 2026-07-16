@@ -1,5 +1,5 @@
 """
-AI Caption Servisi — SADECE YEREL OLLAMA modelleri kullanır.
+AI Caption Servisi — Tamamen Yerel, Ollama tabanlı. Harici API yok.
 Gemini veya herhangi bir harici API KULLANILMAZ.
 
 Görsel analiz için: llava (vision modeli)
