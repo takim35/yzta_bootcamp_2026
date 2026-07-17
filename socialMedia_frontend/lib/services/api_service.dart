@@ -459,6 +459,14 @@ class ApiService {
     return await _post('/wardrobe/items?user_id=$userId', itemData);
   }
 
+  Future<dynamic> updateCloth(int itemId, Map<String, dynamic> itemData) async {
+    return await _put('/wardrobe/items/$itemId', itemData);
+  }
+
+  Future<dynamic> deleteCloth(int itemId) async {
+    return await _delete('/wardrobe/items/$itemId', null);
+  }
+
   Future<dynamic> chat(String userId, String message) async {
     return await _post('/wardrobe/chat', {'user_id': userId, 'mesaj': message});
   }

@@ -27,7 +27,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final currentUserId = ref.read(authProvider).currentUserId;
     final targetUserId = widget.userId ?? currentUserId;
     if (targetUserId != null && targetUserId.isNotEmpty) {
-      await ref.read(profileProvider(targetUserId)).loadProfile(targetUserId, currentUserId ?? targetUserId);
+      await ref.read(profileProvider).loadProfile(targetUserId, currentUserId ?? targetUserId);
     }
   }
 
@@ -45,7 +45,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final targetUserId = widget.userId ?? currentUserId;
     if (targetUserId == null) return const SizedBox.shrink();
 
-    final provider = ref.watch(profileProvider(targetUserId));
+    final provider = ref.watch(profileProvider);
     final s = ref.watch(stringsProvider);
 
     if (provider.isLoading && provider.user == null) {
@@ -126,7 +126,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 provider.userPosts,
                 s,
                 targetUserId,
-                isLocked: !provider.isOwnProfile && user.profileVisibility == 'private' && !user.isFollowing,
+                isLocked: !provider.isOwnProfile && !user.isFollowing,
               ),
               if (provider.isOwnProfile)
                 _buildPostGrid(
@@ -405,7 +405,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       itemCount: posts.length,
       itemBuilder: (context, index) {
         final post = posts[index];
-        final provider = ref.read(profileProvider(targetUserId));
+        final provider = ref.read(profileProvider);
         return GestureDetector(
           onTap: () {
             showDialog(

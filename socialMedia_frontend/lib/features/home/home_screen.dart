@@ -431,7 +431,7 @@ class _StatsRow extends ConsumerWidget {
     final userId = authProv.currentUserId;
     if (userId == null) return const SizedBox.shrink();
 
-    final profileProv = ref.watch(profileProvider(userId));
+    final profileProv = ref.watch(profileProvider);
     final user = profileProv.user;
 
     final String followersCount = user?.followersCount.toString() ?? '0';
