@@ -2,10 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import '../features/feed/domain/models/post_model.dart';
-import '../features/feed/domain/models/comment_model.dart';
+import '../features/feed/domain/models/feed_models.dart';
 import '../features/profile/domain/models/user_model.dart';
-import '../features/feed/domain/models/outfit_item_model.dart';
 import '../core/config/app_config.dart';
 
 class ApiService {
@@ -459,6 +457,10 @@ class ApiService {
     return await _post('/wardrobe/items?user_id=$userId', itemData);
   }
 
+  Future<Map<String, dynamic>> analyzeClothingItem(String base64Image) async {
+    return await _post('/captions/analyze-item', {'image_b64': base64Image});
+  }
+
   Future<dynamic> updateCloth(int itemId, Map<String, dynamic> itemData) async {
     return await _put('/wardrobe/items/$itemId', itemData);
   }
@@ -551,8 +553,17 @@ class ApiService {
   }
 
   // ─── Beğeni Listesi ────────────────────────────────────────
-  Future<List<dynamic>> getPostLikers(int postId) async {
+  Future<List<dynamic>> getPostLikers(String postId) async {
     return await _getList('/posts/$postId/likers');
+  }
+
+  // --- Takip İşlemleri ----------------------------------------------------
+  Future<List<dynamic>> getFollowers(String userId) async {
+    return await _getList('/follows/$userId/followers');
+  }
+
+  Future<List<dynamic>> getFollowing(String userId) async {
+    return await _getList('/follows/$userId/following');
   }
 
   // ─── Bildirimler ───────────────────────────────────────────

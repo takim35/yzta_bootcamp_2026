@@ -208,3 +208,68 @@ async def upload_image(file: UploadFile = File(...)):
 
     url = f"http://{SERVER_HOST}:{SERVER_PORT}/static/uploads/{filename}"
     return {"url": url, "filename": filename}
+
+# -----------------------------------------------------------------------------
+# ENDPOINT: POST /captions/analyze-item
+# -----------------------------------------------------------------------------
+class AnalyzeItemRequest(BaseModel):
+    image_url: Optional[str] = None
+    image_b64: Optional[str] = None
+
+@router.post("/analyze-item")
+async def analyze_item(req: AnalyzeItemRequest):
+    """
+    Görseli Ollama llava ile analiz eder ve JSON döner:
+    { "tur": "Tişört", "renk": "Kırmızı", "kumas": "Pamuk", "stil": "Gündelik" }
+    """
+    image_b64 = req.image_b64
+    if not image_b64 and req.image_url:
+        image_b64 = _image_to_base64(req.image_url)
+
+    if not image_b64:
+        raise HTTPException(status_code=400, detail="Lütfen image_url veya image_b64 sağlayın.")
+
+    prompt = (
+        "Bu kıyafet fotoğrafını analiz et ve sadece JSON formatında yanıt ver. Başka hiçbir metin ekleme. "
+        "Döndüreceğin JSON şu alanları içersin: "
+        "'tur' (Örn: Pantolon, Tişört, Gömlek, Etek, Elbise, Kazak), "
+        "'renk' (Örn: Mavi, Kırmızı, Siyah), "
+        "'kumas' (Örn: Kot, Pamuk, Keten, Yün, Deri), "
+        "'stil' (Örn: Gündelik, Spor, Şık, Resmi). "
+        "Lütfen çıktının SADECE geçerli bir JSON objesi olduğundan emin ol."
+    )
+
+    payload = {
+        "model": OLLAMA_VISION_MODEL,
+        "prompt": prompt,
+        "images": [image_b64],
+        "stream": False,
+    }
+
+    try:
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            resp = await client.post(f"{OLLAMA_BASE_URL}/api/generate", json=payload)
+            resp.raise_for_status()
+            data = resp.json()
+            response_text = data.get("response", "").strip()
+            
+            # Markdown block parsing (```json ... ```)
+            if "```json" in response_text:
+                response_text = response_text.split("```json")[1].split("```")[0].strip()
+            elif "```" in response_text:
+                response_text = response_text.split("```")[1].split("```")[0].strip()
+                
+            import json
+            parsed_data = json.loads(response_text)
+            
+            return {
+                "success": True,
+                "data": parsed_data
+            }
+    except Exception as e:
+        return {
+            "success": False,
+            "message": f"LLaVa analizi başarısız: {str(e)}",
+            "data": { "tur": "", "renk": "", "kumas": "", "stil": "" }
+        }
+
