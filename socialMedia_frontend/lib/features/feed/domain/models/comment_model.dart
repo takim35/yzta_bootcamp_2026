@@ -7,10 +7,6 @@ class CommentModel {
   final String username;
   final String? avatarUrl;
   final String content;
-  final String? parentId;
-  final int likesCount;
-  final bool isLiked;
-  final List<CommentModel> replies;
   final DateTime createdAt;
 
   const CommentModel({
@@ -20,10 +16,6 @@ class CommentModel {
     required this.username,
     this.avatarUrl,
     required this.content,
-    this.parentId,
-    this.likesCount = 0,
-    this.isLiked = false,
-    this.replies = const [],
     required this.createdAt,
   });
 
@@ -40,14 +32,6 @@ class CommentModel {
       username: json['username'] as String? ?? '',
       avatarUrl: json['avatar_url'] as String?,
       content: json['content'] as String? ?? '',
-      parentId: json['parent_id'] as String?,
-      likesCount: json['likes_count'] as int? ?? 0,
-      isLiked: json['is_liked'] as bool? ?? false,
-      replies: json['replies'] != null
-          ? (json['replies'] as List)
-              .map((e) => CommentModel.fromJson(e as Map<String, dynamic>))
-              .toList()
-          : [],
       createdAt: json['created_at'] != null
           ? DateTime.parse(json['created_at'] as String)
           : DateTime.now(),

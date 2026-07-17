@@ -19,7 +19,6 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from app.core.database import get_db
 from app.domain.schemas import FollowRequest, MessageResponse
-from app.api.routers.notifications import create_notification
 
 router = APIRouter()
 
@@ -64,9 +63,6 @@ def follow_user(req: FollowRequest, db: sqlite3.Connection = Depends(get_db)):
             "UPDATE users SET followers_count = followers_count + 1 WHERE user_id = ?",
             (req.following_id,),
         )
-
-        # Bildirim gönder
-        create_notification(db, req.following_id, req.follower_id, 'follow')
 
         db.commit()
 
@@ -118,34 +114,3 @@ def unfollow_user(req: FollowRequest, db: sqlite3.Connection = Depends(get_db)):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Takipten çıkma sırasında hata: {str(e)}")
-
-from typing import List
-from app.domain.schemas import UserResponse
-
-@router.get("/users/{user_id}/followers", response_model=List[UserResponse])
-def get_followers(user_id: str, db: sqlite3.Connection = Depends(get_db)):
-    try:
-        rows = db.execute(
-            """SELECT u.* FROM users u
-               JOIN follows f ON u.user_id = f.follower_id
-               WHERE f.following_id = ?
-               ORDER BY f.created_at DESC""",
-            (user_id,)
-        ).fetchall()
-        return [UserResponse(**dict(row)) for row in rows]
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@router.get("/users/{user_id}/following", response_model=List[UserResponse])
-def get_following(user_id: str, db: sqlite3.Connection = Depends(get_db)):
-    try:
-        rows = db.execute(
-            """SELECT u.* FROM users u
-               JOIN follows f ON u.user_id = f.following_id
-               WHERE f.follower_id = ?
-               ORDER BY f.created_at DESC""",
-            (user_id,)
-        ).fetchall()
-        return [UserResponse(**dict(row)) for row in rows]
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))

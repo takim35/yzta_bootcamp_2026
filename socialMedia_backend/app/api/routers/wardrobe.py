@@ -6,7 +6,7 @@ import json
 
 from app.core.database import get_db
 from app.repositories.item_repository import ItemRepository
-from app.services import gemini_client
+from app.services import ollama_client
 
 router = APIRouter(tags=["Wardrobe"])
 
@@ -51,30 +51,13 @@ def kiyafetleri_listele(user_id: str, db: sqlite3.Connection = Depends(get_db)):
     repo = ItemRepository(db)
     return repo.kiyafetleri_getir(user_id)
 
-@router.put("/items/{item_id}")
-def kiyafet_guncelle(item_id: int, istek: KiyafetEkleIstek, db: sqlite3.Connection = Depends(get_db)):
-    repo = ItemRepository(db)
-    veri = istek.model_dump(exclude_unset=True)
-    basarili = repo.kiyafet_guncelle(kiyafet_id=item_id, **veri)
-    if not basarili:
-        raise HTTPException(status_code=404, detail="Kıyafet bulunamadı veya güncellenemedi.")
-    return {"mesaj": "Kıyafet başarıyla güncellendi."}
-
-@router.delete("/items/{item_id}")
-def kiyafet_sil(item_id: int, db: sqlite3.Connection = Depends(get_db)):
-    repo = ItemRepository(db)
-    basarili = repo.kiyafet_sil(kiyafet_id=item_id)
-    if not basarili:
-        raise HTTPException(status_code=404, detail="Kıyafet bulunamadı.")
-    return {"mesaj": "Kıyafet başarıyla silindi."}
-
 @router.post("/chat")
 def chat(istek: ChatIstek, db: sqlite3.Connection = Depends(get_db)):
     repo = ItemRepository(db)
     gecmis = repo.sohbet_gecmisini_getir(istek.user_id)
     
     try:
-        sonuc = gemini_client.sohbet_yaniti_al(gecmis, istek.mesaj)
+        sonuc = ollama_client.sohbet_yaniti_al(gecmis, istek.mesaj)
     except Exception as e:
         raise HTTPException(status_code=502, detail=f"AI hatası: {e}")
         
@@ -104,7 +87,7 @@ def kombin_oner(istek: KombinOnerIstek, db: sqlite3.Connection = Depends(get_db)
     }
     
     try:
-        sonuc = gemini_client.kombin_onerisi_uret(baglam, temiz_kiyafetler)
+        sonuc = ollama_client.kombin_onerisi_uret(baglam, temiz_kiyafetler)
     except Exception as e:
         raise HTTPException(status_code=502, detail=f"Gemini API hatası: {e}")
         

@@ -3,10 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../../../features/feed/domain/models/post_model.dart';
-import '../../../../features/shared/presentation/screens/image_viewer_screen.dart';
 import '../../../../core/theme/app_theme.dart';
 import 'like_button.dart';
-import 'likers_bottom_sheet.dart';
 
 class PostCard extends ConsumerWidget {
   final PostModel post;
@@ -39,7 +37,7 @@ class PostCard extends ConsumerWidget {
           // ─── Header: Avatar + Username + Time ─────────────────
           _buildHeader(context),
           // ─── Post Image ───────────────────────────────────────
-          _buildImage(context),
+          _buildImage(),
           // ─── Actions & Caption ────────────────────────────────
           _buildFooter(context),
         ],
@@ -124,7 +122,7 @@ class PostCard extends ConsumerWidget {
                 color: AppTheme.textMuted,
                 size: 20,
               ),
-              onPressed: () => _showPostOptions(context),
+              onPressed: () {},
               tooltip: 'Daha fazla',
             ),
           ],
@@ -133,79 +131,13 @@ class PostCard extends ConsumerWidget {
     );
   }
 
-  void _showPostOptions(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: AppTheme.cardDark,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (_) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: 8),
-            Container(
-              width: 40, height: 4,
-              decoration: BoxDecoration(
-                color: AppTheme.textMuted,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const SizedBox(height: 16),
-            ListTile(
-              leading: const Icon(Icons.favorite_border_rounded, color: AppTheme.accentPink),
-              title: const Text('İlgileniyorum', style: TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.bold)),
-              subtitle: const Text('Bu tarz kombinleri daha çok göreceksiniz.', style: TextStyle(color: AppTheme.textMuted, fontSize: 12)),
-              onTap: () {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('İlgi alanlarınıza eklendi! ✨')),
-                );
-              },
-            ),
-            const Divider(color: AppTheme.dividerColor, height: 1),
-            ListTile(
-              leading: const Icon(Icons.visibility_off_outlined, color: AppTheme.textPrimary),
-              title: const Text('İlgilenmiyorum', style: TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.bold)),
-              subtitle: const Text('Bu tür gönderileri daha az göreceksiniz.', style: TextStyle(color: AppTheme.textMuted, fontSize: 12)),
-              onTap: () {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Geri bildiriminiz için teşekkürler! Algoritma güncelleniyor.')),
-                );
-              },
-            ),
-            const SizedBox(height: 8),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildImage(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        if (post.imageUrl.isNotEmpty) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => ImageViewerScreen(
-                imageUrl: post.imageUrl,
-                heroTag: 'post_image_${post.postId}',
-              ),
-            ),
-          );
-        }
-      },
-      child: AspectRatio(
-        aspectRatio: 4 / 5,
-        child: Hero(
-          tag: 'post_image_${post.postId}',
-          child: post.imageUrl.startsWith('http')
-              ? CachedNetworkImage(
-                  imageUrl: post.imageUrl,
-                  fit: BoxFit.cover,
+  Widget _buildImage() {
+    return AspectRatio(
+      aspectRatio: 4 / 5,
+      child: post.imageUrl.startsWith('http')
+          ? CachedNetworkImage(
+              imageUrl: post.imageUrl,
+              fit: BoxFit.cover,
               placeholder: (context, url) => Container(
                 color: AppTheme.surfaceDark,
                 child: const Center(
@@ -262,8 +194,6 @@ class PostCard extends ConsumerWidget {
                 ),
               ),
             ),
-        ),
-      ),
     );
   }
 
@@ -283,7 +213,6 @@ class PostCard extends ConsumerWidget {
                     isLiked: post.isLiked,
                     likesCount: post.likesCount,
                     onToggle: () => onLike(post.postId),
-                    onLikersTap: () => LikersBottomSheet.show(context, postId: post.postId),
                   ),
                   const SizedBox(width: AppTheme.spacingM),
                   GestureDetector(
@@ -312,17 +241,14 @@ class PostCard extends ConsumerWidget {
               ),
               IconButton(
                 icon: Icon(
-                  post.isSaved ? Icons.auto_awesome_rounded : Icons.auto_awesome_outlined,
-                  color: post.isSaved ? const Color(0xFFFFD700) : AppTheme.textPrimary, // Altın sarısı/parıltı efekti
+                  post.isSaved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
+                  color: post.isSaved ? AppTheme.accentViolet : AppTheme.textPrimary,
                   size: 26,
-                  shadows: post.isSaved ? [
-                    const BoxShadow(color: Color(0x66FFD700), blurRadius: 10, spreadRadius: 2)
-                  ] : null,
                 ),
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
                 onPressed: () => onSave?.call(post.postId),
-                tooltip: post.isSaved ? 'Podyum\'dan Çıkar' : 'Podyuma Çıkar',
+                tooltip: post.isSaved ? 'Kaydedilenlerden Çıkar' : 'Kaydet',
               ),
             ],
           ),

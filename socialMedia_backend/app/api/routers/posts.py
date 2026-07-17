@@ -55,52 +55,76 @@ def get_user_posts(user_id: str, viewer_id: Optional[str] = Query(None), db: sql
 def get_saved_posts(user_id: str, db: sqlite3.Connection = Depends(get_db)):
     """Kullanıcının kaydettiği gönderileri döndürür."""
     try:
-        rows = db.execute(
-            """SELECT p.*, u.username, u.display_name, u.avatar_url
-               FROM saves s
-               JOIN posts p ON s.post_id = p.post_id
-               JOIN users u ON p.user_id = u.user_id
-               WHERE s.user_id = ?
-               ORDER BY s.created_at DESC""",
-            (user_id,)
-        ).fetchall()
-        posts = []
-        for row in rows:
-            is_liked = db.execute('SELECT 1 FROM likes WHERE post_id = ? AND user_id = ?', (row['post_id'], user_id)).fetchone() is not None
-            outfit_rows = db.execute('SELECT item_id, category, image_url FROM post_outfit_items WHERE post_id = ?', (row['post_id'],)).fetchall()
-            outfit_items = [OutfitItemResponse(item_id=oi['item_id'], category=oi['category'], image_url=oi['image_url']) for oi in outfit_rows]
-            posts.append(PostResponse(post_id=row['post_id'], user_id=row['user_id'], username=row['username'], display_name=row['display_name'], avatar_url=row['avatar_url'], image_url=row['image_url'], caption=row['caption'], visibility=row['visibility'], ai_training_consent=bool(row['ai_training_consent']), likes_count=row['likes_count'], comments_count=row['comments_count'], is_liked=is_liked, is_saved=True, outfit_items=outfit_items, created_at=row['created_at']))
-        return posts
+        # saved_posts tablosunu oluştur (yoksa)
+        db.execute("""
+            CREATE TABLE IF NOT EXISTS saved_posts (
+                user_id   TEXT NOT NULL,
+                post_id   TEXT NOT NULL,
+                saved_at  TEXT NOT NULL,
+                PRIMARY KEY (user_id, post_id)
+            )
+        """)
+        rows = db.execute("""
+            SELECT p.*, u.username, u.display_name, u.avatar_url
+            FROM saved_posts sp
+            JOIN posts p ON sp.post_id = p.post_id
+            JOIN users u ON p.user_id = u.user_id
+            WHERE sp.user_id = ?
+            ORDER BY sp.saved_at DESC
+        """, (user_id,)).fetchall()
+        return PostRepository.get_user_posts(db, user_id, viewer_id=user_id) if not rows else [
+            PostResponse(
+                post_id=r['post_id'], user_id=r['user_id'],
+                username=r['username'], display_name=r.get('display_name', ''),
+                avatar_url=r.get('avatar_url'), image_url=r['image_url'],
+                caption=r.get('caption', ''), visibility=r.get('visibility', 'public'),
+                ai_training_consent=bool(r.get('ai_training_consent', 0)),
+                likes_count=r.get('likes_count', 0), comments_count=r.get('comments_count', 0),
+                is_liked=db.execute(
+                    'SELECT 1 FROM likes WHERE post_id = ? AND user_id = ?',
+                    (r['post_id'], user_id)
+                ).fetchone() is not None,
+                is_saved=True,
+                outfit_items=[],
+                created_at=r['created_at'],
+            ) for r in rows
+        ]
+    except Exception:
+        return []
+
+
+@router.post('/{post_id}/save')
+def save_post(post_id: str, user_id: str = Query(...), db: sqlite3.Connection = Depends(get_db)):
+    """Gönderiyi kaydeder."""
+    try:
+        db.execute("""
+            CREATE TABLE IF NOT EXISTS saved_posts (
+                user_id   TEXT NOT NULL,
+                post_id   TEXT NOT NULL,
+                saved_at  TEXT NOT NULL,
+                PRIMARY KEY (user_id, post_id)
+            )
+        """)
+        from datetime import datetime
+        db.execute(
+            "INSERT OR IGNORE INTO saved_posts (user_id, post_id, saved_at) VALUES (?,?,?)",
+            (user_id, post_id, datetime.utcnow().isoformat())
+        )
+        db.commit()
+        return {"success": True, "message": "Kaydedildi"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.post("/{post_id}/save", response_model=MessageResponse, status_code=201)
-def save_post(post_id: str, req: dict, db: sqlite3.Connection = Depends(get_db)):
-    """Gönderiyi kaydeder (bookmark)."""
-    try:
-        user_id = req.get('user_id')
-        if not user_id:
-            raise HTTPException(status_code=400, detail="user_id gerekli")
-        post = db.execute("SELECT post_id FROM posts WHERE post_id = ?", (post_id,)).fetchone()
-        if not post:
-            raise HTTPException(status_code=404, detail="Post bulunamadı")
-        existing = db.execute("SELECT 1 FROM saves WHERE post_id = ? AND user_id = ?", (post_id, user_id)).fetchone()
-        if existing:
-            raise HTTPException(status_code=409, detail="Bu gönderiyi zaten kaydetmişsiniz")
-        db.execute("INSERT INTO saves (post_id, user_id) VALUES (?, ?)", (post_id, user_id))
-        db.commit()
-        return MessageResponse(success=True, message="Gönderi kaydedildi")
-    except HTTPException: raise
-    except Exception as e: raise HTTPException(status_code=500, detail=str(e))
-
-
-@router.delete("/{post_id}/save", response_model=MessageResponse)
+@router.delete('/{post_id}/save')
 def unsave_post(post_id: str, user_id: str = Query(...), db: sqlite3.Connection = Depends(get_db)):
-    """Gönderi kaydını kaldırır."""
+    """Gönderiyi kayıtlardan kaldırır."""
     try:
-        db.execute("DELETE FROM saves WHERE post_id = ? AND user_id = ?", (post_id, user_id))
+        db.execute(
+            "DELETE FROM saved_posts WHERE user_id = ? AND post_id = ?",
+            (user_id, post_id)
+        )
         db.commit()
-        return MessageResponse(success=True, message="Kayıt kaldırıldı")
-    except Exception as e: raise HTTPException(status_code=500, detail=str(e))
-
+        return {"success": True, "message": "Kayıtlardan kaldırıldı"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

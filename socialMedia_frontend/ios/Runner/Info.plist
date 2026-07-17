@@ -74,5 +74,38 @@
 	<string>Fotoğrafları kitaplığınıza kaydetmek için erişim gerekiyor.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Video çekimi için mikrofon erişimi gerekiyor.</string>
+
+	<!-- Konum izni açıklamaları -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Hava durumuna göre kombin önerisi sunmak için konumunuza erişmek istiyoruz.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Hava durumuna göre kombin önerisi sunmak için konumunuza erişmek istiyoruz.</string>
+
+	<!--
+	  Google Sign-In için gerekli URL Scheme (REVERSED_CLIENT_ID).
+	  ADIMLAR:
+	    1. Firebase Console → Authentication → Sign-in method → Google → Etkinleştir
+	    2. Yeni GoogleService-Info.plist indir (CLIENT_ID ve REVERSED_CLIENT_ID eklenmiş olacak)
+	    3. Aşağıdaki string değerini plist'teki REVERSED_CLIENT_ID ile güncelle
+
+	  Mevcut proje: spot-7922b
+	  Bundle ID:    com.example.dijitalGardropSocial
+	  App ID:       1:777699158570:ios:3db05222db2e5cc700f153
+	-->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>Google Sign-In</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<!-- BURAYA GoogleService-Info.plist'teki REVERSED_CLIENT_ID değerini yaz -->
+				<!-- Örnek: com.googleusercontent.apps.777699158570-xxxxxxxxxxxxxxxxxxxx -->
+				<string>com.googleusercontent.apps.777699158570-dpl8ajp9lt2qkg7p29bbldmokr3qp1l9</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

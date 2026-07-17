@@ -21,10 +21,6 @@ CREATE TABLE IF NOT EXISTS users (
     following_count INTEGER NOT NULL DEFAULT 0,
     profile_visibility TEXT NOT NULL DEFAULT 'public'
         CHECK (profile_visibility IN ('public', 'private')),
-    is_verified INTEGER NOT NULL DEFAULT 0,
-    verification_code TEXT DEFAULT NULL,
-    two_factor_secret TEXT DEFAULT NULL,
-    two_factor_enabled INTEGER NOT NULL DEFAULT 0,
     created_at    TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
 );
 
@@ -44,7 +40,6 @@ CREATE TABLE IF NOT EXISTS posts (
     ai_training_consent  INTEGER NOT NULL DEFAULT 0
         CHECK (ai_training_consent IN (0, 1)),
     likes_count          INTEGER NOT NULL DEFAULT 0,
-    comments_count       INTEGER NOT NULL DEFAULT 0,
     created_at           TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
@@ -141,35 +136,17 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_export_post
 -- 7. COMMENTS
 -- ============================================================
 CREATE TABLE IF NOT EXISTS comments (
-    comment_id  TEXT PRIMARY KEY,
-    post_id     TEXT NOT NULL,
-    user_id     TEXT NOT NULL,
-    content     TEXT NOT NULL,
-    parent_id   TEXT DEFAULT NULL,
-    likes_count INTEGER NOT NULL DEFAULT 0,
-    created_at  TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+    comment_id TEXT PRIMARY KEY,
+    post_id    TEXT NOT NULL,
+    user_id    TEXT NOT NULL,
+    content    TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
     FOREIGN KEY (post_id) REFERENCES posts(post_id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    FOREIGN KEY (parent_id) REFERENCES comments(comment_id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
 CREATE INDEX IF NOT EXISTS idx_comments_post
     ON comments(post_id, created_at DESC);
-
-CREATE INDEX IF NOT EXISTS idx_comments_parent
-    ON comments(parent_id);
-
--- ============================================================
--- 7.1. COMMENT_LIKES
--- ============================================================
-CREATE TABLE IF NOT EXISTS comment_likes (
-    comment_id TEXT NOT NULL,
-    user_id    TEXT NOT NULL,
-    created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
-    PRIMARY KEY (comment_id, user_id),
-    FOREIGN KEY (comment_id) REFERENCES comments(comment_id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
-);
 
 -- ============================================================
 -- 8. SAVES (Bookmarks)
@@ -187,22 +164,77 @@ CREATE INDEX IF NOT EXISTS idx_saves_user
     ON saves(user_id, created_at DESC);
 
 -- ============================================================
--- 9. NOTIFICATIONS
+-- 9. KIYAFETLER (Wardrobe Items)
 -- ============================================================
-CREATE TABLE IF NOT EXISTS notifications (
-    notification_id TEXT PRIMARY KEY,
-    user_id         TEXT NOT NULL,          -- bildirimi alan kişi
-    actor_id        TEXT NOT NULL,          -- bildirimi tetikleyen kişi
-    type            TEXT NOT NULL
-        CHECK (type IN ('like', 'comment', 'follow', 'mention')),
-    post_id         TEXT DEFAULT NULL,
-    comment_id      TEXT DEFAULT NULL,
-    is_read         INTEGER NOT NULL DEFAULT 0,
-    created_at      TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    FOREIGN KEY (actor_id) REFERENCES users(user_id) ON DELETE CASCADE
+CREATE TABLE IF NOT EXISTS kiyafetler (
+    id               INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id          TEXT    NOT NULL,
+    tur              TEXT    NOT NULL,
+    renk             TEXT    NOT NULL,
+    marka            TEXT    DEFAULT NULL,
+    beden            TEXT    DEFAULT NULL,
+    kumas            TEXT    DEFAULT NULL,
+    kesim            TEXT    DEFAULT NULL,
+    yaka_tipi        TEXT    DEFAULT NULL,
+    kol_tipi         TEXT    DEFAULT NULL,
+    desen            TEXT    DEFAULT 'düz',
+    mevsim           TEXT    DEFAULT 'tüm sezon',
+    stil_etiketi     TEXT    DEFAULT NULL,
+    kullanim_sikligi TEXT    DEFAULT NULL,
+    kombin_notu      TEXT    DEFAULT NULL,
+    temiz            INTEGER NOT NULL DEFAULT 1
+        CHECK (temiz IN (0, 1)),
+    foto_url         TEXT    DEFAULT NULL,
+    olusturulma_tarihi TEXT  NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
-CREATE INDEX IF NOT EXISTS idx_notifications_user
-    ON notifications(user_id, is_read, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_kiyafetler_user
+    ON kiyafetler(user_id);
 
+CREATE INDEX IF NOT EXISTS idx_kiyafetler_user_temiz
+    ON kiyafetler(user_id, temiz);
+
+-- ============================================================
+-- 10. KATEGORİLER (Wardrobe Category Values)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS kategoriler (
+    id    INTEGER PRIMARY KEY AUTOINCREMENT,
+    tip   TEXT NOT NULL,
+    deger TEXT NOT NULL,
+    UNIQUE (tip, deger)
+);
+
+CREATE INDEX IF NOT EXISTS idx_kategoriler_tip
+    ON kategoriler(tip);
+
+-- ============================================================
+-- 11. SOHBET_GECMİSİ (AI Chat History)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS sohbet_gecmisi (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id    TEXT NOT NULL,
+    rol        TEXT NOT NULL CHECK (rol IN ('user', 'assistant')),
+    icerik     TEXT NOT NULL,
+    tarih      TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_sohbet_user
+    ON sohbet_gecmisi(user_id, tarih DESC);
+
+-- ============================================================
+-- 12. KOMBİN_ONERİLERİ (Outfit Suggestions)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS kombin_onerileri (
+    id             INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id        TEXT    NOT NULL,
+    baglam_json    TEXT    NOT NULL,
+    kiyafet_idleri TEXT    NOT NULL,   -- JSON array
+    aciklama       TEXT    DEFAULT NULL,
+    olusturulma    TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_kombin_user
+    ON kombin_onerileri(user_id, olusturulma DESC);

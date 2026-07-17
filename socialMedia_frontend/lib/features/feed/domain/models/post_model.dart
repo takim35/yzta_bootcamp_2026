@@ -1,5 +1,6 @@
 import 'package:timeago/timeago.dart' as timeago;
 import 'outfit_item_model.dart';
+import '../../../../services/api_service.dart';
 
 class PostModel {
   final String postId;
@@ -32,19 +33,23 @@ class PostModel {
     required this.createdAt,
   });
 
+  /// Kısa alias — profile_screen ve provider'lar post.id kullanıyor
+  String get id => postId;
+
   /// Zaman farkını Türkçe olarak döndürür
   String get timeAgo {
     timeago.setLocaleMessages('tr', timeago.TrMessages());
     return timeago.format(createdAt, locale: 'tr');
   }
 
+
   factory PostModel.fromJson(Map<String, dynamic> json) {
     return PostModel(
       postId: json['post_id'] as String? ?? '',
       userId: json['user_id'] as String? ?? '',
       username: json['username'] as String? ?? '',
-      avatarUrl: json['avatar_url'] as String? ?? '',
-      imageUrl: json['image_url'] as String? ?? '',
+      avatarUrl: ApiService.fixImageUrl(json['avatar_url'] as String?),
+      imageUrl: ApiService.fixImageUrl(json['image_url'] as String?),
       caption: json['caption'] as String? ?? '',
       visibility: json['visibility'] as String? ?? 'public',
       likesCount: json['likes_count'] as int? ?? 0,

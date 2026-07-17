@@ -28,17 +28,6 @@ class AuthResponse(BaseModel):
     """Kayıt veya Giriş başarılı olduğunda dönülecek yanıt."""
     user_id: str
     message: str
-    requires_2fa: bool = False
-
-
-class VerifyEmailRequest(BaseModel):
-    email: str
-    code: str
-
-
-class Verify2FARequest(BaseModel):
-    user_id: str
-    code: str
 
 
 class PasswordResetRequest(BaseModel):
@@ -89,13 +78,13 @@ class CommentRequest(BaseModel):
     """Yorum yapma isteği."""
     user_id: str
     content: str
-    parent_id: Optional[str] = None
 
 
 class CaptionRequest(BaseModel):
     """AI caption önerisi isteği."""
     outfit_items: List[Dict] = Field(default_factory=list)
     style_hint: str = ""
+    image_url: Optional[str] = None  # Görsel URL'si — Gemini Vision için
 
 
 # ============================================================
@@ -132,10 +121,6 @@ class CommentResponse(BaseModel):
     username: str
     avatar_url: Optional[str] = None
     content: str
-    parent_id: Optional[str] = None
-    likes_count: int = 0
-    is_liked: bool = False
-    replies: List['CommentResponse'] = Field(default_factory=list)
     created_at: str
 
 
@@ -181,3 +166,39 @@ class MessageResponse(BaseModel):
 
 class TokenRefreshRequest(BaseModel):
     refresh_token: str
+
+
+# ============================================================
+# 2FA Şemaları
+# ============================================================
+
+class TwoFASetupResponse(BaseModel):
+    """2FA kurulum yanıtı — OTP URI ve secret döner."""
+    secret: str
+    otpauth_uri: str
+    message: str
+
+
+class TwoFAVerifyRequest(BaseModel):
+    """2FA kodu doğrulama isteği."""
+    user_id: str
+    code: str
+
+
+class TwoFALoginRequest(BaseModel):
+    """Login sırasında 2FA kodu doğrulama."""
+    user_id: str
+    code: str
+
+
+class TwoFAStatusResponse(BaseModel):
+    """Kullanıcının 2FA durumu."""
+    user_id: str
+    two_fa_enabled: bool
+
+
+class PasswordResetWithTokenRequest(BaseModel):
+    """Token tabanlı şifre sıfırlama (gelecek için hazır)."""
+    email: str
+    new_password: str
+    confirm_password: str

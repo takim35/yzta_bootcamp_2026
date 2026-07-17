@@ -62,9 +62,6 @@ class AppStrings {
 
   // ── Main Home ────────────────────────────────────────────────
   String get mainSubtitle => isTr ? 'Dijital tarzına yön ver.' : 'Define your digital style.';
-  String get homeWelcomeBack => isTr ? 'Tekrar hoş geldin, ' : 'Welcome back, ';
-  String get homeWhatToWear => isTr ? 'Bugün ne giysek?' : 'What to wear today?';
-  String get homeWhatToWearSub => isTr ? 'Sana özel önerilere göz at' : 'Check out your personalized outfits';
   String get wardrobe => isTr ? 'Gardırop' : 'Wardrobe';
   String get wardrobeSub => isTr ? 'Kıyafetlerini yönet' : 'Manage your clothes';
   String get aiStylist => isTr ? 'AI Stilist' : 'AI Stylist';

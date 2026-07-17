@@ -7,8 +7,6 @@ import '../../../../services/api_service.dart';
 import '../providers/profile_provider.dart';
 import '../../../../features/auth/presentation/providers/auth_provider.dart';
 import '../../../../features/onboarding/presentation/screens/onboarding_screen.dart';
-import '../../../../features/auth/presentation/screens/two_factor_setup_screen.dart';
-import '../../../../features/auth/presentation/screens/forgot_password_screen.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -24,12 +22,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   @override
   void initState() {
     super.initState();
-    final currentUserId = ref.read(authProvider).currentUserId;
-    if (currentUserId != null) {
-      final user = ref.read(profileProvider(currentUserId)).user;
-      if (user != null) {
-        // profileVisibility alanı genişletildiğinde buradan okunacak
-      }
+    final user = ref.read(profileProvider).user;
+    if (user != null) {
+      // profileVisibility alanı genişletildiğinde buradan okunacak
     }
   }
 
@@ -60,6 +55,46 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _logout() async {
+    final s = ref.read(stringsProvider);
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppTheme.cardDark,
+        title: Text(
+          s.isTr ? 'Çıkış Yap' : 'Log Out',
+          style: const TextStyle(color: AppTheme.textPrimary),
+        ),
+        content: Text(
+          s.isTr
+              ? 'Hesabınızdan çıkmak istediğinize emin misiniz?'
+              : 'Are you sure you want to log out?',
+          style: const TextStyle(color: AppTheme.textMuted),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(s.isTr ? 'İptal' : 'Cancel',
+                style: const TextStyle(color: AppTheme.textMuted)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(s.isTr ? 'Çıkış' : 'Log Out',
+                style: const TextStyle(color: AppTheme.accentViolet)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true && mounted) {
+      ref.read(authProvider).logout();
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const OnboardingScreen()),
+        (_) => false,
+      );
     }
   }
 
@@ -120,6 +155,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final s = ref.watch(stringsProvider);
+    final locale = ref.watch(localeProvider);
 
     return Scaffold(
       backgroundColor: AppTheme.primaryDark,
@@ -136,43 +172,71 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           : ListView(
               padding: const EdgeInsets.all(24),
               children: [
-                // Removed Privacy Section from here
-
-                const SizedBox(height: 16),
-                
-                // ── Genel ───────────────────────────────────────
+                // ── Dil / Language ──────────────────────────────
                 Text(
-                  s.isTr ? 'Genel' : 'General',
+                  s.isTr ? 'Dil' : 'Language',
+                  style: const TextStyle(
+                      color: AppTheme.accentViolet,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16),
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppTheme.cardDark,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppTheme.dividerColor),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: _LangButton(
+                          label: '🇹🇷  Türkçe',
+                          selected: locale == AppLocale.tr,
+                          onTap: () => ref
+                              .read(localeProvider.notifier)
+                              .setLocale(AppLocale.tr),
+                        ),
+                      ),
+                      Container(width: 1, height: 48, color: AppTheme.dividerColor),
+                      Expanded(
+                        child: _LangButton(
+                          label: '🇬🇧  English',
+                          selected: locale == AppLocale.en,
+                          onTap: () => ref
+                              .read(localeProvider.notifier)
+                              .setLocale(AppLocale.en),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const Divider(color: AppTheme.dividerColor, height: 48),
+
+                // ── Gizlilik ────────────────────────────────────
+                Text(
+                  s.isTr ? 'Gizlilik' : 'Privacy',
                   style: const TextStyle(
                       color: AppTheme.accentViolet,
                       fontWeight: FontWeight.bold,
                       fontSize: 16),
                 ),
                 const SizedBox(height: 16),
-                
-                // Dil Ayarı
                 ListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: Text(s.isTr ? 'Uygulama Dili' : 'App Language',
+                  title: Text(s.isTr ? 'Gizli Profil' : 'Private Profile',
                       style: const TextStyle(color: AppTheme.textPrimary)),
-                  subtitle: Row(
-                    children: [
-                      Expanded(
-                        child: _LangButton(
-                          label: '🇹🇷 Türkçe',
-                          selected: ref.watch(localeProvider) == AppLocale.tr,
-                          onTap: () => ref.read(localeProvider.notifier).setLocale(AppLocale.tr),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: _LangButton(
-                          label: '🇬🇧 English',
-                          selected: ref.watch(localeProvider) == AppLocale.en,
-                          onTap: () => ref.read(localeProvider.notifier).setLocale(AppLocale.en),
-                        ),
-                      ),
-                    ],
+                  subtitle: Text(
+                    s.isTr
+                        ? 'Sadece takipçilerin gönderilerini görebilir.'
+                        : 'Only followers can see your posts.',
+                    style: const TextStyle(color: AppTheme.textMuted),
+                  ),
+                  trailing: Switch(
+                    value: _isPrivate,
+                    onChanged: _updatePrivacy,
+                    activeColor: AppTheme.accentViolet,
                   ),
                 ),
 
@@ -188,18 +252,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // 2FA Setup
+                // Çıkış Yap
                 ListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: Text(s.isTr ? 'İki Aşamalı Doğrulama (2FA)' : 'Two-Factor Authentication (2FA)',
+                  title: Text(s.isTr ? 'Çıkış Yap' : 'Log Out',
                       style: const TextStyle(color: AppTheme.textPrimary)),
-                  trailing: const Icon(Icons.security_rounded, color: AppTheme.accentViolet),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const TwoFactorSetupScreen()),
-                    );
-                  },
+                  trailing: const Icon(Icons.logout_rounded,
+                      color: AppTheme.accentViolet),
+                  onTap: _logout,
                 ),
 
                 // Şifre Sıfırla
@@ -210,30 +270,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   trailing: const Icon(Icons.arrow_forward_ios,
                       size: 16, color: AppTheme.textMuted),
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const ForgotPasswordScreen()),
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                          content: Text(s.isTr
+                              ? 'Şifre sıfırlama bağlantısı e-postanıza gönderildi.'
+                              : 'Password reset link sent to your email.')),
                     );
                   },
                 ),
 
-                // Çıkış Yap
-                ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: Text(s.isTr ? 'Çıkış Yap' : 'Log Out',
-                      style: const TextStyle(color: AppTheme.errorColor)),
-                  trailing: const Icon(Icons.logout_rounded,
-                      color: AppTheme.errorColor),
-                  onTap: () {
-                    ref.read(authProvider).logout();
-                    Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(builder: (_) => const OnboardingScreen()),
-                      (_) => false,
-                    );
-                  },
-                ),
-
-                const Divider(color: AppTheme.dividerColor, height: 48),
                 // Hesabı Sil
                 ListTile(
                   contentPadding: EdgeInsets.zero,

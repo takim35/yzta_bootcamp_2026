@@ -6,22 +6,31 @@ import '../features/feed/domain/models/post_model.dart';
 import '../features/feed/domain/models/comment_model.dart';
 import '../features/profile/domain/models/user_model.dart';
 import '../features/feed/domain/models/outfit_item_model.dart';
+import '../core/config/app_config.dart';
 
 class ApiService {
   ApiService._internal();
   static final ApiService _instance = ApiService._internal();
   factory ApiService() => _instance;
 
-  /// Base URL — Bilgisayarın yerel IP adresi (telefon aynı WiFi ağındayken çalışır)
-  static String get baseUrl {
-    return const String.fromEnvironment(
-      'API_BASE_URL',
-      defaultValue: 'http://127.0.0.1:8000',
-    );
+  /// Base URL — AppConfig üzerinden platform-bağımsız olarak belirlenir.
+  /// Override için: flutter run --dart-define=API_HOST=192.168.1.100
+  static String get baseUrl => AppConfig.baseUrl;
+
+  /// Veritabanında kayıtlı localhost/127.0.0.1/eski-IP URL'lerini
+  /// güncel sunucu adresiyle değiştirir. iOS/Android/Windows uyumlu.
+  static String fixImageUrl(String? url) {
+    if (url == null || url.isEmpty) return '';
+    // Bilinen tüm local adres varyantlarını AppConfig.baseUrl ile değiştir
+    return url
+        .replaceAllMapped(
+          RegExp(r'https?://(localhost|127\.0\.0\.1|10\.0\.2\.2|10\.5\.5\.\d+):8000'),
+          (_) => AppConfig.baseUrl,
+        );
   }
 
   final http.Client _client = http.Client();
-  static const Duration _timeout = Duration(seconds: 15);
+  static const Duration _timeout = Duration(seconds: 30); // Ollama AI çağrıları için daha uzun
 
   // ─── Headers ────────────────────────────────────────────────
   Map<String, String> get _headers => {
@@ -179,36 +188,24 @@ class ApiService {
     throw ApiException(message, statusCode: response.statusCode);
   }
 
-  // ─── Auth ──────────────────────────────────────────────────────────
-  Future<Map<String, dynamic>> register(String email, String password) async {
+  // ─── Auth ───────────────────────────────────────────────────
+  Future<String> register(String email, String password) async {
     final body = {
       'email': email,
       'password': password,
     };
     final data = await _post('/auth/register', body);
-    return data;
+    return data['user_id'] as String;
   }
 
-  Future<Map<String, dynamic>> login(String email, String password) async {
+  Future<String> login(String email, String password) async {
     final body = {
       'email': email,
       'password': password,
     };
     final data = await _post('/auth/login', body);
-    return data;
+    return data['user_id'] as String;
   }
-
-  Future<Map<String, dynamic>> verifyEmail(String email, String code) => 
-      _post('/auth/verify-email', {'email': email, 'code': code});
-      
-  Future<Map<String, dynamic>> setup2FA(String userId) => 
-      _get('/auth/2fa/setup/$userId');
-      
-  Future<Map<String, dynamic>> verify2FASetup(String userId, String code) => 
-      _post('/auth/2fa/verify', {'user_id': userId, 'code': code});
-      
-  Future<Map<String, dynamic>> login2FA(String userId, String code) => 
-      _post('/auth/2fa/login', {'user_id': userId, 'code': code});
 
   Future<void> resetPassword(String email, String newPassword) async {
     final body = {
@@ -216,6 +213,22 @@ class ApiService {
       'new_password': newPassword,
     };
     await _post('/auth/reset-password', body);
+  }
+
+  Future<String> loginWithGoogle({
+    required String idToken,
+    required String email,
+    required String displayName,
+    String? avatarUrl,
+  }) async {
+    final body = {
+      'id_token': idToken,
+      'email': email,
+      'display_name': displayName,
+      if (avatarUrl != null) 'avatar_url': avatarUrl,
+    };
+    final data = await _post('/auth/google', body);
+    return data['user_id'] as String;
   }
 
   // ─── Feed ───────────────────────────────────────────────────
@@ -237,23 +250,6 @@ class ApiService {
         [];
     final nextCursor = data['next_cursor'] as String?;
     return (posts: posts, nextCursor: nextCursor);
-  }
-
-  // ─── Upload Image ───────────────────────────────────────────
-  Future<String> uploadImage(File file) async {
-    final uri = Uri.parse('$baseUrl/captions/upload');
-    final request = http.MultipartRequest('POST', uri)
-      ..files.add(await http.MultipartFile.fromPath('file', file.path));
-    final streamed = await request.send();
-    final response = await http.Response.fromStream(streamed);
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body) as Map<String, dynamic>;
-      return data['url'] as String;
-    }
-    throw ApiException(
-      'Resim yüklenemedi. (status: ${response.statusCode})',
-      statusCode: response.statusCode,
-    );
   }
 
   // ─── Create Post ───────────────────────────────────────────
@@ -312,10 +308,9 @@ class ApiService {
   }
 
   Future<UserModel> getMyProfile(String userId) async {
-    // using user_id as token
-    final data = await _getDecoded('/users/me', queryParams: null);
-    return UserModel.fromJson(data); // Actually we should pass header
-    // Wait, _get doesn't take headers, let's implement getWithHeaders or just use user_id directly.
+    // /users/me endpoint'i yok — doğrudan /users/{id} kullan
+    final data = await _get('/users/$userId');
+    return UserModel.fromJson(data);
   }
 
   Future<void> updateProfile({
@@ -378,67 +373,64 @@ class ApiService {
     await _delete('/posts/$postId/like?user_id=$userId', {});
   }
 
-  Future<List<Map<String, dynamic>>> getPostLikers(String postId) async {
-    final response = await _getList('/posts/$postId/likes');
-    return response.map((item) => item as Map<String, dynamic>).toList();
-  }
-
   // ─── Save ───────────────────────────────────────────────────
   Future<void> savePost({
     required String postId,
     required String userId,
   }) async {
-    await _post('/posts/$postId/save', {'user_id': userId});
+    // Backend: POST /posts/{post_id}/save?user_id=...
+    final uri = Uri.parse('$baseUrl/posts/$postId/save').replace(
+      queryParameters: {'user_id': userId},
+    );
+    final response = await _client.post(uri, headers: _headers).timeout(_timeout);
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      _throwError(response);
+    }
   }
 
   Future<void> unsavePost({
     required String postId,
     required String userId,
   }) async {
-    await _delete('/posts/$postId/save?user_id=$userId', {});
+    // Backend: DELETE /posts/{post_id}/save?user_id=...
+    final uri = Uri.parse('$baseUrl/posts/$postId/save').replace(
+      queryParameters: {'user_id': userId},
+    );
+    final request = http.Request('DELETE', uri)..headers.addAll(_headers);
+    final streamed = await _client.send(request).timeout(_timeout);
+    final response = await http.Response.fromStream(streamed);
+    if (response.statusCode != 200) {
+      _throwError(response);
+    }
   }
 
-  // ══════════════════════════════════════════════════════════════
-  // Comments
-  // ══════════════════════════════════════════════════════════════
+  // ─── Comments ───────────────────────────────────────────────
   Future<String> addComment({
     required String postId,
     required String userId,
     required String content,
-    String? parentId,
   }) async {
+    // Backend 'text' field bekliyor ('content' değil)
     final data = await _post('/posts/$postId/comments', {
       'user_id': userId,
-      'content': content,
-      if (parentId != null) 'parent_id': parentId,
+      'text': content,
     });
-    return data['data']['comment_id'] as String;
+    // Backend: {success: true, data: {comment_id: "..."}}
+    return data['data']?['comment_id'] as String? ?? '';
   }
 
-  Future<List<CommentModel>> getComments(String postId, {String? userId}) async {
-    final url = userId != null ? '/posts/$postId/comments?user_id=$userId' : '/posts/$postId/comments';
-    final data = await _getList(url);
-    return data.map((e) => CommentModel.fromJson(e as Map<String, dynamic>)).toList();
-  }
-
-  Future<void> likeComment({
-    required String commentId,
-    required String userId,
-  }) async {
-    await _post('/comments/$commentId/like', {'user_id': userId});
-  }
-
-  Future<void> unlikeComment({
-    required String commentId,
-    required String userId,
-  }) async {
-    await _delete('/comments/$commentId/like?user_id=$userId', {});
+  Future<List<CommentModel>> getComments(String postId) async {
+    final data = await _getList('/posts/$postId/comments');
+    return data
+        .map((e) => CommentModel.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   // ─── Caption Suggestion ────────────────────────────────────
   Future<String> suggestCaption({
     required List<OutfitItem> outfitItems,
     String? styleHint,
+    String? imageUrl,  // Yüklenen görselin URL'si (Gemini Vision için)
   }) async {
     final body = <String, dynamic>{
       'outfit_items':
@@ -447,11 +439,15 @@ class ApiService {
     if (styleHint != null && styleHint.isNotEmpty) {
       body['style_hint'] = styleHint;
     }
+    if (imageUrl != null && imageUrl.isNotEmpty) {
+      body['image_url'] = imageUrl;  // Görsel URL'sini backend'e gönder
+    }
     final data = await _post('/captions/suggest', body);
     // Backend MessageResponse: {success, message, data: {caption: "..."}}
     final nested = data['data'] as Map<String, dynamic>?;
     return nested?['caption'] as String? ?? '';
   }
+
 
 
   // --- Epic 3: Wardrobe & AI Stylist ---
@@ -461,14 +457,6 @@ class ApiService {
 
   Future<dynamic> addCloth(String userId, Map<String, dynamic> itemData) async {
     return await _post('/wardrobe/items?user_id=$userId', itemData);
-  }
-
-  Future<dynamic> updateCloth(int itemId, Map<String, dynamic> itemData) async {
-    return await _put('/wardrobe/items/$itemId', itemData);
-  }
-
-  Future<dynamic> deleteCloth(int itemId) async {
-    return await _delete('/wardrobe/items/$itemId', null);
   }
 
   Future<dynamic> chat(String userId, String message) async {
@@ -498,42 +486,35 @@ class ApiService {
     });
   }
 
-  Future<List<dynamic>> searchUsers(String query, {String? viewerId}) async {
-    String endpoint = '/search?query=$query';
-    if (viewerId != null) {
-      endpoint += '&viewer_id=$viewerId';
+  // ─── 2FA Yardımcı Metodları ────────────────────────────────
+  /// 2FA setup/verify için POST isteği — Map döner
+  Future<Map<String, dynamic>> post2FA(String endpoint, Map<String, dynamic> body) async {
+    return await _post(endpoint, body);
+  }
+
+  /// 2FA disable için DELETE isteği
+  Future<void> delete2FA(String endpoint) async {
+    try {
+      final uri = Uri.parse('$baseUrl$endpoint');
+      final request = http.Request('DELETE', uri)..headers.addAll(_headers);
+      final streamed = await _client.send(request).timeout(_timeout);
+      final response = await http.Response.fromStream(streamed);
+      if (response.statusCode != 200) {
+        _throwError(response);
+      }
+    } on SocketException {
+      throw ApiException('Bağlantı hatası. İnternet bağlantınızı kontrol edin.');
+    } on TimeoutException {
+      throw ApiException('İstek zaman aşımına uğradı.');
+    } catch (e) {
+      if (e is ApiException) rethrow;
+      throw ApiException('Beklenmeyen hata: $e');
     }
-    return await _getList(endpoint);
   }
 
-  Future<List<dynamic>> getFollowers(String userId) async {
-    return await _getList('/users/$userId/followers');
-  }
-
-  Future<List<dynamic>> getFollowing(String userId) async {
-    return await _getList('/users/$userId/following');
-  }
-
-  // ─── Notifications ──────────────────────────────────────────
-  Future<List<Map<String, dynamic>>> getNotifications({
-    required String userId,
-    int limit = 50,
-  }) async {
-    final data = await _getList('/notifications?user_id=$userId&limit=$limit');
-    return data.cast<Map<String, dynamic>>();
-  }
-
-  Future<int> getUnreadNotificationCount({required String userId}) async {
-    final data = await _get('/notifications/unread-count?user_id=$userId');
-    return data['count'] as int? ?? 0;
-  }
-
-  Future<void> markNotificationRead(String notificationId) async {
-    await _put('/notifications/$notificationId/read', {});
-  }
-
-  Future<void> markAllNotificationsRead({required String userId}) async {
-    await _put('/notifications/read-all?user_id=$userId', {});
+  /// 2FA status için GET isteği — Map döner
+  Future<Map<String, dynamic>> get2FAStatus(String endpoint) async {
+    return await _get(endpoint);
   }
 
   // ─── Dispose ────────────────────────────────────────────────

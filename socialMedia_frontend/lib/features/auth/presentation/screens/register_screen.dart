@@ -4,9 +4,8 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/localization/locale_provider.dart';
 import '../../../../core/localization/app_strings.dart';
 import '../../../../services/api_service.dart';
-import '../../../main_home_screen.dart';
+import '../../../home/home_screen.dart';
 import '../providers/auth_provider.dart';
-import 'email_verification_screen.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -75,8 +74,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         await authProv.register(email, password);
 
         if (mounted) {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) => EmailVerificationScreen(email: email)),
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (_) => const HomeScreen()),
+            (route) => false,
           );
         }
       } on ApiException catch (e) {
@@ -94,6 +94,29 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           setState(() => _isLoading = false);
         }
       }
+    }
+  }
+
+  Future<void> _onGoogleSignIn() async {
+    setState(() {
+      _errorMessage = null;
+      _isLoading = true;
+    });
+    try {
+      final success = await ref.read(authProvider).loginWithGoogle();
+      if (success && mounted) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
+          (route) => false,
+        );
+      }
+    } catch (e) {
+      final msg = e.toString().contains('ApiException')
+          ? e.toString().split('ApiException: ').last.split(' (status:').first
+          : 'Google ile giriş başarısız oldu.';
+      if (mounted) setState(() => _errorMessage = msg);
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -235,7 +258,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     },
                   ),
                   const SizedBox(height: AppTheme.spacingXXL),
-                  
+
+                  // Kayıt butonu
                   GestureDetector(
                     onTap: _isLoading ? null : _onRegisterTap,
                     child: Container(
@@ -272,6 +296,57 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // ── Google ile Kayıt ──────────────────────────
+                  GestureDetector(
+                    onTap: _isLoading ? null : _onGoogleSignIn,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      height: 52,
+                      decoration: BoxDecoration(
+                        color: AppTheme.surfaceDark,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: AppTheme.dividerColor,
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 22,
+                            height: 22,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: const Center(
+                              child: Text(
+                                'G',
+                                style: TextStyle(
+                                  color: Color(0xFF4285F4),
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            s.isTr ? 'Google ile Devam Et' : 'Continue with Google',
+                            style: const TextStyle(
+                              color: AppTheme.textPrimary,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),

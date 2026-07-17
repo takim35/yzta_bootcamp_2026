@@ -1,3 +1,5 @@
+import '../../../../services/api_service.dart';
+
 class UserModel {
   final String userId;
   final String email;
@@ -8,7 +10,6 @@ class UserModel {
   final int followersCount;
   final int followingCount;
   final bool isFollowing;
-  final String profileVisibility;
 
   const UserModel({
     required this.userId,
@@ -20,7 +21,6 @@ class UserModel {
     required this.followersCount,
     required this.followingCount,
     required this.isFollowing,
-    this.profileVisibility = 'public',
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -29,12 +29,11 @@ class UserModel {
       email: json['email'] as String? ?? '',
       username: json['username'] as String? ?? '',
       displayName: json['display_name'] as String? ?? '',
-      avatarUrl: json['avatar_url'] as String? ?? '',
+      avatarUrl: ApiService.fixImageUrl(json['avatar_url'] as String?),
       bio: json['bio'] as String? ?? '',
       followersCount: json['followers_count'] as int? ?? 0,
       followingCount: json['following_count'] as int? ?? 0,
       isFollowing: json['is_following'] as bool? ?? false,
-      profileVisibility: json['profile_visibility'] as String? ?? 'public',
     );
   }
 
@@ -49,7 +48,6 @@ class UserModel {
       'followers_count': followersCount,
       'following_count': followingCount,
       'is_following': isFollowing,
-      'profile_visibility': profileVisibility,
     };
   }
 
@@ -63,7 +61,6 @@ class UserModel {
     int? followersCount,
     int? followingCount,
     bool? isFollowing,
-    String? profileVisibility,
   }) {
     return UserModel(
       userId: userId ?? this.userId,
@@ -75,7 +72,6 @@ class UserModel {
       followersCount: followersCount ?? this.followersCount,
       followingCount: followingCount ?? this.followingCount,
       isFollowing: isFollowing ?? this.isFollowing,
-      profileVisibility: profileVisibility ?? this.profileVisibility,
     );
   }
 

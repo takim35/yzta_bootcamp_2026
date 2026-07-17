@@ -90,7 +90,7 @@ class ItemRepository:
 
         set_ifadesi = ", ".join([f"{k} = ?" for k in kolonlar])
         cur = self.db.execute(
-            f"UPDATE kiyafetler SET {set_ifadesi}, guncelleme_tarihi = CURRENT_TIMESTAMP WHERE id = ?",
+            f"UPDATE kiyafetler SET {set_ifadesi} WHERE id = ?",
             degerler + [kiyafet_id],
         )
         self.db.commit()
@@ -104,37 +104,33 @@ class ItemRepository:
         self.db.commit()
         return cur.rowcount > 0
 
-    def kiyafet_sil(self, kiyafet_id: int) -> bool:
-        cur = self.db.execute("DELETE FROM kiyafetler WHERE id = ?", (kiyafet_id,))
-        self.db.commit()
-        return cur.rowcount > 0
-
     # ---------- Sohbet ve Kombin ----------
     def mesaj_kaydet(self, user_id: str, rol: str, mesaj: str):
         self.db.execute(
-            "INSERT INTO sohbetler (user_id, rol, mesaj) VALUES (?, ?, ?)",
+            "INSERT INTO sohbet_gecmisi (user_id, rol, icerik) VALUES (?, ?, ?)",
             (user_id, rol, mesaj),
         )
         self.db.commit()
 
     def sohbet_gecmisini_getir(self, user_id: str, limit: int = 20) -> list[dict]:
         rows = self.db.execute(
-            "SELECT rol, mesaj FROM sohbetler WHERE user_id = ? ORDER BY id DESC LIMIT ?",
+            "SELECT rol, icerik AS mesaj FROM sohbet_gecmisi WHERE user_id = ? ORDER BY id DESC LIMIT ?",
             (user_id, limit),
         ).fetchall()
         return [dict(row) for row in reversed(rows)]
 
     def kombin_onerisi_kaydet(self, user_id: str, baglam_json: str, kiyafet_idleri: list[int], aciklama: str) -> int:
+        import json as _json
         cur = self.db.execute(
-            "INSERT INTO kombin_oneriler (user_id, baglam_json, onerilen_kiyafet_idleri, aciklama) VALUES (?, ?, ?, ?)",
-            (user_id, baglam_json, ",".join(map(str, kiyafet_idleri)), aciklama),
+            "INSERT INTO kombin_onerileri (user_id, baglam_json, kiyafet_idleri, aciklama) VALUES (?, ?, ?, ?)",
+            (user_id, baglam_json, _json.dumps(kiyafet_idleri), aciklama),
         )
         self.db.commit()
         return cur.lastrowid
 
     def kombin_geri_bildirim_kaydet(self, oneri_id: int, begenildi: bool):
         self.db.execute(
-            "UPDATE kombin_oneriler SET begenildi = ? WHERE id = ?",
+            "UPDATE kombin_onerileri SET begenildi = ? WHERE id = ?",
             (int(begenildi), oneri_id),
         )
         self.db.commit()

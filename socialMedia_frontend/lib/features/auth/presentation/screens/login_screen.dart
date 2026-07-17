@@ -4,12 +4,10 @@ import 'dart:math' as math;
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/localization/locale_provider.dart';
 import '../../../../core/localization/app_strings.dart';
-import 'two_factor_verify_screen.dart';
-import 'email_verification_screen.dart';
-import 'forgot_password_screen.dart';
-import '../../../../features/main_home_screen.dart';
+import '../../../home/home_screen.dart';
 import '../providers/auth_provider.dart';
 import 'register_screen.dart';
+import 'forgot_password_screen.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -26,7 +24,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
   bool _isPasswordVisible = false;
   bool _isLoading = false;
   String? _errorMessage;
-  bool _isLogin = true;
 
   late AnimationController _bgController;
   late AnimationController _entryController;
@@ -76,39 +73,58 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     return validDomains.any((d) => email.toLowerCase().endsWith(d));
   }
 
-  Future<void> _submit() async {
-    FocusScope.of(context).unfocus();
+  Future<void> _onLoginTap() async {
     setState(() => _errorMessage = null);
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
     try {
-      final result = await ref.read(authProvider).login(
+      await ref.read(authProvider).login(
             _emailController.text.trim(),
             _passwordController.text,
           );
-          
       if (mounted) {
-        if (result['requires_2fa'] == true) {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) => TwoFactorVerifyScreen(userId: result['user_id'])),
-          );
-        } else {
-          Navigator.of(context).pushReplacement(
-            PageRouteBuilder(
-              pageBuilder: (_, __, ___) => const MainHomeScreen(),
-              transitionsBuilder: (_, anim, __, child) =>
-                  FadeTransition(opacity: anim, child: child),
-              transitionDuration: const Duration(milliseconds: 500),
-            ),
-          );
-        }
+        Navigator.of(context).pushReplacement(
+          PageRouteBuilder(
+            pageBuilder: (_, __, ___) => const HomeScreen(),
+            transitionsBuilder: (_, anim, __, child) =>
+                FadeTransition(opacity: anim, child: child),
+            transitionDuration: const Duration(milliseconds: 500),
+          ),
+        );
       }
     } catch (e) {
       final msg = e.toString().contains('ApiException')
           ? e.toString().split('ApiException: ').last.split(' (status:').first
-          : 'Giriş başarısız oldu. Lütfen bilgilerinizi kontrol edin.';
+          : 'Login failed. Please check your credentials.';
       setState(() => _errorMessage = msg);
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _onGoogleSignIn() async {
+    setState(() {
+      _errorMessage = null;
+      _isLoading = true;
+    });
+    try {
+      final success = await ref.read(authProvider).loginWithGoogle();
+      if (success && mounted) {
+        Navigator.of(context).pushReplacement(
+          PageRouteBuilder(
+            pageBuilder: (_, __, ___) => const HomeScreen(),
+            transitionsBuilder: (_, anim, __, child) =>
+                FadeTransition(opacity: anim, child: child),
+            transitionDuration: const Duration(milliseconds: 500),
+          ),
+        );
+      }
+    } catch (e) {
+      final msg = e.toString().contains('ApiException')
+          ? e.toString().split('ApiException: ').last.split(' (status:').first
+          : 'Google ile giriş başarısız oldu.';
+      if (mounted) setState(() => _errorMessage = msg);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -377,7 +393,59 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                           // Sign in button
                           _buildSignInButton(s),
 
-                          const SizedBox(height: 32),
+                          const SizedBox(height: 28),
+
+                          // ── Google Sign-In Butonu ───────────
+                          GestureDetector(
+                            onTap: _isLoading ? null : _onGoogleSignIn,
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              height: 52,
+                              decoration: BoxDecoration(
+                                color: AppTheme.surfaceDark,
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                  color: AppTheme.dividerColor,
+                                  width: 1.5,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  // Google 'G' ikonu
+                                  Container(
+                                    width: 22,
+                                    height: 22,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: const Center(
+                                      child: Text(
+                                        'G',
+                                        style: TextStyle(
+                                          color: Color(0xFF4285F4),
+                                          fontWeight: FontWeight.w900,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Text(
+                                    s.isTr ? 'Google ile Giriş Yap' : 'Continue with Google',
+                                    style: const TextStyle(
+                                      color: AppTheme.textPrimary,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(height: 24),
 
                           // Divider
                           Row(
@@ -453,7 +521,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
 
   Widget _buildSignInButton(AppStrings s) {
     return GestureDetector(
-      onTap: _isLoading ? null : _submit,
+      onTap: _isLoading ? null : _onLoginTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         height: 54,

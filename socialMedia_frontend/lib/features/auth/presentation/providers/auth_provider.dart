@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../services/api_service.dart';
+import '../../../../services/google_auth_service.dart';
 
 final authProvider = ChangeNotifierProvider((ref) => AuthProvider());
 
@@ -55,34 +56,45 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  Future<Map<String, dynamic>> login(String email, String password) async {
+  Future<void> login(String email, String password) async {
     _setLoading(true);
     try {
-      final result = await ApiService().login(email, password);
-      // If 2FA is required, don't save session yet. Let UI handle it.
-      if (result['requires_2fa'] == false) {
-        _currentUserId = result['user_id'];
-        await _saveSession(result['user_id']);
-        notifyListeners();
-      }
-      return result;
+      final userId = await ApiService().login(email, password);
+      _currentUserId = userId;
+      await _saveSession(userId);
+      notifyListeners();
     } finally {
       _setLoading(false);
     }
   }
 
-  Future<void> finalizeLogin(String userId) async {
-    _currentUserId = userId;
-    await _saveSession(userId);
-    notifyListeners();
-  }
-
-  Future<Map<String, dynamic>> register(String email, String password) async {
+  Future<void> register(String email, String password) async {
     _setLoading(true);
     try {
-      final result = await ApiService().register(email, password);
-      // Do not auto-login, wait for email verification
-      return result;
+      final userId = await ApiService().register(email, password);
+      _currentUserId = userId;
+      await _saveSession(userId);
+      notifyListeners();
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  /// Google ile giriş yap / kayıt ol
+  /// null döner: kullanıcı dialogu kapattı
+  /// exception: gerçek hata
+  Future<bool> loginWithGoogle() async {
+    _setLoading(true);
+    try {
+      final userId = await GoogleAuthService().signIn();
+      if (userId == null) {
+        // Kullanıcı iptal etti
+        return false;
+      }
+      _currentUserId = userId;
+      await _saveSession(userId);
+      notifyListeners();
+      return true;
     } finally {
       _setLoading(false);
     }
@@ -96,6 +108,10 @@ class AuthProvider extends ChangeNotifier {
   Future<void> logout() async {
     _currentUserId = null;
     await _clearSession();
+    // Google oturumunu da kapat
+    try {
+      await GoogleAuthService().signOut();
+    } catch (_) {}
     notifyListeners();
   }
 }
