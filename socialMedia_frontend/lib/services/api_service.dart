@@ -527,6 +527,47 @@ class ApiService {
     return await _get(endpoint);
   }
 
+  // ─── 2FA Metotları ──────────────────────────────────────────
+  Future<Map<String, dynamic>> setup2FA(String userId) async {
+    return await _post('/auth/2fa/setup', {'user_id': userId});
+  }
+
+  Future<Map<String, dynamic>> verify2FASetup(String userId, String code) async {
+    return await _post('/auth/2fa/verify-setup', {'user_id': userId, 'code': code});
+  }
+
+  Future<Map<String, dynamic>> login2FA(String userId, String code) async {
+    return await _post('/auth/2fa/verify', {'user_id': userId, 'code': code});
+  }
+
+  // ─── E-posta Doğrulama ─────────────────────────────────────
+  Future<Map<String, dynamic>> verifyEmail(String userId, String code) async {
+    return await _post('/auth/verify-email', {'user_id': userId, 'code': code});
+  }
+
+  // ─── Arama ─────────────────────────────────────────────────
+  Future<List<dynamic>> searchUsers(String query) async {
+    return await _getList('/users/search?q=$query');
+  }
+
+  // ─── Beğeni Listesi ────────────────────────────────────────
+  Future<List<dynamic>> getPostLikers(int postId) async {
+    return await _getList('/posts/$postId/likers');
+  }
+
+  // ─── Bildirimler ───────────────────────────────────────────
+  Future<List<dynamic>> getNotifications(String userId) async {
+    return await _getList('/notifications/$userId');
+  }
+
+  Future<Map<String, dynamic>> markAllNotificationsRead(String userId) async {
+    return await _put('/notifications/$userId/read-all', {});
+  }
+
+  Future<Map<String, dynamic>> markNotificationRead(int notificationId) async {
+    return await _put('/notifications/$notificationId/read', {});
+  }
+
   // ─── Dispose ────────────────────────────────────────────────
   void dispose() {
     _client.close();

@@ -105,6 +105,13 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// 2FA doğrulaması sonrası oturumu kaydet
+  Future<void> finalizeLogin(String userId) async {
+    _currentUserId = userId;
+    await _saveSession(userId);
+    notifyListeners();
+  }
+
   Future<void> logout() async {
     _currentUserId = null;
     await _clearSession();
