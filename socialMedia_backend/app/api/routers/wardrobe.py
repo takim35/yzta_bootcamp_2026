@@ -31,6 +31,7 @@ class KiyafetEkleIstek(BaseModel):
 class ChatIstek(BaseModel):
     user_id: str
     mesaj: str
+    hava_durumu: Optional[str] = None
 
 class KombinOnerIstek(BaseModel):
     user_id: str
@@ -56,8 +57,12 @@ def chat(istek: ChatIstek, db: sqlite3.Connection = Depends(get_db)):
     repo = ItemRepository(db)
     gecmis = repo.sohbet_gecmisini_getir(istek.user_id)
     
+    baglamli_mesaj = istek.mesaj
+    if istek.hava_durumu:
+        baglamli_mesaj = f"[Sistem Notu: Kullanıcının bulunduğu konumda güncel hava durumu '{istek.hava_durumu}']\nKullanıcı: {istek.mesaj}"
+
     try:
-        sonuc = ollama_client.sohbet_yaniti_al(gecmis, istek.mesaj)
+        sonuc = ollama_client.sohbet_yaniti_al(gecmis, baglamli_mesaj)
     except Exception as e:
         raise HTTPException(status_code=502, detail=f"AI hatası: {e}")
         

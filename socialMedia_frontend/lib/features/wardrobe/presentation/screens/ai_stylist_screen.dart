@@ -4,6 +4,7 @@ import '../../../../services/api_service.dart';
 import '../../../../core/localization/locale_provider.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../features/auth/presentation/providers/auth_provider.dart';
+import '../../../../services/weather_service.dart';
 
 class AiStylistScreen extends ConsumerStatefulWidget {
   const AiStylistScreen({super.key});
@@ -19,6 +20,7 @@ class _AiStylistScreenState extends ConsumerState<AiStylistScreen> {
   final List<Map<String, String>> _messages = [];
   bool _isLoading = false;
   bool _historyLoaded = false;
+  String? _weatherContext;
 
   @override
   void initState() {
@@ -36,6 +38,11 @@ class _AiStylistScreenState extends ConsumerState<AiStylistScreen> {
   Future<void> _loadHistory() async {
     final userId = ref.read(authProvider).currentUserId;
     if (userId == null) return;
+
+    // Arka planda hava durumunu çek
+    WeatherService().getCurrentWeatherContext().then((weather) {
+      if (mounted) _weatherContext = weather;
+    });
 
     try {
       final history = await _apiService.getChatHistory(userId);
@@ -67,7 +74,7 @@ class _AiStylistScreenState extends ConsumerState<AiStylistScreen> {
     _scrollToBottom();
 
     try {
-      final response = await _apiService.chat(userId, text);
+      final response = await _apiService.chat(userId, text, weather: _weatherContext);
       final aiText = response['asistan_mesaji']?.toString() ??
           response['reply']?.toString() ??
           'Yanıt üretilemedi.';
