@@ -31,6 +31,7 @@ class LikeRequest(BaseModel):
 class CommentRequest(BaseModel):
     user_id: str
     content: str
+    parent_id: Optional[str] = None
 
 
 # ══════════════════════════════════════════════════════════════
@@ -116,14 +117,20 @@ def add_comment(post_id: str, req: CommentRequest, db: sqlite3.Connection = Depe
                 user_id    TEXT NOT NULL,
                 content    TEXT NOT NULL,
                 created_at TEXT NOT NULL,
+                parent_id  TEXT DEFAULT NULL,
                 FOREIGN KEY (post_id) REFERENCES posts(post_id),
                 FOREIGN KEY (user_id) REFERENCES users(user_id)
             )
         """)
+        # Mevcut tabloya parent_id ekle (hata verirse zaten var demektir)
+        try:
+            db.execute("ALTER TABLE comments ADD COLUMN parent_id TEXT DEFAULT NULL")
+        except Exception:
+            pass
 
         db.execute(
-            "INSERT INTO comments (comment_id, post_id, user_id, content, created_at) VALUES (?,?,?,?,?)",
-            (comment_id, post_id, req.user_id, req.content, now),
+            "INSERT INTO comments (comment_id, post_id, user_id, content, created_at, parent_id) VALUES (?,?,?,?,?,?)",
+            (comment_id, post_id, req.user_id, req.content, now, req.parent_id),
         )
         try:
             db.execute(
@@ -151,11 +158,17 @@ def get_comments(post_id: str, db: sqlite3.Connection = Depends(get_db)):
                 post_id    TEXT NOT NULL,
                 user_id    TEXT NOT NULL,
                 content    TEXT NOT NULL,
-                created_at TEXT NOT NULL
+                created_at TEXT NOT NULL,
+                parent_id  TEXT DEFAULT NULL
             )
         """)
+        try:
+            db.execute("ALTER TABLE comments ADD COLUMN parent_id TEXT DEFAULT NULL")
+        except Exception:
+            pass
+
         rows = db.execute(
-            """SELECT c.comment_id, c.user_id, u.username, c.content, c.created_at
+            """SELECT c.comment_id, c.user_id, u.username, c.content, c.created_at, c.parent_id
                FROM comments c
                LEFT JOIN users u ON c.user_id = u.user_id
                WHERE c.post_id = ?
@@ -170,6 +183,7 @@ def get_comments(post_id: str, db: sqlite3.Connection = Depends(get_db)):
                 "username": r[2] or "Bilinmeyen",
                 "content": r[3],
                 "created_at": r[4],
+                "parent_id": r[5],
             }
             for r in rows
         ]

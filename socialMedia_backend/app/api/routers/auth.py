@@ -80,16 +80,20 @@ def request_password_reset(
         code = str(random.randint(100000, 999999))
         mock_reset_codes[request.email] = code
         
-        # 3. Gerçekte burada e-posta gönderimi yapılır. Şimdilik konsola yazdırıyoruz.
-        print(f"!!! ŞİFRE SIFIRLAMA KODU !!! Email: {request.email} -> Kod: {code}")
+        # 3. Konsola ASCII-safe yaz (Windows charmap hatasi onlemek icin)
+        import sys
+        try:
+            print(f"[RESET CODE] Email: {request.email} -> Code: {code}", flush=True)
+        except Exception:
+            sys.stdout.buffer.write(f"[RESET CODE] Email: {request.email} -> Code: {code}\n".encode('utf-8'))
         
         return {
             'success': True, 
-            'message': 'Eğer bu e-posta adresi sistemimizde kayıtlıysa, şifre sıfırlama kodu gönderildi.',
-            'debug_code': code # Geliştirme aşamasında test kolaylığı için kodu dönüyoruz
+            'message': 'Sifre sifirlama kodu gonderildi.',
+            'debug_code': code  # Gelistirme asamasinda test kolayligi icin kodu donuyoruz
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Kod gönderme sırasında hata oluştu: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Kod gonderme sirasinda hata olustu: {str(e)}")
 
 
 @router.post('/verify-reset-code')

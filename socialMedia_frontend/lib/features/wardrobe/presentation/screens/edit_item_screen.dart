@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import '../../../../core/theme/app_theme.dart';
 import '../../../../features/auth/presentation/providers/auth_provider.dart';
 import '../../../../services/api_service.dart';
+import '../../../../core/localization/locale_provider.dart';
 
 class EditItemScreen extends ConsumerStatefulWidget {
   final Map<String, dynamic> initialItem;
@@ -31,9 +32,9 @@ class _EditItemScreenState extends ConsumerState<EditItemScreen> {
   final _markaCtrl = TextEditingController();
   final _bedenCtrl = TextEditingController();
 
-  final List<String> _turler = ['Ãœst Giyim', 'Alt Giyim', 'DÄ±ÅŸ Giyim', 'Elbise', 'AyakkabÄ±', 'Aksesuar', 'Ã‡anta'];
-  final List<String> _renkler = ['Siyah', 'Beyaz', 'KÄ±rmÄ±zÄ±', 'Mavi', 'YeÅŸil', 'SarÄ±', 'Gri', 'Kahverengi', 'Ã‡ok Renkli'];
-  final List<String> _mevsimler = ['Ä°lkbahar', 'Yaz', 'Sonbahar', 'KÄ±ÅŸ', 'TÃ¼m Sezon'];
+  final List<String> _turler = ['Üst Giyim', 'Alt Giyim', 'Dış Giyim', 'Elbise', 'Ayakkabı', 'Aksesuar', 'Çanta'];
+  final List<String> _renkler = ['Siyah', 'Beyaz', 'Kırmızı', 'Mavi', 'Yeşil', 'Sarı', 'Gri', 'Kahverengi', 'Çok Renkli'];
+  final List<String> _mevsimler = ['İlkbahar', 'Yaz', 'Sonbahar', 'Kış', 'Tüm Sezon'];
 
   @override
   void initState() {
@@ -95,13 +96,13 @@ class _EditItemScreenState extends ConsumerState<EditItemScreen> {
       if (mounted) {
         Navigator.pop(context, true);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('KÄ±yafet gÃ¼ncellendi!')),
+          const SnackBar(content: Text('Clothing updated!')),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Hata: $e')),
+          SnackBar(content: Text('Error: $e')),
         );
       }
     } finally {
@@ -114,16 +115,16 @@ class _EditItemScreenState extends ConsumerState<EditItemScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppTheme.cardDark,
-        title: const Text('KÄ±yafeti Sil', style: TextStyle(color: AppTheme.errorColor)),
-        content: const Text('Bu kÄ±yafeti gardÄ±roptan silmek istediÄŸinize emin misiniz?', style: TextStyle(color: AppTheme.textPrimary)),
+        title: const Text('Delete Clothing', style: TextStyle(color: AppTheme.errorColor)),
+        content: const Text('Are you sure you want to delete this clothing from your wardrobe?', style: TextStyle(color: AppTheme.textPrimary)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Ä°ptal', style: TextStyle(color: AppTheme.textMuted)),
+            child: const Text('Cancel', style: TextStyle(color: AppTheme.textMuted)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Sil', style: TextStyle(color: AppTheme.errorColor)),
+            child: const Text('Delete', style: TextStyle(color: AppTheme.errorColor)),
           ),
         ],
       ),
@@ -136,13 +137,13 @@ class _EditItemScreenState extends ConsumerState<EditItemScreen> {
         if (mounted) {
           Navigator.pop(context, true);
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('KÄ±yafet silindi.')),
+            const SnackBar(content: Text('Clothing deleted.')),
           );
         }
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Silinirken hata oluÅŸtu: $e')),
+            SnackBar(content: Text('Error during deletion: $e')),
           );
         }
       } finally {
@@ -161,7 +162,7 @@ class _EditItemScreenState extends ConsumerState<EditItemScreen> {
           children: [
             ListTile(
               leading: const Icon(Icons.camera_alt_rounded, color: AppTheme.accentViolet),
-              title: const Text('Kamera', style: TextStyle(color: AppTheme.textPrimary)),
+              title: const Text('Camera', style: TextStyle(color: AppTheme.textPrimary)),
               onTap: () {
                 Navigator.pop(context);
                 _pickImage(ImageSource.camera);
@@ -169,7 +170,7 @@ class _EditItemScreenState extends ConsumerState<EditItemScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.photo_library_rounded, color: AppTheme.accentPink),
-              title: const Text('FotoÄŸraf KitaplÄ±ÄŸÄ±', style: TextStyle(color: AppTheme.textPrimary)),
+              title: const Text('Photo Library', style: TextStyle(color: AppTheme.textPrimary)),
               onTap: () {
                 Navigator.pop(context);
                 _pickImage(ImageSource.gallery);
@@ -183,12 +184,12 @@ class _EditItemScreenState extends ConsumerState<EditItemScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final s = ref.watch(stringsProvider);
     final fotoUrl = widget.initialItem['foto_url'] as String?;
-
     return Scaffold(
       backgroundColor: AppTheme.primaryDark,
       appBar: AppBar(
-        title: const Text('KÄ±yafeti DÃ¼zenle', style: TextStyle(color: AppTheme.textPrimary)),
+        title: Text(s.isTr ? 'Kıyafeti Düzenle' : 'Edit Clothing', style: const TextStyle(color: AppTheme.textPrimary)),
         backgroundColor: AppTheme.primaryDark,
         elevation: 0,
         iconTheme: const IconThemeData(color: AppTheme.textPrimary),
@@ -209,7 +210,7 @@ class _EditItemScreenState extends ConsumerState<EditItemScreen> {
                 )
               : TextButton(
                   onPressed: _submit,
-                  child: const Text('Kaydet', style: TextStyle(color: AppTheme.accentViolet, fontWeight: FontWeight.bold)),
+                  child: Text(s.isTr ? 'Kaydet' : 'Save', style: const TextStyle(color: AppTheme.accentViolet, fontWeight: FontWeight.bold)),
                 ),
         ],
       ),
@@ -237,33 +238,33 @@ class _EditItemScreenState extends ConsumerState<EditItemScreen> {
                             children: [
                               Icon(Icons.add_photo_alternate_rounded, size: 52, color: AppTheme.accentViolet.withValues(alpha: 0.7)),
                               const SizedBox(height: 12),
-                              const Text('FotoÄŸraf deÄŸiÅŸtir', style: TextStyle(color: AppTheme.textMuted, fontSize: 15)),
+                              Text(s.isTr ? 'Fotoğraf değiştir' : 'Change photo', style: const TextStyle(color: AppTheme.textMuted, fontSize: 15)),
                             ],
                           ),
               ),
             ),
             const SizedBox(height: 24),
-            _SectionLabel(text: 'Tür *'),
-            _ChipsField(value: _tur, items: _turler, onChanged: (v) => setState(() => _tur = v)),
+            const _SectionLabel(text: 'Type *'),
+            _ChipsField(value: _tur, items: _turler, onChanged: (v) => setState(() => _tur = v), displayTranslator: (val) => s.translateWardrobe(val)),
             const SizedBox(height: 16),
-            _SectionLabel(text: 'Renk *'),
-            _ChipsField(value: _renk, items: _renkler, onChanged: (v) => setState(() => _renk = v)),
+            const _SectionLabel(text: 'Color *'),
+            _ChipsField(value: _renk, items: _renkler, onChanged: (v) => setState(() => _renk = v), displayTranslator: (val) => s.translateWardrobe(val)),
             const SizedBox(height: 16),
-            _SectionLabel(text: 'Mevsim'),
-            _ChipsField(value: _mevsim, items: _mevsimler, onChanged: (v) => setState(() => _mevsim = v)),
+            const _SectionLabel(text: 'Season'),
+            _ChipsField(value: _mevsim, items: _mevsimler, onChanged: (v) => setState(() => _mevsim = v), displayTranslator: (val) => s.translateWardrobe(val)),
             const SizedBox(height: 16),
-            _SectionLabel(text: 'Marka'),
+            const _SectionLabel(text: 'Brand'),
             TextField(
               controller: _markaCtrl,
               style: const TextStyle(color: AppTheme.textPrimary),
-              decoration: _inputDeco('Marka giriniz'),
+              decoration: _inputDeco('Enter brand'),
             ),
             const SizedBox(height: 16),
-            _SectionLabel(text: 'Beden'),
+            const _SectionLabel(text: 'Size'),
             TextField(
               controller: _bedenCtrl,
               style: const TextStyle(color: AppTheme.textPrimary),
-              decoration: _inputDeco('Beden (Ã–rn: M, 38)'),
+              decoration: _inputDeco('Size (e.g. M, 38)'),
             ),
             const SizedBox(height: 40),
           ],
@@ -303,8 +304,14 @@ class _ChipsField extends StatelessWidget {
   final String value;
   final List<String> items;
   final void Function(String) onChanged;
+  final String Function(String)? displayTranslator;
 
-  const _ChipsField({required this.value, required this.items, required this.onChanged});
+  const _ChipsField({
+    required this.value,
+    required this.items,
+    required this.onChanged,
+    this.displayTranslator,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -325,7 +332,7 @@ class _ChipsField extends StatelessWidget {
               ),
             ),
             child: Text(
-              item,
+              displayTranslator != null ? displayTranslator!(item) : item,
               style: TextStyle(
                 color: isSelected ? AppTheme.textPrimary : AppTheme.textPrimary,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,

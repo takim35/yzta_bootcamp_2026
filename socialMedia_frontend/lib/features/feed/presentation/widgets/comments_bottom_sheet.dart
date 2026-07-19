@@ -53,10 +53,13 @@ class CommentsBottomSheet extends StatefulWidget {
 class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
   final ApiService _api = ApiService();
   final TextEditingController _controller = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
   final List<CommentModel> _comments = [];
   bool _isLoading = true;
   bool _isSending = false;
   String? _errorMessage;
+  String? _replyingToCommentId;
+  String? _replyingToUsername;
 
   @override
   void initState() {
@@ -67,6 +70,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
   @override
   void dispose() {
     _controller.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -111,8 +115,13 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
         postId: widget.postId,
         userId: widget.currentUserId,
         content: content,
+        parentId: _replyingToCommentId,
       );
       _controller.clear();
+      setState(() {
+        _replyingToCommentId = null;
+        _replyingToUsername = null;
+      });
       await _loadComments();
       widget.onCommentsCountChanged?.call(_comments.length);
     } on ApiException catch (e) {
@@ -127,6 +136,40 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
       );
     } finally {
       if (mounted) setState(() => _isSending = false);
+    }
+  }
+
+  Future<void> _deleteComment(String commentId) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppTheme.surfaceDark,
+        title: const Text('Yorumu Sil', style: TextStyle(color: AppTheme.textPrimary)),
+        content: const Text('Bu yorumu silmek istediğinize emin misiniz?', style: TextStyle(color: AppTheme.textSecondary)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('İptal', style: TextStyle(color: AppTheme.textMuted)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Sil', style: TextStyle(color: AppTheme.errorColor)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    try {
+      await _api.deleteComment(commentId: commentId, userId: widget.currentUserId);
+      await _loadComments();
+      widget.onCommentsCountChanged?.call(_comments.length);
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Yorum silinemedi.')),
+      );
     }
   }
 
@@ -160,6 +203,32 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
             const Divider(height: 1, color: AppTheme.dividerColor),
             Expanded(child: _buildBody()),
             const Divider(height: 1, color: AppTheme.dividerColor),
+            if (_replyingToUsername != null) ...[
+              Container(
+                color: AppTheme.cardDark.withOpacity(0.5),
+                padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingM, vertical: 8),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        '@$_replyingToUsername kullanıcısına yanıt veriliyor...',
+                        style: const TextStyle(color: AppTheme.textMuted, fontSize: 13),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _replyingToCommentId = null;
+                          _replyingToUsername = null;
+                        });
+                      },
+                      child: const Icon(Icons.close_rounded, color: AppTheme.textMuted, size: 18),
+                    ),
+                  ],
+                ),
+              ),
+              const Divider(height: 1, color: AppTheme.dividerColor),
+            ],
             _buildInput(),
           ],
         ),
@@ -192,61 +261,86 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
       );
     }
 
+    // parentId'si null olanlar veya bizim listemizde parentId'si bulunmayanlar ana yorumdur
+    final commentIds = _comments.map((c) => c.commentId).toSet();
+    final parents = _comments.where((c) => c.parentId == null || !commentIds.contains(c.parentId)).toList();
+
     return ListView.separated(
       padding: const EdgeInsets.all(AppTheme.spacingM),
-      itemCount: _comments.length,
+      itemCount: parents.length,
       separatorBuilder: (_, __) => const SizedBox(height: AppTheme.spacingM),
       itemBuilder: (context, index) {
-        final comment = _comments[index];
-        return Row(
+        final parent = parents[index];
+        final replies = _comments.where((c) => c.parentId == parent.commentId).toList();
+
+        return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CircleAvatar(
-              radius: 16,
-              backgroundColor: AppTheme.cardDark,
-              backgroundImage: comment.avatarUrl != null &&
-                      comment.avatarUrl!.isNotEmpty
-                  ? CachedNetworkImageProvider(comment.avatarUrl!)
-                  : null,
-              child: comment.avatarUrl == null || comment.avatarUrl!.isEmpty
-                  ? Text(
-                      comment.username.isNotEmpty
-                          ? comment.username[0].toUpperCase()
-                          : '?',
+            _buildCommentRow(parent, isReply: false),
+            if (replies.isNotEmpty) ...[
+              const SizedBox(height: AppTheme.spacingS),
+              ...replies.map((reply) => Padding(
+                    padding: const EdgeInsets.only(left: 36.0, top: 8.0),
+                    child: _buildCommentRow(reply, isReply: true),
+                  )),
+            ],
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildCommentRow(CommentModel comment, {required bool isReply}) {
+    final isOwnComment = comment.userId == widget.currentUserId;
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        CircleAvatar(
+          radius: isReply ? 12 : 16,
+          backgroundColor: AppTheme.cardDark,
+          backgroundImage: comment.avatarUrl != null && comment.avatarUrl!.isNotEmpty
+              ? CachedNetworkImageProvider(comment.avatarUrl!)
+              : null,
+          child: comment.avatarUrl == null || comment.avatarUrl!.isEmpty
+              ? Text(
+                  comment.username.isNotEmpty ? comment.username[0].toUpperCase() : '?',
+                  style: TextStyle(
+                    color: AppTheme.textPrimary,
+                    fontSize: isReply ? 10 : 12,
+                  ),
+                )
+              : null,
+        ),
+        const SizedBox(width: AppTheme.spacingS),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: '${comment.username} ',
                       style: const TextStyle(
                         color: AppTheme.textPrimary,
-                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
                       ),
-                    )
-                  : null,
-            ),
-            const SizedBox(width: AppTheme.spacingS),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  RichText(
-                    text: TextSpan(
-                      children: [
-                        TextSpan(
-                          text: '${comment.username} ',
-                          style: const TextStyle(
-                            color: AppTheme.textPrimary,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14,
-                          ),
-                        ),
-                        TextSpan(
-                          text: comment.content,
-                          style: const TextStyle(
-                            color: AppTheme.textSecondary,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
                     ),
-                  ),
-                  const SizedBox(height: 2),
+                    TextSpan(
+                      text: comment.content,
+                      style: const TextStyle(
+                        color: AppTheme.textSecondary,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 4),
+              Row(
+                children: [
                   Text(
                     comment.timeAgo,
                     style: const TextStyle(
@@ -254,12 +348,43 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                       fontSize: 12,
                     ),
                   ),
+                  if (!isReply) ...[
+                    const SizedBox(width: 16),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _replyingToCommentId = comment.commentId;
+                          _replyingToUsername = comment.username;
+                        });
+                        _focusNode.requestFocus();
+                      },
+                      child: const Text(
+                        'Yanıtla',
+                        style: TextStyle(
+                          color: AppTheme.textMuted,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
                 ],
               ),
+            ],
+          ),
+        ),
+        if (isOwnComment) ...[
+          const SizedBox(width: AppTheme.spacingS),
+          GestureDetector(
+            onTap: () => _deleteComment(comment.commentId),
+            child: const Icon(
+              Icons.delete_outline_rounded,
+              color: AppTheme.textMuted,
+              size: 18,
             ),
-          ],
-        );
-      },
+          ),
+        ],
+      ],
     );
   }
 
@@ -271,9 +396,10 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
           Expanded(
             child: TextField(
               controller: _controller,
+              focusNode: _focusNode,
               style: const TextStyle(color: AppTheme.textPrimary),
               decoration: InputDecoration(
-                hintText: 'Yorum ekle...',
+                hintText: _replyingToUsername != null ? 'Yanıt ekle...' : 'Yorum ekle...',
                 hintStyle: const TextStyle(color: AppTheme.textMuted),
                 filled: true,
                 fillColor: AppTheme.cardDark,

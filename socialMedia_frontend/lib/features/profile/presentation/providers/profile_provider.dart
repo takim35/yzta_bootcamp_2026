@@ -125,6 +125,20 @@ class ProfileProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // ─── Gönderi Düzenle ─────────────────────────────────────────
+  Future<void> updatePost(String postId, String userId, String caption) async {
+    await _api.updatePost(postId: postId, userId: userId, caption: caption);
+    final index = _userPosts.indexWhere((p) => p.id == postId);
+    if (index != -1) {
+      _userPosts[index] = _userPosts[index].copyWith(caption: caption);
+    }
+    final savedIndex = _savedPosts.indexWhere((p) => p.id == postId);
+    if (savedIndex != -1) {
+      _savedPosts[savedIndex] = _savedPosts[savedIndex].copyWith(caption: caption);
+    }
+    notifyListeners();
+  }
+
   // ─── Temizle ────────────────────────────────────────────────
   void clear() {
     _user = null;

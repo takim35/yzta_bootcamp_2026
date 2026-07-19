@@ -45,22 +45,31 @@ class PostRepository:
         posts = []
         for row in rows:
             is_liked = False
+            is_saved = False
             if viewer_id:
                 is_liked = db.execute('SELECT 1 FROM likes WHERE post_id = ? AND user_id = ?', (row['post_id'], viewer_id)).fetchone() is not None
+                try:
+                    is_saved = db.execute('SELECT 1 FROM saved_posts WHERE post_id = ? AND user_id = ?', (row['post_id'], viewer_id)).fetchone() is not None
+                except Exception:
+                    is_saved = False
             outfit_rows = db.execute('SELECT item_id, category, image_url FROM post_outfit_items WHERE post_id = ?', (row['post_id'],)).fetchall()
             outfit_items = [OutfitItemResponse(item_id=oi['item_id'], category=oi['category'], image_url=oi['image_url']) for oi in outfit_rows]
-            posts.append(PostResponse(post_id=row['post_id'], user_id=row['user_id'], username=row['username'], display_name=row['display_name'], avatar_url=row['avatar_url'], image_url=row['image_url'], caption=row['caption'], visibility=row['visibility'], ai_training_consent=bool(row['ai_training_consent']), likes_count=row['likes_count'], is_liked=is_liked, outfit_items=outfit_items, created_at=row['created_at']))
+            posts.append(PostResponse(post_id=row['post_id'], user_id=row['user_id'], username=row['username'], display_name=row['display_name'], avatar_url=row['avatar_url'], image_url=row['image_url'], caption=row['caption'], visibility=row['visibility'], ai_training_consent=bool(row['ai_training_consent']), likes_count=row['likes_count'], comments_count=dict(row).get('comments_count', 0), is_liked=is_liked, is_saved=is_saved, outfit_items=outfit_items, created_at=row['created_at']))
         return posts
 
     @staticmethod
     def get_feed(db: sqlite3.Connection, user_id: str, limit: int = 20):
         rows = db.execute(
-            "SELECT p.*, u.username, u.display_name, u.avatar_url FROM posts p JOIN users u ON p.user_id = u.user_id WHERE p.user_id != ? AND (p.visibility = 'public' OR (p.visibility = 'followers' AND EXISTS (SELECT 1 FROM follows WHERE follower_id = ? AND following_id = p.user_id))) ORDER BY p.created_at DESC LIMIT ?", (user_id, user_id, limit)
+            "SELECT p.*, u.username, u.display_name, u.avatar_url FROM posts p JOIN users u ON p.user_id = u.user_id WHERE (p.user_id = ? OR p.visibility = 'public' OR (p.visibility = 'followers' AND EXISTS (SELECT 1 FROM follows WHERE follower_id = ? AND following_id = p.user_id))) ORDER BY p.created_at DESC LIMIT ?", (user_id, user_id, limit)
         ).fetchall()
         posts = []
         for row in rows:
             is_liked = db.execute('SELECT 1 FROM likes WHERE post_id = ? AND user_id = ?', (row['post_id'], user_id)).fetchone() is not None
+            try:
+                is_saved = db.execute('SELECT 1 FROM saved_posts WHERE post_id = ? AND user_id = ?', (row['post_id'], user_id)).fetchone() is not None
+            except Exception:
+                is_saved = False
             outfit_rows = db.execute('SELECT item_id, category, image_url FROM post_outfit_items WHERE post_id = ?', (row['post_id'],)).fetchall()
             outfit_items = [OutfitItemResponse(item_id=oi['item_id'], category=oi['category'], image_url=oi['image_url']) for oi in outfit_rows]
-            posts.append(PostResponse(post_id=row['post_id'], user_id=row['user_id'], username=row['username'], display_name=row['display_name'], avatar_url=row['avatar_url'], image_url=row['image_url'], caption=row['caption'], visibility=row['visibility'], ai_training_consent=bool(row['ai_training_consent']), likes_count=row['likes_count'], is_liked=is_liked, outfit_items=outfit_items, created_at=row['created_at']))
+            posts.append(PostResponse(post_id=row['post_id'], user_id=row['user_id'], username=row['username'], display_name=row['display_name'], avatar_url=row['avatar_url'], image_url=row['image_url'], caption=row['caption'], visibility=row['visibility'], ai_training_consent=bool(row['ai_training_consent']), likes_count=row['likes_count'], comments_count=dict(row).get('comments_count', 0), is_liked=is_liked, is_saved=is_saved, outfit_items=outfit_items, created_at=row['created_at']))
         return posts

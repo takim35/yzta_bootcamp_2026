@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../../../../features/feed/domain/models/post_model.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../features/auth/presentation/providers/auth_provider.dart';
+import '../providers/feed_provider.dart';
 import 'like_button.dart';
 
 class PostCard extends ConsumerWidget {
@@ -56,7 +57,8 @@ class PostCard extends ConsumerWidget {
         children: [
           // Avatar
           GestureDetector(
-            onTap: () {
+            onTap: () => onUserTap?.call(post.userId),
+            onLongPress: () {
               if (post.avatarUrl.isNotEmpty) {
                 showDialog(
                   context: context,
@@ -189,12 +191,7 @@ class PostCard extends ConsumerWidget {
                             title: const Text('Düzenle', style: TextStyle(color: AppTheme.textPrimary)),
                             onTap: () {
                               Navigator.pop(context);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Düzenleme özelliği yakında!'),
-                                  backgroundColor: AppTheme.surfaceDark,
-                                ),
-                              );
+                              _showEditDialog(context, ref);
                             },
                           ),
                           ListTile(
@@ -202,12 +199,7 @@ class PostCard extends ConsumerWidget {
                             title: const Text('Sil', style: TextStyle(color: AppTheme.errorColor)),
                             onTap: () {
                               Navigator.pop(context);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Silme özelliği yakında!'),
-                                  backgroundColor: AppTheme.surfaceDark,
-                                ),
-                              );
+                              _showDeleteConfirm(context, ref);
                             },
                           ),
                         ] else ...[
@@ -394,10 +386,9 @@ class PostCard extends ConsumerWidget {
                 ],
               ),
               IconButton(
-                icon: Icon(
-                  post.isSaved ? Icons.star_rounded : Icons.star_border_rounded,
-                  color: post.isSaved ? Colors.amber : AppTheme.textPrimary,
-                  size: 28,
+                icon: Opacity(
+                  opacity: post.isSaved ? 1.0 : 0.4,
+                  child: const Text('✨', style: TextStyle(fontSize: 24)),
                 ),
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
@@ -450,5 +441,99 @@ class PostCard extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _showEditDialog(BuildContext context, WidgetRef ref) async {
+    final controller = TextEditingController(text: post.caption);
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppTheme.surfaceDark,
+        title: const Text('Gönderiyi Düzenle', style: TextStyle(color: AppTheme.textPrimary)),
+        content: TextField(
+          controller: controller,
+          maxLines: 3,
+          style: const TextStyle(color: AppTheme.textPrimary),
+          decoration: InputDecoration(
+            hintText: 'Yeni açıklama...',
+            hintStyle: const TextStyle(color: AppTheme.textMuted),
+            enabledBorder: OutlineInputBorder(
+              borderSide: const BorderSide(color: AppTheme.dividerColor),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: const BorderSide(color: AppTheme.accentViolet),
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('İptal', style: TextStyle(color: AppTheme.textMuted)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Kaydet', style: TextStyle(color: AppTheme.accentViolet)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      final newCaption = controller.text.trim();
+      try {
+        await ref.read(feedProvider).updatePost(post.postId, newCaption);
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Gönderi güncellendi.')),
+          );
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Güncelleme hatası: $e')),
+          );
+        }
+      }
+    }
+  }
+
+  Future<void> _showDeleteConfirm(BuildContext context, WidgetRef ref) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppTheme.surfaceDark,
+        title: const Text('Gönderiyi Sil', style: TextStyle(color: AppTheme.textPrimary)),
+        content: const Text('Bu gönderiyi kalıcı olarak silmek istediğinize emin misiniz?', style: TextStyle(color: AppTheme.textSecondary)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('İptal', style: TextStyle(color: AppTheme.textMuted)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Sil', style: TextStyle(color: AppTheme.errorColor)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      try {
+        await ref.read(feedProvider).deletePost(post.postId);
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Gönderi silindi.')),
+          );
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Silme hatası: $e')),
+          );
+        }
+      }
+    }
   }
 }

@@ -114,3 +114,49 @@ def unfollow_user(req: FollowRequest, db: sqlite3.Connection = Depends(get_db)):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Takipten çıkma sırasında hata: {str(e)}")
+
+
+@router.get("/follows/{user_id}/followers")
+def get_followers(user_id: str, db: sqlite3.Connection = Depends(get_db)):
+    """Kullanıcıyı takip edenlerin listesini döndürür."""
+    try:
+        rows = db.execute("""
+            SELECT u.user_id, u.username, u.display_name, u.avatar_url
+            FROM follows f
+            JOIN users u ON f.follower_id = u.user_id
+            WHERE f.following_id = ?
+        """, (user_id,)).fetchall()
+        return [
+            {
+                "user_id": r[0],
+                "username": r[1] or "",
+                "display_name": r[2] or "",
+                "avatar_url": r[3]
+            }
+            for r in rows
+        ]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/follows/{user_id}/following")
+def get_following(user_id: str, db: sqlite3.Connection = Depends(get_db)):
+    """Kullanıcının takip ettiği kişilerin listesini döndürür."""
+    try:
+        rows = db.execute("""
+            SELECT u.user_id, u.username, u.display_name, u.avatar_url
+            FROM follows f
+            JOIN users u ON f.following_id = u.user_id
+            WHERE f.follower_id = ?
+        """, (user_id,)).fetchall()
+        return [
+            {
+                "user_id": r[0],
+                "username": r[1] or "",
+                "display_name": r[2] or "",
+                "avatar_url": r[3]
+            }
+            for r in rows
+        ]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

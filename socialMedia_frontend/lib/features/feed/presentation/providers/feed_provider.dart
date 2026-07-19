@@ -171,4 +171,22 @@ class FeedProvider extends ChangeNotifier {
     _posts[index] = _posts[index].copyWith(commentsCount: count);
     notifyListeners();
   }
+
+  Future<void> deletePost(String postId) async {
+    await _api.deletePost(postId: postId, userId: currentUserId);
+    _posts.removeWhere((p) => p.postId == postId);
+    notifyListeners();
+    // Profil sayfasını da tetikleyelim
+    _ref.read(profileProvider).loadProfile(currentUserId, currentUserId);
+  }
+
+  Future<void> updatePost(String postId, String caption) async {
+    await _api.updatePost(postId: postId, userId: currentUserId, caption: caption);
+    final index = _posts.indexWhere((p) => p.postId == postId);
+    if (index != -1) {
+      _posts[index] = _posts[index].copyWith(caption: caption);
+      notifyListeners();
+    }
+    _ref.read(profileProvider).loadProfile(currentUserId, currentUserId);
+  }
 }

@@ -44,6 +44,30 @@ def delete_post(
     except HTTPException: raise
     except Exception as e: raise HTTPException(status_code=500, detail=str(e))
 
+from app.domain.schemas import PostUpdateRequest
+@router.patch("/{post_id}", response_model=MessageResponse)
+def update_post(
+    post_id: str,
+    req: PostUpdateRequest,
+    user_id: str = Query(..., description="Güncelleyen kullanıcı ID"),
+    db: sqlite3.Connection = Depends(get_db),
+):
+    """Bir gönderinin açıklamasını günceller."""
+    try:
+        row = db.execute("SELECT user_id FROM posts WHERE post_id = ?", (post_id,)).fetchone()
+        if not row:
+            raise HTTPException(status_code=404, detail="Gönderi bulunamadı")
+        if row[0] != user_id:
+            raise HTTPException(status_code=403, detail="Bu gönderiyi düzenleme yetkiniz yok")
+
+        if req.caption is not None:
+            db.execute("UPDATE posts SET caption = ? WHERE post_id = ?", (req.caption, post_id))
+        
+        db.commit()
+        return MessageResponse(success=True, message="Gönderi güncellendi")
+    except HTTPException: raise
+    except Exception as e: raise HTTPException(status_code=500, detail=str(e))
+
 @router.get("/users/{user_id}/posts", response_model=List[PostResponse])
 def get_user_posts(user_id: str, viewer_id: Optional[str] = Query(None), db: sqlite3.Connection = Depends(get_db)):
     try:
@@ -72,14 +96,14 @@ def get_saved_posts(user_id: str, db: sqlite3.Connection = Depends(get_db)):
             WHERE sp.user_id = ?
             ORDER BY sp.saved_at DESC
         """, (user_id,)).fetchall()
-        return PostRepository.get_user_posts(db, user_id, viewer_id=user_id) if not rows else [
+        return [] if not rows else [
             PostResponse(
                 post_id=r['post_id'], user_id=r['user_id'],
-                username=r['username'], display_name=r.get('display_name', ''),
-                avatar_url=r.get('avatar_url'), image_url=r['image_url'],
-                caption=r.get('caption', ''), visibility=r.get('visibility', 'public'),
-                ai_training_consent=bool(r.get('ai_training_consent', 0)),
-                likes_count=r.get('likes_count', 0), comments_count=r.get('comments_count', 0),
+                username=r['username'], display_name=dict(r).get('display_name', ''),
+                avatar_url=dict(r).get('avatar_url'), image_url=r['image_url'],
+                caption=dict(r).get('caption', ''), visibility=dict(r).get('visibility', 'public'),
+                ai_training_consent=bool(dict(r).get('ai_training_consent', 0)),
+                likes_count=dict(r).get('likes_count', 0), comments_count=dict(r).get('comments_count', 0),
                 is_liked=db.execute(
                     'SELECT 1 FROM likes WHERE post_id = ? AND user_id = ?',
                     (r['post_id'], user_id)

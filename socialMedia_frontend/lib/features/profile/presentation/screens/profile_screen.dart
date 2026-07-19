@@ -441,37 +441,70 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             ),
                       ),
                     ),
+                    Container(
+                      width: double.infinity,
+                      margin: const EdgeInsets.only(top: 12),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: AppTheme.surfaceDark,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppTheme.dividerColor),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '@${post.username}',
+                            style: const TextStyle(
+                              color: AppTheme.textPrimary,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            post.caption.isNotEmpty ? post.caption : (s.isTr ? 'Açıklama yok' : 'No caption'),
+                            style: const TextStyle(
+                              color: AppTheme.textSecondary,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                     if (provider.isOwnProfile) ...[
                       const SizedBox(height: 16),
-                      ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(backgroundColor: AppTheme.errorColor),
-                        icon: const Icon(Icons.delete, color: AppTheme.textPrimary),
-                        label: Text(s.isTr ? 'Sil' : 'Delete', style: const TextStyle(color: AppTheme.textPrimary)),
-                        onPressed: () async {
-                          Navigator.pop(ctx);
-                          final userId = ref.read(authProvider).currentUserId;
-                          if (userId == null) return;
-                          try {
-                            await provider.deletePost(post.postId, userId);
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(s.isTr ? 'Gönderi silindi.' : 'Post deleted.'),
-                                  backgroundColor: Colors.green,
-                                ),
-                              );
-                            }
-                          } catch (e) {
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Silme hatası: $e'),
-                                  backgroundColor: AppTheme.errorColor,
-                                ),
-                              );
-                            }
-                          }
-                        },
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppTheme.accentViolet,
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            ),
+                            icon: const Icon(Icons.edit_rounded, color: AppTheme.textPrimary, size: 18),
+                            label: Text(s.isTr ? 'Düzenle' : 'Edit', style: const TextStyle(color: AppTheme.textPrimary)),
+                            onPressed: () {
+                              Navigator.pop(ctx);
+                              _showProfileEditDialog(context, post);
+                            },
+                          ),
+                          const SizedBox(width: 16),
+                          ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppTheme.errorColor,
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            ),
+                            icon: const Icon(Icons.delete_rounded, color: AppTheme.textPrimary, size: 18),
+                            label: Text(s.isTr ? 'Sil' : 'Delete', style: const TextStyle(color: AppTheme.textPrimary)),
+                            onPressed: () {
+                              Navigator.pop(ctx);
+                              _showProfileDeleteConfirm(context, post);
+                            },
+                          ),
+                        ],
                       ),
                     ]
                   ],
@@ -527,6 +560,111 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       ],
     ),
     );
+  }
+
+  Future<void> _showProfileEditDialog(BuildContext context, PostModel post) async {
+    final controller = TextEditingController(text: post.caption);
+    final isTr = ref.read(localeProvider) == AppLocale.tr;
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppTheme.surfaceDark,
+        title: Text(isTr ? 'Gönderiyi Düzenle' : 'Edit Post', style: const TextStyle(color: AppTheme.textPrimary)),
+        content: TextField(
+          controller: controller,
+          maxLines: 3,
+          style: const TextStyle(color: AppTheme.textPrimary),
+          decoration: InputDecoration(
+            hintText: isTr ? 'Yeni açıklama...' : 'New caption...',
+            hintStyle: const TextStyle(color: AppTheme.textMuted),
+            enabledBorder: OutlineInputBorder(
+              borderSide: const BorderSide(color: AppTheme.dividerColor),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: const BorderSide(color: AppTheme.accentViolet),
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(isTr ? 'İptal' : 'Cancel', style: const TextStyle(color: AppTheme.textMuted)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(isTr ? 'Kaydet' : 'Save', style: const TextStyle(color: AppTheme.accentViolet)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      final newCaption = controller.text.trim();
+      final userId = ref.read(authProvider).currentUserId;
+      if (userId == null) return;
+      try {
+        await ref.read(profileProvider).updatePost(post.postId, userId, newCaption);
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(isTr ? 'Gönderi güncellendi.' : 'Post updated.')),
+          );
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('${isTr ? "Güncelleme hatası" : "Update error"}: $e')),
+          );
+        }
+      }
+    }
+  }
+
+  Future<void> _showProfileDeleteConfirm(BuildContext context, PostModel post) async {
+    final isTr = ref.read(localeProvider) == AppLocale.tr;
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppTheme.surfaceDark,
+        title: Text(isTr ? 'Gönderiyi Sil' : 'Delete Post', style: const TextStyle(color: AppTheme.textPrimary)),
+        content: Text(
+          isTr 
+            ? 'Bu gönderiyi kalıcı olarak silmek istediğinize emin misiniz?' 
+            : 'Are you sure you want to permanently delete this post?', 
+          style: const TextStyle(color: AppTheme.textSecondary)
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(isTr ? 'İptal' : 'Cancel', style: const TextStyle(color: AppTheme.textMuted)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(isTr ? 'Sil' : 'Delete', style: const TextStyle(color: AppTheme.errorColor)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      final userId = ref.read(authProvider).currentUserId;
+      if (userId == null) return;
+      try {
+        await ref.read(profileProvider).deletePost(post.postId, userId);
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(isTr ? 'Gönderi silindi.' : 'Post deleted.')),
+          );
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('${isTr ? "Silme hatası" : "Delete error"}: $e')),
+          );
+        }
+      }
+    }
   }
 }
 

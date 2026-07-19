@@ -148,12 +148,14 @@ class ApiService {
       if (body != null) {
         request.body = jsonEncode(body);
       }
-      final streamedResponse =
-          await _client.send(request).timeout(_timeout);
-      final response = await http.Response.fromStream(streamedResponse);
+      final streamed = await _client.send(request).timeout(_timeout);
+      final response = await http.Response.fromStream(streamed);
 
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body) as Map<String, dynamic>;
+      if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 204) {
+        if (response.body.isNotEmpty) {
+          return jsonDecode(response.body) as Map<String, dynamic>;
+        }
+        return {};
       } else {
         _throwError(response);
       }
@@ -166,6 +168,33 @@ class ApiService {
       throw ApiException('Beklenmeyen bir hata oluştu: $e');
     }
   }
+
+  Future<Map<String, dynamic>> _patch(
+      String endpoint, Map<String, dynamic> body) async {
+    try {
+      final uri = Uri.parse('$baseUrl$endpoint');
+      final response = await _client
+          .patch(uri, headers: _headers, body: jsonEncode(body))
+          .timeout(_timeout);
+
+      if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 204) {
+        if (response.body.isNotEmpty) {
+          return jsonDecode(response.body) as Map<String, dynamic>;
+        }
+        return {};
+      } else {
+        _throwError(response);
+      }
+    } on SocketException {
+      throw ApiException('Bağlantı hatası. İnternet bağlantınızı kontrol edin.');
+    } on TimeoutException {
+      throw ApiException('İstek zaman aşımına uğradı. Lütfen tekrar deneyin.');
+    } catch (e) {
+      if (e is ApiException) rethrow;
+      throw ApiException('Beklenmeyen bir hata oluştu: $e');
+    }
+  }
+
 
   // ─── Error Handler ──────────────────────────────────────────
   Never _throwError(http.Response response) {
@@ -312,6 +341,12 @@ class ApiService {
     await _delete('/posts/$postId?user_id=$userId', null);
   }
 
+  Future<void> updatePost({required String postId, required String userId, required String caption}) async {
+    await _patch('/posts/$postId?user_id=$userId', {
+      'caption': caption,
+    });
+  }
+
   // ─── User Profile ──────────────────────────────────────────
   Future<UserModel> getUser(String userId) async {
     final data = await _get('/users/$userId');
@@ -420,14 +455,24 @@ class ApiService {
     required String postId,
     required String userId,
     required String content,
+    String? parentId,
   }) async {
-    // Backend 'text' field bekliyor ('content' değil)
-    final data = await _post('/posts/$postId/comments', {
+    final body = <String, dynamic>{
       'user_id': userId,
-      'text': content,
-    });
-    // Backend: {success: true, data: {comment_id: "..."}}
+      'content': content,
+    };
+    if (parentId != null) {
+      body['parent_id'] = parentId;
+    }
+    final data = await _post('/posts/$postId/comments', body);
     return data['data']?['comment_id'] as String? ?? '';
+  }
+
+  Future<void> deleteComment({
+    required String commentId,
+    required String userId,
+  }) async {
+    await _delete('/comments/$commentId?user_id=$userId', null);
   }
 
   Future<List<CommentModel>> getComments(String postId) async {
@@ -561,8 +606,9 @@ class ApiService {
   }
 
   // ─── Arama ─────────────────────────────────────────────────
-  Future<List<dynamic>> searchUsers(String query) async {
-    return await _getList('/users/search?q=$query');
+  Future<List<dynamic>> searchUsers(String query, {String? viewerId}) async {
+    final viewerParam = viewerId != null ? '&viewer_id=$viewerId' : '';
+    return await _getList('/search?query=$query$viewerParam');
   }
 
   // ─── Beğeni Listesi ────────────────────────────────────────

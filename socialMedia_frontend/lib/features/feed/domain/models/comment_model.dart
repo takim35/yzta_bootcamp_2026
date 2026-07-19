@@ -8,6 +8,7 @@ class CommentModel {
   final String? avatarUrl;
   final String content;
   final DateTime createdAt;
+  final String? parentId;
 
   const CommentModel({
     required this.commentId,
@@ -17,6 +18,7 @@ class CommentModel {
     this.avatarUrl,
     required this.content,
     required this.createdAt,
+    this.parentId,
   });
 
   String get timeAgo {
@@ -35,6 +37,7 @@ class CommentModel {
       createdAt: json['created_at'] != null
           ? DateTime.parse(json['created_at'] as String)
           : DateTime.now(),
+      parentId: json['parent_id'] as String?,
     );
   }
 }

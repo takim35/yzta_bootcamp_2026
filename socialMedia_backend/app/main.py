@@ -53,7 +53,7 @@ app.include_router(likes.router,                         tags=["Likes"])   # /po
 app.include_router(feed.router,                          tags=["Feed"])
 app.include_router(follows.router,                       tags=["Follows"])
 app.include_router(users.router,     prefix="/users",    tags=["Users"])
-app.include_router(search.router,    prefix="/users/search", tags=["Search"])
+app.include_router(search.router,    prefix="/search",      tags=["Search"])
 app.include_router(wardrobe.router,  prefix="/wardrobe", tags=["Wardrobe"])
 app.include_router(captions_router,  prefix="/captions", tags=["Captions"])
 

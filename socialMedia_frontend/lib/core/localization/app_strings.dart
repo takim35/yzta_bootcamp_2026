@@ -134,5 +134,55 @@ class AppStrings {
   String get noClothesFound => isTr ? 'Henüz kıyafet yok. Biraz ekle!' : 'No clothes found. Add some!';
   String get askForSuggestions => isTr ? 'Kombin önerisi iste...' : 'Ask for outfit suggestions...';
   String get cannotGenerateResponse => isTr ? 'Yanıt oluşturulamadı.' : 'I could not generate a response.';
+
+  String translateWardrobe(String val) {
+    if (isTr) return val;
+    final map = {
+      'Tişör': 'T-Shirt',
+      'Tişört': 'T-Shirt',
+      'Gömlek': 'Shirt',
+      'Bluz': 'Blouse',
+      'Kazak': 'Sweater',
+      'Sweatshirt': 'Sweatshirt',
+      'Pantolon': 'Trousers',
+      'Şort': 'Shorts',
+      'Etek': 'Skirt',
+      'Elbise': 'Dress',
+      'Ceket': 'Jacket',
+      'Mont': 'Coat',
+      'Kaban': 'Overcoat',
+      'Ayakkabı': 'Shoes',
+      'Bot': 'Boots',
+      'Sneaker': 'Sneaker',
+      'Çanta': 'Bag',
+      'Aksesuar': 'Accessory',
+      'Diğer': 'Other',
+      'Üst Giyim': 'Top Wear',
+      'Alt Giyim': 'Bottom Wear',
+      'Dış Giyim': 'Outerwear',
+      'Siyah': 'Black',
+      'Beyaz': 'White',
+      'Gri': 'Grey',
+      'Lacivert': 'Navy Blue',
+      'Mavi': 'Blue',
+      'Kırmızı': 'Red',
+      'Pembe': 'Pink',
+      'Yeşil': 'Green',
+      'Sarı': 'Yellow',
+      'Turuncu': 'Orange',
+      'Mor': 'Purple',
+      'Kahverengi': 'Brown',
+      'Bej': 'Beige',
+      'Bordo': 'Burgundy',
+      'Karışık': 'Mixed',
+      'Çok Renkli': 'Multicolor',
+      'Yaz': 'Summer',
+      'Kış': 'Winter',
+      'İlkbahar': 'Spring',
+      'Sonbahar': 'Autumn',
+      'Tüm Sezon': 'All Seasons',
+    };
+    return map[val] ?? val;
+  }
 }
 

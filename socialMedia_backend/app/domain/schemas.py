@@ -69,6 +69,14 @@ class PostCreate(BaseModel):
     ai_training_consent: bool = False
 
 
+class PostUpdateRequest(BaseModel):
+    """Var olan postu güncelleme isteği."""
+    caption: Optional[str] = None
+    visibility: Optional[Literal["public", "followers", "private"]] = None
+    outfit_items: Optional[List[str]] = None
+    ai_training_consent: Optional[bool] = None
+
+
 class FollowRequest(BaseModel):
     """Takip etme / takipten çıkma isteği."""
     follower_id: str

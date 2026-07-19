@@ -35,7 +35,8 @@ class SearchProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final results = await _apiService.searchUsers(query);
+      final currentUserId = _ref.read(authProvider).currentUserId;
+      final results = await _apiService.searchUsers(query, viewerId: currentUserId);
       _searchResults = results.map((e) => UserModel.fromJson(e as Map<String, dynamic>)).toList();
     } catch (e) {
       _errorMessage = e.toString();

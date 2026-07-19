@@ -6,6 +6,7 @@ import '../../../../features/auth/presentation/providers/auth_provider.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/localization/locale_provider.dart';
 import 'add_item_screen.dart';
+import 'edit_item_screen.dart';
 
 class WardrobeScreen extends ConsumerStatefulWidget {
   const WardrobeScreen({super.key});
@@ -51,7 +52,7 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.add_rounded, color: AppTheme.accentViolet, size: 28),
-            tooltip: 'Kıyafet Ekle',
+            tooltip: s.isTr ? 'Kıyafet Ekle' : 'Add Clothing',
             onPressed: () {
               Navigator.push(
                 context,
@@ -79,14 +80,14 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> {
                   const Icon(Icons.error_outline, color: AppTheme.errorColor, size: 48),
                   const SizedBox(height: 12),
                   Text(
-                    'Hata: ${snapshot.error}',
+                    'Error: ${snapshot.error}',
                     style: const TextStyle(color: AppTheme.textSecondary),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 16),
                   TextButton(
                     onPressed: _loadClothes,
-                    child: const Text('Yeniden Dene', style: TextStyle(color: AppTheme.accentViolet)),
+                    child: const Text('Retry', style: TextStyle(color: AppTheme.accentViolet)),
                   ),
                 ],
               ),
@@ -107,9 +108,9 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> {
                     style: const TextStyle(color: AppTheme.textSecondary, fontSize: 16),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    'Sağ üstteki + butonuyla kıyafet ekleyin',
-                    style: TextStyle(color: AppTheme.textMuted, fontSize: 13),
+                  Text(
+                    s.isTr ? 'Sağ üstteki + butonuyla kıyafet ekleyin' : 'Add clothing using the + button on top right',
+                    style: const TextStyle(color: AppTheme.textMuted, fontSize: 13),
                   ),
                 ],
               ),
@@ -128,53 +129,65 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> {
             itemBuilder: (context, index) {
               final cloth = clothes[index] as Map<String, dynamic>;
               final imageUrl = cloth['foto_url']?.toString() ?? cloth['image_url']?.toString() ?? '';
-              final tur = cloth['tur']?.toString() ?? cloth['category']?.toString() ?? 'Kıyafet';
+              final tur = cloth['tur']?.toString() ?? cloth['category']?.toString() ?? 'Clothing';
               final renk = cloth['renk']?.toString() ?? '';
 
-              return Container(
-                decoration: BoxDecoration(
-                  color: AppTheme.cardDark,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppTheme.dividerColor, width: 0.5),
-                ),
-                clipBehavior: Clip.antiAlias,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Expanded(
-                      child: imageUrl.isNotEmpty
-                          ? Image.network(
-                              imageUrl,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => const _EmptyClothIcon(),
-                            )
-                          : const _EmptyClothIcon(),
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => EditItemScreen(initialItem: cloth),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            tur,
-                            style: const TextStyle(
-                              color: AppTheme.textPrimary,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
-                            ),
-                          ),
-                          if (renk.isNotEmpty)
+                  ).then((refreshed) {
+                    if (refreshed == true) _loadClothes();
+                  });
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: AppTheme.cardDark,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: AppTheme.dividerColor, width: 0.5),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(
+                        child: imageUrl.isNotEmpty
+                            ? Image.network(
+                                imageUrl,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) => const _EmptyClothIcon(),
+                              )
+                            : const _EmptyClothIcon(),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
                             Text(
-                              renk,
+                              s.translateWardrobe(tur),
                               style: const TextStyle(
-                                color: AppTheme.textMuted,
-                                fontSize: 12,
+                                color: AppTheme.textPrimary,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
                               ),
                             ),
-                        ],
+                            if (renk.isNotEmpty)
+                              Text(
+                                s.translateWardrobe(renk),
+                                style: const TextStyle(
+                                  color: AppTheme.textMuted,
+                                  fontSize: 12,
+                                ),
+                              ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               );
             },

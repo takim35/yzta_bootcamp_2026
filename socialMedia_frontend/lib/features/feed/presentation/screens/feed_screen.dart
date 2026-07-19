@@ -6,6 +6,8 @@ import '../../../../features/feed/presentation/widgets/shimmer_loading.dart';
 import '../../../../features/feed/presentation/widgets/empty_state.dart';
 import '../../../../features/auth/presentation/providers/auth_provider.dart';
 import '../../../../features/feed/presentation/widgets/comments_bottom_sheet.dart';
+import '../../../../features/feed/presentation/widgets/notifications_bottom_sheet.dart';
+import '../../../../features/profile/presentation/screens/profile_screen.dart';
 import '../../../../core/theme/app_theme.dart';
 
 class FeedScreen extends ConsumerStatefulWidget {
@@ -114,7 +116,12 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                     );
                   },
                   onUserTap: (userId) {
-                    debugPrint('Profil sayfasına git: $userId');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ProfileScreen(userId: userId),
+                      ),
+                    );
                   },
                 );
               },
@@ -126,6 +133,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
   }
 
   PreferredSizeWidget _buildAppBar() {
+    final currentUserId = ref.watch(authProvider).currentUserId ?? '';
     return AppBar(
       title: ShaderMask(
         shaderCallback: (bounds) => AppTheme.primaryGradient.createShader(
@@ -150,7 +158,9 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
             Icons.notifications_outlined,
             color: AppTheme.textPrimary,
           ),
-          onPressed: () {},
+          onPressed: () {
+            NotificationsBottomSheet.show(context, currentUserId: currentUserId);
+          },
           tooltip: 'Bildirimler',
         ),
       ],

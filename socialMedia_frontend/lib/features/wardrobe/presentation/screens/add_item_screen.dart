@@ -7,6 +7,7 @@ import 'dart:convert';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../features/auth/presentation/providers/auth_provider.dart';
 import '../../../../services/api_service.dart';
+import '../../../../core/localization/locale_provider.dart';
 
 class AddItemScreen extends ConsumerStatefulWidget {
   const AddItemScreen({super.key});
@@ -73,7 +74,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
             });
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('Yapay zeka kıyafeti başarıyla analiz etti! ✨'),
+                content: Text('AI analyzed the clothing successfully! ✨'),
                 backgroundColor: AppTheme.accentViolet,
               ),
             );
@@ -106,7 +107,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
     final userId = ref.read(authProvider).currentUserId;
     if (userId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Oturum açmanız gerekiyor.')),
+        const SnackBar(content: Text('You need to log in.')),
       );
       return;
     }
@@ -131,13 +132,13 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
       if (mounted) {
         Navigator.pop(context, true); // true = yenile
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('✅ Kıyafet eklendi!')),
+          const SnackBar(content: Text('✅ Clothing added successfully!')),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Hata: $e')),
+          SnackBar(content: Text('Error: $e')),
         );
       }
     } finally {
@@ -167,7 +168,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
             const SizedBox(height: 16),
             ListTile(
               leading: const Icon(Icons.camera_alt_rounded, color: AppTheme.accentViolet),
-              title: const Text('Kamera', style: TextStyle(color: AppTheme.textPrimary)),
+              title: const Text('Camera', style: TextStyle(color: AppTheme.textPrimary)),
               onTap: () {
                 Navigator.pop(context);
                 _pickImage(ImageSource.camera);
@@ -175,7 +176,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.photo_library_rounded, color: AppTheme.accentPink),
-              title: const Text('Fotoğraf Kitaplığı', style: TextStyle(color: AppTheme.textPrimary)),
+              title: const Text('Photo Library', style: TextStyle(color: AppTheme.textPrimary)),
               onTap: () {
                 Navigator.pop(context);
                 _pickImage(ImageSource.gallery);
@@ -190,10 +191,11 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final s = ref.watch(stringsProvider);
     return Scaffold(
       backgroundColor: AppTheme.primaryDark,
       appBar: AppBar(
-        title: const Text('Kıyafet Ekle', style: TextStyle(color: AppTheme.textPrimary)),
+        title: const Text('Add Clothing', style: TextStyle(color: AppTheme.textPrimary)),
         backgroundColor: AppTheme.primaryDark,
         elevation: 0,
         iconTheme: const IconThemeData(color: AppTheme.textPrimary),
@@ -208,7 +210,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
                 )
               : TextButton(
                   onPressed: _submit,
-                  child: const Text('Kaydet', style: TextStyle(color: AppTheme.accentViolet, fontWeight: FontWeight.bold)),
+                  child: const Text('Save', style: TextStyle(color: AppTheme.accentViolet, fontWeight: FontWeight.bold)),
                 ),
         ],
       ),
@@ -253,7 +255,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
                                   CircularProgressIndicator(color: AppTheme.accentViolet),
                                   SizedBox(height: 12),
                                   Text(
-                                    'Yapay Zeka Analiz Ediyor...',
+                                    'AI Analyzing...',
                                     style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                                   ),
                                 ],
@@ -267,10 +269,10 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
                           Icon(Icons.add_photo_alternate_rounded,
                               size: 52, color: AppTheme.accentViolet.withValues(alpha: 0.7)),
                           const SizedBox(height: 12),
-                          const Text('Fotoğraf ekle',
+                          const Text('Add photo',
                               style: TextStyle(color: AppTheme.textMuted, fontSize: 15)),
                           const SizedBox(height: 4),
-                          const Text('Kamera veya kitaplıktan seç',
+                          const Text('Select from camera or library',
                               style: TextStyle(color: AppTheme.textMuted, fontSize: 12)),
                         ],
                       ),
@@ -280,43 +282,46 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
             const SizedBox(height: 24),
 
             // ── Kategori ────────────────────────────────
-            _SectionLabel(text: 'Tür *'),
+            _SectionLabel(text: 'Type *'),
             _DropdownField(
               value: _tur,
               items: _turler,
               onChanged: (v) => setState(() => _tur = v!),
+              displayTranslator: (val) => s.translateWardrobe(val), // Force translate to English
             ),
 
             const SizedBox(height: 16),
 
             // ── Renk ────────────────────────────────────
-            _SectionLabel(text: 'Renk *'),
+            _SectionLabel(text: 'Color *'),
             _DropdownField(
               value: _renk,
               items: _renkler,
               onChanged: (v) => setState(() => _renk = v!),
+              displayTranslator: (val) => s.translateWardrobe(val), // Force translate to English
             ),
 
             const SizedBox(height: 16),
 
             // ── Mevsim ──────────────────────────────────
-            _SectionLabel(text: 'Mevsim'),
+            _SectionLabel(text: 'Season'),
             _DropdownField(
               value: _mevsim,
               items: _mevsimler,
               onChanged: (v) => setState(() => _mevsim = v!),
+              displayTranslator: (val) => s.translateWardrobe(val), // Force translate to English
             ),
 
             const SizedBox(height: 16),
 
             // ── Marka ───────────────────────────────────
-            _SectionLabel(text: 'Marka (opsiyonel)'),
+            _SectionLabel(text: 'Brand (optional)'),
             _TextField(controller: _markaCtrl, hint: 'Nike, Zara, H&M...'),
 
             const SizedBox(height: 16),
 
             // ── Beden ───────────────────────────────────
-            _SectionLabel(text: 'Beden (opsiyonel)'),
+            _SectionLabel(text: 'Size (optional)'),
             _TextField(controller: _bedenCtrl, hint: 'XS, S, M, L, XL, 36, 38...'),
 
             const SizedBox(height: 40),
@@ -333,7 +338,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
                 ),
                 child: _isLoading
                     ? const CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
-                    : const Text('Kıyafeti Ekle',
+                    : const Text('Add Clothing',
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
               ),
             ),
@@ -364,8 +369,14 @@ class _DropdownField extends StatelessWidget {
   final String value;
   final List<String> items;
   final void Function(String?) onChanged;
+  final String Function(String)? displayTranslator;
 
-  const _DropdownField({required this.value, required this.items, required this.onChanged});
+  const _DropdownField({
+    required this.value,
+    required this.items,
+    required this.onChanged,
+    this.displayTranslator,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -383,7 +394,9 @@ class _DropdownField extends StatelessWidget {
         dropdownColor: AppTheme.cardDark,
         style: const TextStyle(color: AppTheme.textPrimary, fontSize: 15),
         items: items
-            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+            .map((e) => DropdownMenuItem(
+                value: e,
+                child: Text(displayTranslator != null ? displayTranslator!(e) : e)))
             .toList(),
         onChanged: onChanged,
       ),
