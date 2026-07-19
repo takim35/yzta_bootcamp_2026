@@ -175,3 +175,74 @@ def get_comments(post_id: str, db: sqlite3.Connection = Depends(get_db)):
         ]
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Yorumlar alınırken hata: {e}")
+
+
+@router.delete("/comments/{comment_id}")
+def delete_comment(
+    comment_id: str,
+    user_id: str = Query(..., description="Yorumu silen kullanıcı ID"),
+    db: sqlite3.Connection = Depends(get_db),
+):
+    """Kullanıcının kendi yorumunu siler."""
+    try:
+        comment = db.execute(
+            "SELECT user_id, post_id FROM comments WHERE comment_id = ?", (comment_id,)
+        ).fetchone()
+        if not comment:
+            raise HTTPException(status_code=404, detail="Yorum bulunamadı.")
+        if comment[0] != user_id:
+            raise HTTPException(status_code=403, detail="Bu yorumu silme yetkiniz yok.")
+
+        db.execute("DELETE FROM comments WHERE comment_id = ?", (comment_id,))
+        try:
+            db.execute(
+                "UPDATE posts SET comments_count = MAX(0, comments_count - 1) WHERE post_id = ?",
+                (comment[1],),
+            )
+        except Exception:
+            pass
+        db.commit()
+        return MessageResponse(success=True, message="Yorum silindi.")
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Yorum silinirken hata: {e}")
+
+
+class ReportRequest(BaseModel):
+    user_id: str
+    reason: Optional[str] = "Uygunsuz içerik"
+
+
+@router.post("/comments/{comment_id}/report", status_code=201)
+def report_comment(comment_id: str, req: ReportRequest, db: sqlite3.Connection = Depends(get_db)):
+    """Bir yorumu raporlar."""
+    try:
+        comment = db.execute(
+            "SELECT comment_id FROM comments WHERE comment_id = ?", (comment_id,)
+        ).fetchone()
+        if not comment:
+            raise HTTPException(status_code=404, detail="Yorum bulunamadı.")
+
+        # Rapor tablosu yoksa oluştur
+        db.execute("""
+            CREATE TABLE IF NOT EXISTS reports (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                comment_id TEXT NOT NULL,
+                reporter_user_id TEXT NOT NULL,
+                reason TEXT,
+                created_at TEXT NOT NULL,
+                FOREIGN KEY (comment_id) REFERENCES comments(comment_id)
+            )
+        """)
+        now = datetime.utcnow().isoformat()
+        db.execute(
+            "INSERT INTO reports (comment_id, reporter_user_id, reason, created_at) VALUES (?,?,?,?)",
+            (comment_id, req.user_id, req.reason, now),
+        )
+        db.commit()
+        return MessageResponse(success=True, message="Yorum başarıyla raporlandı.")
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Raporlama sırasında hata: {e}")

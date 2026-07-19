@@ -38,7 +38,6 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> {
   @override
   Widget build(BuildContext context) {
     final s = ref.watch(stringsProvider);
-    final userId = ref.watch(authProvider).currentUserId ?? '';
 
     return Scaffold(
       backgroundColor: AppTheme.primaryDark,

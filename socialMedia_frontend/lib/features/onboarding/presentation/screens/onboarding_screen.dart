@@ -317,8 +317,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                         offset: Offset(0, _floatAnimation.value),
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 400),
-                          width: 150,
-                          height: 150,
+                          width: 120,
+                          height: 120,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             gradient: LinearGradient(
@@ -339,7 +339,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                           ),
                           child: Icon(
                             page['icon'] as IconData,
-                            size: 72,
+                            size: 56,
                             color: Colors.white,
                           ),
                         ),
@@ -347,10 +347,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                     },
                   ),
 
-                  SizedBox(height: size.height * 0.06),
+                  SizedBox(height: size.height * 0.04),
 
                   // Page content via PageView (text only)
-                  Expanded(
+                  SizedBox(
+                    height: size.height * 0.25,
                     child: PageView.builder(
                       controller: _pageController,
                       onPageChanged: _onPageChanged,
@@ -359,36 +360,40 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                         final p = pages[index];
                         return FadeTransition(
                           opacity: _fadeAnimation,
-                          child: Column(
+                          child: SingleChildScrollView(
+                              child: Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Text(
                                 p['title'] as String,
                                 textAlign: TextAlign.center,
                                 style: const TextStyle(
-                                  fontSize: 34,
+                                  fontSize: 28,
                                   fontWeight: FontWeight.w800,
                                   color: AppTheme.textPrimary,
                                   height: 1.15,
                                   letterSpacing: -0.5,
                                 ),
                               ),
-                              const SizedBox(height: 20),
+                              const SizedBox(height: 16),
                               Text(
                                 p['subtitle'] as String,
                                 textAlign: TextAlign.center,
                                 style: const TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 14,
                                   color: AppTheme.textSecondary,
                                   height: 1.6,
                                 ),
                               ),
                             ],
                           ),
+                          ),
                         );
                       },
                     ),
                   ),
+
+                  const Spacer(),
 
                   // Dots + Next button
                   Padding(

@@ -5,17 +5,19 @@ import '../../../../features/feed/domain/models/post_model.dart';
 import '../../../../services/api_service.dart';
 
 import '../../../../features/auth/presentation/providers/auth_provider.dart';
+import '../../../../features/profile/presentation/providers/profile_provider.dart';
 
 final feedProvider = ChangeNotifierProvider((ref) {
   final currentUserId = ref.watch(authProvider).currentUserId ?? '';
-  return FeedProvider(currentUserId: currentUserId);
+  return FeedProvider(currentUserId: currentUserId, ref: ref);
 });
 
 class FeedProvider extends ChangeNotifier {
   final ApiService _api = ApiService();
   final String currentUserId;
+  final Ref _ref;
 
-  FeedProvider({required this.currentUserId}) {
+  FeedProvider({required this.currentUserId, required Ref ref}) : _ref = ref {
     // Provider oluşturulunca hemen yüklemeye başla — ekran açılana kadar veri hazır olur
     if (currentUserId.isNotEmpty) {
       loadFeed();
@@ -152,9 +154,12 @@ class FeedProvider extends ChangeNotifier {
       } else {
         await _api.savePost(postId: postId, userId: currentUserId);
       }
+
+      // Kaydetme işleminden sonra profil sağlayıcısını tetikleyerek Podyum'un güncellenmesini sağla
+      _ref.read(profileProvider).loadProfile(currentUserId, currentUserId);
     } catch (e) {
-      // Revert on failure
-      _posts[index] = post;
+      // Hata durumunda optimistic update'i geri al
+      _posts[index] = post.copyWith(isSaved: wasSaved);
       notifyListeners();
       debugPrint('Kaydetme hatası: $e');
     }

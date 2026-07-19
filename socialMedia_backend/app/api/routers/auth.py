@@ -1,4 +1,5 @@
 import sqlite3
+import random
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
@@ -6,7 +7,8 @@ from pydantic import BaseModel
 from app.core.database import get_db
 from app.domain.schemas import (
     UserRegisterRequest, UserLoginRequest, AuthResponse,
-    PasswordResetRequest, TokenRefreshRequest,
+    PasswordResetRequest, PasswordResetCodeRequest, PasswordResetVerifyRequest,
+    TokenRefreshRequest,
     TwoFASetupResponse, TwoFAVerifyRequest, TwoFAStatusResponse,
     TwoFALoginRequest,
 )
@@ -16,6 +18,9 @@ router = APIRouter()
 
 def get_repository(db: sqlite3.Connection = Depends(get_db)) -> AuthRepository:
     return AuthRepository(db)
+
+# Geçici olarak kodları hafızada tutmak için (Gerçek uygulamada veritabanı veya Redis kullanılmalı)
+mock_reset_codes = {}
 
 
 # ─── Kayıt / Giriş ─────────────────────────────────────────
@@ -58,14 +63,61 @@ def login(
 
 # ─── Şifre Sıfırlama ───────────────────────────────────────
 
+@router.post('/request-password-reset')
+def request_password_reset(
+    request: PasswordResetCodeRequest,
+    repo: AuthRepository = Depends(get_repository)
+):
+    """Kullanıcının e-postasına şifre sıfırlama kodu gönderir."""
+    try:
+        # 1. Kullanıcı var mı kontrol et
+        user = repo.get_user_by_email(request.email)
+        if not user:
+            # Güvenlik açısından kullanıcı bulunamasa bile her zaman başarılı dönülür
+            return {'success': True, 'message': 'Eğer bu e-posta adresi sistemimizde kayıtlıysa, şifre sıfırlama kodu gönderildi.'}
+            
+        # 2. Kod üret
+        code = str(random.randint(100000, 999999))
+        mock_reset_codes[request.email] = code
+        
+        # 3. Gerçekte burada e-posta gönderimi yapılır. Şimdilik konsola yazdırıyoruz.
+        print(f"!!! ŞİFRE SIFIRLAMA KODU !!! Email: {request.email} -> Kod: {code}")
+        
+        return {
+            'success': True, 
+            'message': 'Eğer bu e-posta adresi sistemimizde kayıtlıysa, şifre sıfırlama kodu gönderildi.',
+            'debug_code': code # Geliştirme aşamasında test kolaylığı için kodu dönüyoruz
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Kod gönderme sırasında hata oluştu: {str(e)}")
+
+
+@router.post('/verify-reset-code')
+def verify_reset_code(
+    request: PasswordResetVerifyRequest
+):
+    """Gönderilen şifre sıfırlama kodunu doğrular."""
+    if request.email in mock_reset_codes and mock_reset_codes[request.email] == request.code:
+        return {'success': True, 'message': 'Kod doğrulandı.'}
+    raise HTTPException(status_code=400, detail="Geçersiz veya süresi dolmuş kod.")
+
+
 @router.post('/reset-password')
 def reset_password(
     request: PasswordResetRequest,
     repo: AuthRepository = Depends(get_repository)
 ):
-    """Kullanıcının şifresini gerçek veritabanı güncellemesiyle sıfırlar."""
+    """Kullanıcının şifresini doğrulanmış kodu baz alarak sıfırlar."""
     try:
+        # Sadece kodu daha önce doğrulanmış (mock_reset_codes içinde bulunan) kişilerin şifresini sıfırla
+        if request.email not in mock_reset_codes:
+            raise HTTPException(status_code=400, detail="Lütfen önce doğrulama kodunu girin.")
+            
         repo.reset_password(request.email, request.new_password)
+        
+        # Kullanılan kodu temizle
+        del mock_reset_codes[request.email]
+        
         return {'success': True, 'message': 'Şifreniz başarıyla sıfırlandı.'}
     except HTTPException:
         raise

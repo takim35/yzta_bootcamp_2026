@@ -2,7 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import '../features/feed/domain/models/feed_models.dart';
+import '../features/feed/domain/models/post_model.dart';
+import '../features/feed/domain/models/comment_model.dart';
+import '../features/feed/domain/models/outfit_item_model.dart';
 import '../features/profile/domain/models/user_model.dart';
 import '../core/config/app_config.dart';
 
@@ -34,6 +36,7 @@ class ApiService {
   Map<String, String> get _headers => {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
+        'Bypass-Tunnel-Reminder': 'true',
       };
 
   // ─── Generic Request Handler ────────────────────────────────
@@ -203,6 +206,16 @@ class ApiService {
     };
     final data = await _post('/auth/login', body);
     return data['user_id'] as String;
+  }
+
+  Future<void> requestPasswordResetCode(String email) async {
+    final body = {'email': email};
+    await _post('/auth/request-password-reset', body);
+  }
+
+  Future<void> verifyResetCode(String email, String code) async {
+    final body = {'email': email, 'code': code};
+    await _post('/auth/verify-reset-code', body);
   }
 
   Future<void> resetPassword(String email, String newPassword) async {
@@ -568,14 +581,14 @@ class ApiService {
 
   // ─── Bildirimler ───────────────────────────────────────────
   Future<List<dynamic>> getNotifications(String userId) async {
-    return await _getList('/notifications/$userId');
+    return await _getList('/notifications?user_id=$userId');
   }
 
   Future<Map<String, dynamic>> markAllNotificationsRead(String userId) async {
-    return await _put('/notifications/$userId/read-all', {});
+    return await _put('/notifications/read-all?user_id=$userId', {});
   }
 
-  Future<Map<String, dynamic>> markNotificationRead(int notificationId) async {
+  Future<Map<String, dynamic>> markNotificationRead(String notificationId) async {
     return await _put('/notifications/$notificationId/read', {});
   }
 

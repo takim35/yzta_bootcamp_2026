@@ -1,5 +1,9 @@
+import 'dart:io';
+import 'dart:convert';
+import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart' as http;
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/localization/locale_provider.dart';
 import '../../../../services/api_service.dart';
@@ -17,6 +21,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   final _displayNameController = TextEditingController();
   final _bioController = TextEditingController();
   final _avatarUrlController = TextEditingController();
+  final _picker = ImagePicker();
+  File? _selectedImage;
   bool _isLoading = false;
 
   @override
@@ -30,17 +36,43 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     }
   }
 
+  Future<String?> _uploadImage(File file) async {
+    final uri = Uri.parse('${ApiService.baseUrl}/captions/upload');
+    final request = http.MultipartRequest('POST', uri)
+      ..files.add(await http.MultipartFile.fromPath('file', file.path));
+    final streamed = await request.send();
+    final response = await http.Response.fromStream(streamed);
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      return data['url'] as String?;
+    }
+    return null;
+  }
+
+  Future<void> _pickImage() async {
+    final xfile = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 75, maxWidth: 1024);
+    if (xfile != null) {
+      setState(() => _selectedImage = File(xfile.path));
+    }
+  }
+
   Future<void> _saveProfile() async {
     setState(() => _isLoading = true);
     try {
       final userId = ref.read(authProvider).currentUserId;
       if (userId == null) return;
       
+      String avatarUrl = _avatarUrlController.text;
+      if (_selectedImage != null) {
+        final uploadedUrl = await _uploadImage(_selectedImage!);
+        if (uploadedUrl != null) avatarUrl = uploadedUrl;
+      }
+      
       await ApiService().updateProfile(
         userId: userId,
         displayName: _displayNameController.text,
         bio: _bioController.text,
-        avatarUrl: _avatarUrlController.text,
+        avatarUrl: avatarUrl,
       );
       
       // Refresh profile data
@@ -87,27 +119,33 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         child: Column(
           children: [
             Center(
-              child: Stack(
-                children: [
-                  CircleAvatar(
-                    radius: 50,
-                    backgroundColor: AppTheme.surfaceDark,
-                    backgroundImage: _avatarUrlController.text.isNotEmpty ? NetworkImage(_avatarUrlController.text) : null,
-                    child: _avatarUrlController.text.isEmpty ? const Icon(Icons.person, size: 50, color: AppTheme.textSecondary) : null,
-                  ),
-                  Positioned(
-                    bottom: 0,
-                    right: 0,
-                    child: Container(
-                      decoration: const BoxDecoration(
-                        color: AppTheme.accentViolet,
-                        shape: BoxShape.circle,
-                      ),
-                      padding: const EdgeInsets.all(8),
-                      child: const Icon(Icons.camera_alt, color: Colors.white, size: 20),
+              child: GestureDetector(
+                onTap: _pickImage,
+                child: Stack(
+                  children: [
+                    CircleAvatar(
+                      radius: 50,
+                      backgroundColor: AppTheme.surfaceDark,
+                      backgroundImage: _selectedImage != null 
+                          ? FileImage(_selectedImage!) as ImageProvider
+                          : (_avatarUrlController.text.isNotEmpty ? NetworkImage(_avatarUrlController.text) : null),
+                      child: (_selectedImage == null && _avatarUrlController.text.isEmpty) 
+                          ? const Icon(Icons.person, size: 50, color: AppTheme.textSecondary) : null,
                     ),
-                  )
-                ],
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          color: AppTheme.accentViolet,
+                          shape: BoxShape.circle,
+                        ),
+                        padding: const EdgeInsets.all(8),
+                        child: const Icon(Icons.camera_alt, color: Colors.white, size: 20),
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 32),

@@ -19,6 +19,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
   final _picker = ImagePicker();
   File? _selectedImage;
   bool _isLoading = false;
+  bool _isAnalyzing = false;
 
   // Form state
   String _tur = 'Tişört';
@@ -49,7 +50,42 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
       maxWidth: 1024,
     );
     if (xfile != null) {
-      setState(() => _selectedImage = File(xfile.path));
+      setState(() {
+        _selectedImage = File(xfile.path);
+        _isAnalyzing = true;
+      });
+      
+      try {
+        final bytes = await xfile.readAsBytes();
+        final base64Image = base64Encode(bytes);
+        final result = await ApiService().analyzeClothingItem(base64Image);
+        
+        if (result['success'] == true && result['data'] != null) {
+          final data = result['data'];
+          if (mounted) {
+            setState(() {
+              if (data['tur'] != null && _turler.contains(data['tur'])) {
+                _tur = data['tur'];
+              }
+              if (data['renk'] != null && _renkler.contains(data['renk'])) {
+                _renk = data['renk'];
+              }
+            });
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Yapay zeka kıyafeti başarıyla analiz etti! ✨'),
+                backgroundColor: AppTheme.accentViolet,
+              ),
+            );
+          }
+        }
+      } catch (e) {
+        debugPrint("AI Analyze Error: $e");
+      } finally {
+        if (mounted) {
+          setState(() => _isAnalyzing = false);
+        }
+      }
     }
   }
 
@@ -198,9 +234,32 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
                   ),
                 ),
                 child: _selectedImage != null
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(14),
-                        child: Image.file(_selectedImage!, fit: BoxFit.cover),
+                    ? Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(14),
+                            child: Image.file(_selectedImage!, fit: BoxFit.cover),
+                          ),
+                          if (_isAnalyzing)
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.5),
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              child: const Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  CircularProgressIndicator(color: AppTheme.accentViolet),
+                                  SizedBox(height: 12),
+                                  Text(
+                                    'Yapay Zeka Analiz Ediyor...',
+                                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ],
                       )
                     : Column(
                         mainAxisAlignment: MainAxisAlignment.center,

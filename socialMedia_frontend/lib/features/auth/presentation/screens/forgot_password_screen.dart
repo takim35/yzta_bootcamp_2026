@@ -14,9 +14,11 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
     with TickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
+  final _codeController = TextEditingController();
   final _newPasswordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
+  int _currentStep = 1;
   bool _isLoading = false;
   bool _isNewPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
@@ -49,12 +51,53 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
   void dispose() {
     _entryController.dispose();
     _emailController.dispose();
+    _codeController.dispose();
     _newPasswordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
   }
 
-  Future<void> _onSubmit() async {
+  Future<void> _onRequestCode() async {
+    setState(() => _errorMessage = null);
+    if (_emailController.text.trim().isEmpty || !_emailController.text.contains('@')) {
+      setState(() => _errorMessage = 'Geçerli bir e-posta adresi girin.');
+      return;
+    }
+    setState(() => _isLoading = true);
+    try {
+      await ApiService().requestPasswordResetCode(_emailController.text.trim());
+      if (mounted) setState(() => _currentStep = 2);
+    } catch (e) {
+      final msg = e.toString().contains('ApiException')
+          ? e.toString().split('ApiException: ').last.split(' (status:').first
+          : 'Kod gönderilirken bir hata oluştu.';
+      setState(() => _errorMessage = msg);
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _onVerifyCode() async {
+    setState(() => _errorMessage = null);
+    if (_codeController.text.trim().length < 4) {
+      setState(() => _errorMessage = 'Lütfen geçerli bir kod girin.');
+      return;
+    }
+    setState(() => _isLoading = true);
+    try {
+      await ApiService().verifyResetCode(_emailController.text.trim(), _codeController.text.trim());
+      if (mounted) setState(() => _currentStep = 3);
+    } catch (e) {
+      final msg = e.toString().contains('ApiException')
+          ? e.toString().split('ApiException: ').last.split(' (status:').first
+          : 'Kod doğrulanırken bir hata oluştu.';
+      setState(() => _errorMessage = msg);
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _onSubmitNewPassword() async {
     setState(() => _errorMessage = null);
     if (!_formKey.currentState!.validate()) return;
 
@@ -98,7 +141,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
               position: _slideAnimation,
               child: FadeTransition(
                 opacity: _fadeAnimation,
-                child: _success ? _buildSuccessView() : _buildFormView(),
+                child: _success ? _buildSuccessState() : _buildForm(),
               ),
             ),
           ),
@@ -107,54 +150,47 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
     );
   }
 
-  Widget _buildSuccessView() {
+  Widget _buildSuccessState() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Container(
-          width: 80,
-          height: 80,
+          padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            gradient: AppTheme.primaryGradient,
             shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: AppTheme.accentViolet.withValues(alpha: 0.4),
-                blurRadius: 20,
-                offset: const Offset(0, 8),
-              ),
-            ],
+            color: AppTheme.accentViolet.withValues(alpha: 0.15),
           ),
-          child: const Icon(Icons.check_rounded, color: Colors.white, size: 44),
+          child: const Icon(
+            Icons.check_circle_rounded,
+            color: AppTheme.accentViolet,
+            size: 80,
+          ),
         ),
-        const SizedBox(height: 28),
+        const SizedBox(height: 32),
         const Text(
-          'Şifreniz Sıfırlandı!',
-          style: TextStyle(
-            fontSize: 26,
-            fontWeight: FontWeight.w800,
-            color: AppTheme.textPrimary,
-          ),
+          'Başarılı!',
+          style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: AppTheme.textPrimary),
         ),
         const SizedBox(height: 12),
         const Text(
-          'Yeni şifrenizle giriş yapabilirsiniz.',
+          'Şifreniz başarıyla güncellendi.',
           textAlign: TextAlign.center,
-          style: TextStyle(color: AppTheme.textSecondary, fontSize: 15),
+          style: TextStyle(color: AppTheme.textSecondary, fontSize: 16),
         ),
-        const SizedBox(height: 36),
-        SizedBox(
-          width: double.infinity,
-          height: 52,
-          child: ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.accentViolet,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        const SizedBox(height: 48),
+        GestureDetector(
+          onTap: () => Navigator.pop(context),
+          child: Container(
+            height: 54,
+            decoration: BoxDecoration(
+              gradient: AppTheme.primaryGradient,
+              borderRadius: BorderRadius.circular(14),
             ),
-            child: const Text(
-              'Giriş Ekranına Dön',
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white),
+            child: const Center(
+              child: Text(
+                'Giriş Yap',
+                style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700),
+              ),
             ),
           ),
         ),
@@ -162,29 +198,22 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
     );
   }
 
-  Widget _buildFormView() {
+  Widget _buildForm() {
     return Form(
       key: _formKey,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // ── İkon ─────────────────────────────────
-          Center(
-            child: Container(
-              width: 70,
-              height: 70,
-              decoration: BoxDecoration(
-                gradient: AppTheme.primaryGradient,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppTheme.accentViolet.withValues(alpha: 0.4),
-                    blurRadius: 20,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-              ),
-              child: const Icon(Icons.lock_reset_rounded, size: 36, color: Colors.white),
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppTheme.surfaceDark,
+              border: Border.all(color: AppTheme.dividerColor, width: 1.5),
+            ),
+            child: const Icon(
+              Icons.lock_reset_rounded,
+              color: AppTheme.accentViolet,
+              size: 48,
             ),
           ),
           const SizedBox(height: 24),
@@ -195,14 +224,17 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
             style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: AppTheme.textPrimary),
           ),
           const SizedBox(height: 8),
-          const Text(
-            'E-posta adresinizi ve yeni şifrenizi girin.',
+          Text(
+            _currentStep == 1 
+                ? 'E-posta adresinize bir sıfırlama kodu göndereceğiz.'
+                : _currentStep == 2
+                    ? 'E-postanıza gelen 6 haneli kodu girin.'
+                    : 'Yeni şifrenizi belirleyin.',
             textAlign: TextAlign.center,
-            style: TextStyle(color: AppTheme.textSecondary, fontSize: 14),
+            style: const TextStyle(color: AppTheme.textSecondary, fontSize: 14),
           ),
           const SizedBox(height: 36),
 
-          // ── Hata kutusu ──────────────────────────
           if (_errorMessage != null) ...[
             Container(
               padding: const EdgeInsets.all(14),
@@ -227,96 +259,106 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
             ),
           ],
 
-          // ── E-posta ──────────────────────────────
-          _buildTextField(
-            controller: _emailController,
-            hintText: 'E-posta Adresi',
-            icon: Icons.email_outlined,
-            keyboardType: TextInputType.emailAddress,
-            validator: (v) {
-              if (v == null || v.isEmpty) return 'Lütfen e-posta adresinizi girin.';
-              if (!v.contains('@')) return 'Geçerli bir e-posta adresi girin.';
-              return null;
-            },
-          ),
-          const SizedBox(height: 16),
-
-          // ── Yeni Şifre ───────────────────────────
-          _buildTextField(
-            controller: _newPasswordController,
-            hintText: 'Yeni Şifre',
-            icon: Icons.lock_outline_rounded,
-            isPassword: true,
-            isVisible: _isNewPasswordVisible,
-            onToggleVisibility: () => setState(() => _isNewPasswordVisible = !_isNewPasswordVisible),
-            validator: (v) {
-              if (v == null || v.isEmpty) return 'Yeni şifrenizi girin.';
-              if (v.length < 6) return 'Şifre en az 6 karakter olmalıdır.';
-              return null;
-            },
-          ),
-          const SizedBox(height: 16),
-
-          // ── Şifre Tekrar ─────────────────────────
-          _buildTextField(
-            controller: _confirmPasswordController,
-            hintText: 'Şifreyi Tekrar Girin',
-            icon: Icons.lock_outline_rounded,
-            isPassword: true,
-            isVisible: _isConfirmPasswordVisible,
-            onToggleVisibility: () => setState(() => _isConfirmPasswordVisible = !_isConfirmPasswordVisible),
-            validator: (v) {
-              if (v == null || v.isEmpty) return 'Şifrenizi tekrar girin.';
-              if (v != _newPasswordController.text) return 'Şifreler eşleşmiyor.';
-              return null;
-            },
-          ),
-          const SizedBox(height: 28),
-
-          // ── Gönder Butonu ─────────────────────────
-          GestureDetector(
-            onTap: _isLoading ? null : _onSubmit,
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              height: 54,
-              decoration: BoxDecoration(
-                gradient: _isLoading ? null : AppTheme.primaryGradient,
-                color: _isLoading ? AppTheme.surfaceDark : null,
-                borderRadius: BorderRadius.circular(14),
-                boxShadow: _isLoading
-                    ? []
-                    : [
-                        BoxShadow(
-                          color: AppTheme.accentViolet.withValues(alpha: 0.4),
-                          blurRadius: 16,
-                          offset: const Offset(0, 6),
-                        ),
-                      ],
-              ),
-              child: Center(
-                child: _isLoading
-                    ? const SizedBox(
-                        width: 22,
-                        height: 22,
-                        child: CircularProgressIndicator(
-                          color: AppTheme.accentViolet,
-                          strokeWidth: 2.5,
-                        ),
-                      )
-                    : const Text(
-                        'Şifremi Sıfırla',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-              ),
+          if (_currentStep == 1) ...[
+            _buildTextField(
+              controller: _emailController,
+              hintText: 'E-posta Adresi',
+              icon: Icons.email_outlined,
+              keyboardType: TextInputType.emailAddress,
+              validator: (v) {
+                if (v == null || v.isEmpty) return 'Lütfen e-posta adresinizi girin.';
+                if (!v.contains('@')) return 'Geçerli bir e-posta adresi girin.';
+                return null;
+              },
             ),
-          ),
+            const SizedBox(height: 28),
+            _buildButton('Kodu Gönder', _onRequestCode),
+          ] else if (_currentStep == 2) ...[
+            _buildTextField(
+              controller: _codeController,
+              hintText: '6 Haneli Kod',
+              icon: Icons.lock_clock_outlined,
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: 28),
+            _buildButton('Kodu Doğrula', _onVerifyCode),
+          ] else if (_currentStep == 3) ...[
+            _buildTextField(
+              controller: _newPasswordController,
+              hintText: 'Yeni Şifre',
+              icon: Icons.lock_outline_rounded,
+              isPassword: true,
+              isVisible: _isNewPasswordVisible,
+              onToggleVisibility: () => setState(() => _isNewPasswordVisible = !_isNewPasswordVisible),
+              validator: (v) {
+                if (v == null || v.isEmpty) return 'Yeni şifrenizi girin.';
+                if (v.length < 6) return 'Şifre en az 6 karakter olmalıdır.';
+                return null;
+              },
+            ),
+            const SizedBox(height: 16),
+            _buildTextField(
+              controller: _confirmPasswordController,
+              hintText: 'Şifreyi Tekrar Girin',
+              icon: Icons.lock_outline_rounded,
+              isPassword: true,
+              isVisible: _isConfirmPasswordVisible,
+              onToggleVisibility: () => setState(() => _isConfirmPasswordVisible = !_isConfirmPasswordVisible),
+              validator: (v) {
+                if (v == null || v.isEmpty) return 'Şifrenizi tekrar girin.';
+                if (v != _newPasswordController.text) return 'Şifreler eşleşmiyor.';
+                return null;
+              },
+            ),
+            const SizedBox(height: 28),
+            _buildButton('Şifreyi Yenile', _onSubmitNewPassword),
+          ],
           const SizedBox(height: 20),
         ],
+      ),
+    );
+  }
+
+  Widget _buildButton(String text, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: _isLoading ? null : onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        height: 54,
+        decoration: BoxDecoration(
+          gradient: _isLoading ? null : AppTheme.primaryGradient,
+          color: _isLoading ? AppTheme.surfaceDark : null,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: _isLoading
+              ? []
+              : [
+                  BoxShadow(
+                    color: AppTheme.accentViolet.withValues(alpha: 0.4),
+                    blurRadius: 16,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+        ),
+        child: Center(
+          child: _isLoading
+              ? const SizedBox(
+                  width: 22,
+                  height: 22,
+                  child: CircularProgressIndicator(
+                    color: AppTheme.accentViolet,
+                    strokeWidth: 2.5,
+                  ),
+                )
+              : Text(
+                  text,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+        ),
       ),
     );
   }

@@ -4,7 +4,7 @@ Python 3.9 uyumlu (Optional kullanımı).
 """
 from __future__ import annotations
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, EmailStr
 from typing import Literal, Optional, List, Dict
 
 
@@ -14,13 +14,13 @@ from typing import Literal, Optional, List, Dict
 
 class UserRegisterRequest(BaseModel):
     """Kayıt isteği."""
-    email: str
+    email: EmailStr
     password: str
 
 
 class UserLoginRequest(BaseModel):
     """Giriş isteği."""
-    email: str
+    email: EmailStr
     password: str
 
 
@@ -32,8 +32,19 @@ class AuthResponse(BaseModel):
 
 class PasswordResetRequest(BaseModel):
     """Şifre sıfırlama isteği."""
-    email: str
+    email: EmailStr
     new_password: str
+
+
+class PasswordResetCodeRequest(BaseModel):
+    """Şifre sıfırlama kodu talep isteği."""
+    email: EmailStr
+
+
+class PasswordResetVerifyRequest(BaseModel):
+    """Şifre sıfırlama kodu doğrulama isteği."""
+    email: EmailStr
+    code: str
 
 
 class ProfileUpdateRequest(BaseModel):

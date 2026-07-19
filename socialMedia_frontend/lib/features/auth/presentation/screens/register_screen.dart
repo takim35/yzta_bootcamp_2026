@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/localization/locale_provider.dart';
-import '../../../../core/localization/app_strings.dart';
 import '../../../../services/api_service.dart';
 import '../../../home/home_screen.dart';
 import '../providers/auth_provider.dart';
@@ -12,17 +11,6 @@ class RegisterScreen extends ConsumerStatefulWidget {
 
   @override
   ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
-}
-
-class _ProfileHeaderDivider extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 1,
-      height: 40,
-      color: AppTheme.dividerColor,
-    );
-  }
 }
 
 class _RegisterScreenState extends ConsumerState<RegisterScreen> {

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../../../features/feed/domain/models/post_model.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../features/auth/presentation/providers/auth_provider.dart';
 import 'like_button.dart';
 
 class PostCard extends ConsumerWidget {
@@ -35,25 +36,59 @@ class PostCard extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // ─── Header: Avatar + Username + Time ─────────────────
-          _buildHeader(context),
-          // ─── Post Image ───────────────────────────────────────
-          _buildImage(),
-          // ─── Actions & Caption ────────────────────────────────
+          _buildHeader(context, ref),
+          // ─── Post Image ───────────────────────────────────────          // 📸 Post Image
+          _buildImage(context),
+          // ✨ Actions & Caption ────────────────────────────────
           _buildFooter(context),
         ],
       ),
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
-    return InkWell(
-      onTap: () => onUserTap?.call(post.userId),
-      child: Padding(
-        padding: const EdgeInsets.all(AppTheme.spacingM),
-        child: Row(
-          children: [
-            // Avatar
-            Container(
+  Widget _buildHeader(BuildContext context, WidgetRef ref) {
+    final currentUserId = ref.read(authProvider).currentUserId;
+    final isMine = post.userId == currentUserId;
+
+    return Padding(
+      padding: const EdgeInsets.all(AppTheme.spacingM),
+      child: Row(
+        children: [
+          // Avatar
+          GestureDetector(
+            onTap: () {
+              if (post.avatarUrl.isNotEmpty) {
+                showDialog(
+                  context: context,
+                  builder: (_) => Dialog(
+                    backgroundColor: Colors.transparent,
+                    insetPadding: const EdgeInsets.all(16),
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        InteractiveViewer(
+                          clipBehavior: Clip.none,
+                          child: CachedNetworkImage(
+                            imageUrl: post.avatarUrl,
+                            fit: BoxFit.contain,
+                            placeholder: (context, url) => const CircularProgressIndicator(color: AppTheme.accentViolet),
+                          ),
+                        ),
+                        Positioned(
+                          top: 10,
+                          right: 10,
+                          child: IconButton(
+                            icon: const Icon(Icons.close, color: Colors.white, size: 30),
+                            onPressed: () => Navigator.pop(context),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
+            },
+            child: Container(
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: AppTheme.primaryGradient,
@@ -88,9 +123,13 @@ class PostCard extends ConsumerWidget {
                 ),
               ),
             ),
-            const SizedBox(width: AppTheme.spacingM),
-            // Username + Time
-            Expanded(
+          ),
+          const SizedBox(width: AppTheme.spacingM),
+          // Username + Time
+          Expanded(
+            child: GestureDetector(
+              onTap: () => onUserTap?.call(post.userId),
+              behavior: HitTestBehavior.opaque,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -115,6 +154,7 @@ class PostCard extends ConsumerWidget {
                 ],
               ),
             ),
+          ),
             // More options
             IconButton(
               icon: const Icon(
@@ -122,20 +162,133 @@ class PostCard extends ConsumerWidget {
                 color: AppTheme.textMuted,
                 size: 20,
               ),
-              onPressed: () {},
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  backgroundColor: AppTheme.surfaceDark,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                  ),
+                  builder: (context) => SafeArea(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const SizedBox(height: 8),
+                        Container(
+                          width: 40,
+                          height: 4,
+                          decoration: BoxDecoration(
+                            color: AppTheme.dividerColor,
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        if (isMine) ...[
+                          ListTile(
+                            leading: const Icon(Icons.edit_rounded, color: AppTheme.textPrimary),
+                            title: const Text('Düzenle', style: TextStyle(color: AppTheme.textPrimary)),
+                            onTap: () {
+                              Navigator.pop(context);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Düzenleme özelliği yakında!'),
+                                  backgroundColor: AppTheme.surfaceDark,
+                                ),
+                              );
+                            },
+                          ),
+                          ListTile(
+                            leading: const Icon(Icons.delete_outline_rounded, color: AppTheme.errorColor),
+                            title: const Text('Sil', style: TextStyle(color: AppTheme.errorColor)),
+                            onTap: () {
+                              Navigator.pop(context);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Silme özelliği yakında!'),
+                                  backgroundColor: AppTheme.surfaceDark,
+                                ),
+                              );
+                            },
+                          ),
+                        ] else ...[
+                          ListTile(
+                            leading: const Icon(Icons.favorite, color: Colors.pinkAccent),
+                            title: const Text('İlgileniyorum', style: TextStyle(color: AppTheme.textPrimary)),
+                            onTap: () {
+                              Navigator.pop(context);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('İlgi alanlarınıza eklendi! ✨'),
+                                  backgroundColor: Colors.pinkAccent,
+                                ),
+                              );
+                            },
+                          ),
+                          ListTile(
+                            leading: const Icon(Icons.visibility_off_outlined, color: AppTheme.textMuted),
+                            title: const Text('İlgilenmiyorum', style: TextStyle(color: AppTheme.textPrimary)),
+                            onTap: () {
+                              Navigator.pop(context);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Bu tarz gönderiler daha az gösterilecek.'),
+                                  backgroundColor: AppTheme.surfaceDark,
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                        const SizedBox(height: 16),
+                      ],
+                    ),
+                  ),
+                );
+              },
               tooltip: 'Daha fazla',
             ),
           ],
         ),
-      ),
     );
   }
 
-  Widget _buildImage() {
-    return AspectRatio(
-      aspectRatio: 4 / 5,
-      child: post.imageUrl.startsWith('http')
-          ? CachedNetworkImage(
+  Widget _buildImage(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (_) => Dialog(
+            backgroundColor: Colors.transparent,
+            insetPadding: const EdgeInsets.all(16),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                InteractiveViewer(
+                  clipBehavior: Clip.none,
+                  child: post.imageUrl.startsWith('http')
+                      ? CachedNetworkImage(
+                          imageUrl: post.imageUrl,
+                          fit: BoxFit.contain,
+                          placeholder: (context, url) => const CircularProgressIndicator(color: AppTheme.accentViolet),
+                        )
+                      : Image.file(File(post.imageUrl), fit: BoxFit.contain),
+                ),
+                Positioned(
+                  top: 10,
+                  right: 10,
+                  child: IconButton(
+                    icon: const Icon(Icons.close, color: Colors.white, size: 30),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+      child: AspectRatio(
+        aspectRatio: 4 / 5,
+        child: post.imageUrl.startsWith('http')
+            ? CachedNetworkImage(
               imageUrl: post.imageUrl,
               fit: BoxFit.cover,
               placeholder: (context, url) => Container(
@@ -194,6 +347,7 @@ class PostCard extends ConsumerWidget {
                 ),
               ),
             ),
+      ),
     );
   }
 
@@ -241,14 +395,14 @@ class PostCard extends ConsumerWidget {
               ),
               IconButton(
                 icon: Icon(
-                  post.isSaved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
-                  color: post.isSaved ? AppTheme.accentViolet : AppTheme.textPrimary,
-                  size: 26,
+                  post.isSaved ? Icons.star_rounded : Icons.star_border_rounded,
+                  color: post.isSaved ? Colors.amber : AppTheme.textPrimary,
+                  size: 28,
                 ),
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
                 onPressed: () => onSave?.call(post.postId),
-                tooltip: post.isSaved ? 'Kaydedilenlerden Çıkar' : 'Kaydet',
+                tooltip: post.isSaved ? 'Podyumdan Çıkar' : 'Podyuma Ekle',
               ),
             ],
           ),

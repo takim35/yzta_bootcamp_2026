@@ -16,7 +16,6 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final s = ref.watch(stringsProvider);
-    final size = MediaQuery.of(context).size;
 
     return Scaffold(
       backgroundColor: AppTheme.primaryDark,

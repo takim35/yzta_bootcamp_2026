@@ -7,7 +7,6 @@ import '../../../../features/feed/domain/models/post_model.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/localization/locale_provider.dart';
 import '../../../../core/localization/app_strings.dart';
-import '../../../../features/feed/presentation/widgets/empty_state.dart';
 import '../../../../features/feed/presentation/widgets/shimmer_loading.dart';
 import '../../../../core/widgets/custom_shimmer.dart';
 import 'follow_list_screen.dart';
@@ -199,16 +198,44 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       shape: BoxShape.circle,
                       color: AppTheme.surfaceDark,
                     ),
-                    child: CircleAvatar(
-                      radius: 44,
-                      backgroundColor: AppTheme.cardDark,
-                      backgroundImage: user.avatarUrl.isNotEmpty
-                          ? NetworkImage(user.avatarUrl)
-                          : null,
-                      child: user.avatarUrl.isEmpty
-                          ? const Icon(Icons.person,
-                              size: 44, color: AppTheme.textSecondary)
-                          : null,
+                    child: GestureDetector(
+                      onTap: user.avatarUrl.isNotEmpty ? () {
+                        showDialog(
+                          context: context,
+                          builder: (_) => Dialog(
+                            backgroundColor: Colors.transparent,
+                            insetPadding: const EdgeInsets.all(16),
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                InteractiveViewer(
+                                  clipBehavior: Clip.none,
+                                  child: Image.network(user.avatarUrl),
+                                ),
+                                Positioned(
+                                  top: 10,
+                                  right: 10,
+                                  child: IconButton(
+                                    icon: const Icon(Icons.close, color: Colors.white, size: 30),
+                                    onPressed: () => Navigator.pop(context),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      } : null,
+                      child: CircleAvatar(
+                        radius: 44,
+                        backgroundColor: AppTheme.cardDark,
+                        backgroundImage: user.avatarUrl.isNotEmpty
+                            ? NetworkImage(user.avatarUrl)
+                            : null,
+                        child: user.avatarUrl.isEmpty
+                            ? const Icon(Icons.person,
+                                size: 44, color: AppTheme.textSecondary)
+                            : null,
+                      ),
                     ),
                   ),
                 ),
@@ -224,22 +251,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   ),
                 ),
                 const SizedBox(height: 4),
-                // Email
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.email_outlined,
-                        size: 14, color: AppTheme.textMuted),
-                    const SizedBox(width: 4),
-                    Text(
-                      user.email,
-                      style: const TextStyle(
-                        color: AppTheme.textSecondary,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ],
-                ),
                 if (user.bio.isNotEmpty) ...[
                   const SizedBox(height: AppTheme.spacingM),
                   Text(
@@ -416,17 +427,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: post.imageUrl.startsWith('http') 
-                        ? Image.network(
-                            post.imageUrl,
-                            fit: BoxFit.contain,
-                          )
-                        : Image.file(
-                            File(post.imageUrl),
-                            fit: BoxFit.contain,
-                          ),
+                    Flexible(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: post.imageUrl.startsWith('http') 
+                          ? Image.network(
+                              post.imageUrl,
+                              fit: BoxFit.contain,
+                            )
+                          : Image.file(
+                              File(post.imageUrl),
+                              fit: BoxFit.contain,
+                            ),
+                      ),
                     ),
                     if (provider.isOwnProfile) ...[
                       const SizedBox(height: 16),
@@ -517,62 +530,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 }
 
-// ── Language Option Widget ─────────────────────────────────────
-class _LangOption extends StatelessWidget {
-  final String flag;
-  final String label;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  const _LangOption({
-    required this.flag,
-    required this.label,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? AppTheme.accentViolet.withValues(alpha: 0.15)
-              : AppTheme.surfaceDark,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected ? AppTheme.accentViolet : AppTheme.dividerColor,
-            width: isSelected ? 1.5 : 1,
-          ),
-        ),
-        child: Row(
-          children: [
-            Text(flag, style: const TextStyle(fontSize: 22)),
-            const SizedBox(width: 12),
-            Text(
-              label,
-              style: TextStyle(
-                color: isSelected
-                    ? AppTheme.accentViolet
-                    : AppTheme.textPrimary,
-                fontSize: 16,
-                fontWeight:
-                    isSelected ? FontWeight.w700 : FontWeight.w500,
-              ),
-            ),
-            const Spacer(),
-            if (isSelected)
-              const Icon(Icons.check_circle_rounded,
-                  color: AppTheme.accentViolet, size: 20),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 // ── Tab Bar Delegate ───────────────────────────────────────────
 class _TabBarDelegate extends SliverPersistentHeaderDelegate {

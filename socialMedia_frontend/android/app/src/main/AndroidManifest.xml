@@ -13,7 +13,7 @@
     <!-- İnternet -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
->>>>>>> origin/ahmet_16_07_2026
+
     <application
         android:label="dijital_gardrop_social"
         android:name="${applicationName}"

@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../services/api_service.dart';
 import '../providers/auth_provider.dart';
-import 'package:qr_flutter/qr_flutter.dart'; // We can use qr_flutter if we add it, otherwise we just show the secret for now.
 
 class TwoFactorSetupScreen extends ConsumerStatefulWidget {
   const TwoFactorSetupScreen({super.key});
@@ -19,7 +18,6 @@ class _TwoFactorSetupScreenState extends ConsumerState<TwoFactorSetupScreen> {
   bool _isVerifying = false;
   String? _errorMessage;
   String? _secret;
-  String? _qrUri;
 
   @override
   void initState() {
@@ -35,7 +33,6 @@ class _TwoFactorSetupScreenState extends ConsumerState<TwoFactorSetupScreen> {
       if (mounted) {
         setState(() {
           _secret = data['secret'];
-          _qrUri = data['qr_uri'];
           _isLoading = false;
         });
       }

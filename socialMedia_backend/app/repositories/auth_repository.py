@@ -2,12 +2,21 @@ import sqlite3
 import hashlib
 import uuid
 import pyotp
+import bcrypt
 from fastapi import HTTPException
 from typing import Optional
 
 def hash_password(password: str) -> str:
-    """Şifreyi SHA-256 ile hashler."""
-    return hashlib.sha256(password.encode('utf-8')).hexdigest()
+    """Şifreyi bcrypt ile hashler."""
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+def verify_password(password: str, hashed: str) -> bool:
+    """Şifreyi bcrypt hash ile doğrular. Eski SHA-256 hashlerle geriye uyumlu."""
+    # Eski SHA-256 hashleri destekle (64 karakter hex)
+    if len(hashed) == 64 and not hashed.startswith('$2'):
+        return hashlib.sha256(password.encode('utf-8')).hexdigest() == hashed
+    # Yeni bcrypt hashleri
+    return bcrypt.checkpw(password.encode('utf-8'), hashed.encode('utf-8'))
 
 class AuthRepository:
     def __init__(self, db: sqlite3.Connection):
@@ -52,7 +61,7 @@ class AuthRepository:
         if not user:
             raise HTTPException(status_code=404, detail="Hesabınız bulunamadı, lütfen kayıt olun.")
 
-        if user["password_hash"] != hash_password(password):
+        if not verify_password(password, user["password_hash"]):
             raise HTTPException(status_code=401, detail="Şifre hatalı, lütfen tekrar deneyin.")
 
         return user["user_id"]
@@ -66,6 +75,15 @@ class AuthRepository:
         new_hash = hash_password(new_password)
         self.db.execute("UPDATE users SET password_hash = ? WHERE email = ?", (new_hash, email))
         self.db.commit()
+
+    def get_user_by_email(self, email: str) -> Optional[dict]:
+        """E-posta adresine göre kullanıcıyı bulur. Bulamazsa None döner."""
+        user = self.db.execute(
+            "SELECT user_id, username, email FROM users WHERE email = ?", (email,)
+        ).fetchone()
+        if user:
+            return {"user_id": user["user_id"], "username": user["username"], "email": user["email"]}
+        return None
 
     # ─── 2FA — TOTP ────────────────────────────────────────────
 

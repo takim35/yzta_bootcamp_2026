@@ -18,6 +18,7 @@ from pathlib import Path
 from fastapi import APIRouter, HTTPException, UploadFile, File
 from typing import Optional
 
+from pydantic import BaseModel
 from app.domain.schemas import CaptionRequest, MessageResponse
 
 router = APIRouter()

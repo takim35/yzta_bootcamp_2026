@@ -4,6 +4,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/localization/locale_provider.dart';
 import '../../../../services/api_service.dart';
 import '../../../../features/auth/presentation/providers/auth_provider.dart';
+import '../../../profile/presentation/screens/profile_screen.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class NotificationsScreen extends ConsumerStatefulWidget {
@@ -29,10 +30,10 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
 
     setState(() => _isLoading = true);
     try {
-      final data = await ApiService().getNotifications(userId: userId);
+      final data = await ApiService().getNotifications(userId);
       if (mounted) {
         setState(() {
-          _notifications = data;
+          _notifications = List<Map<String, dynamic>>.from(data);
           _isLoading = false;
         });
       }
@@ -47,7 +48,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     final userId = ref.read(authProvider).currentUserId;
     if (userId == null) return;
     try {
-      await ApiService().markAllNotificationsRead(userId: userId);
+      await ApiService().markAllNotificationsRead(userId);
       await _loadNotifications();
     } catch (_) {}
   }
@@ -148,7 +149,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                       final postImageUrl = notif['post_image_url'] as String?;
 
                       return Container(
-                        color: isRead ? Colors.transparent : AppTheme.accentViolet.withOpacity(0.05),
+                        color: isRead ? Colors.transparent : AppTheme.accentViolet.withValues(alpha: 0.05),
                         child: ListTile(
                           leading: Stack(
                             clipBehavior: Clip.none,
@@ -168,7 +169,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                                 right: -2,
                                 child: Container(
                                   padding: const EdgeInsets.all(2),
-                                  decoration: BoxDecoration(
+                                  decoration: const BoxDecoration(
                                     color: AppTheme.primaryDark,
                                     shape: BoxShape.circle,
                                   ),
@@ -211,6 +212,27 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                                 await ApiService().markNotificationRead(notif['notification_id'] as String);
                                 await _loadNotifications();
                               } catch (_) {}
+                            }
+                            
+                            if (type == 'follow') {
+                              if (!context.mounted) return;
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => ProfileScreen(userId: notif['actor_id'] as String),
+                                ),
+                              );
+                            } else if (type == 'like' || type == 'comment') {
+                              final currentUserId = ref.read(authProvider).currentUserId;
+                              if (currentUserId != null) {
+                                if (!context.mounted) return;
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => ProfileScreen(userId: currentUserId),
+                                  ),
+                                );
+                              }
                             }
                           },
                         ),

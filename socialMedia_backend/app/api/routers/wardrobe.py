@@ -52,6 +52,35 @@ def kiyafetleri_listele(user_id: str, db: sqlite3.Connection = Depends(get_db)):
     repo = ItemRepository(db)
     return repo.kiyafetleri_getir(user_id)
 
+@router.put("/items/{item_id}")
+def kiyafet_guncelle(item_id: int, istek: KiyafetEkleIstek, db: sqlite3.Connection = Depends(get_db)):
+    """Mevcut bir kıyafeti günceller."""
+    repo = ItemRepository(db)
+    veri = istek.model_dump()
+    try:
+        updated = repo.kiyafet_guncelle(kiyafet_id=item_id, **veri)
+        if not updated:
+            raise HTTPException(status_code=404, detail="Kıyafet bulunamadı.")
+        return {"mesaj": "Kıyafet güncellendi", "id": item_id}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Kıyafet güncellenirken hata: {str(e)}")
+
+@router.delete("/items/{item_id}")
+def kiyafet_sil(item_id: int, db: sqlite3.Connection = Depends(get_db)):
+    """Bir kıyafeti siler."""
+    repo = ItemRepository(db)
+    try:
+        deleted = repo.kiyafet_sil(kiyafet_id=item_id)
+        if not deleted:
+            raise HTTPException(status_code=404, detail="Kıyafet bulunamadı.")
+        return {"mesaj": "Kıyafet silindi", "id": item_id}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Kıyafet silinirken hata: {str(e)}")
+
 @router.post("/chat")
 def chat(istek: ChatIstek, db: sqlite3.Connection = Depends(get_db)):
     repo = ItemRepository(db)
