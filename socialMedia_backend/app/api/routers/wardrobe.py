@@ -39,6 +39,12 @@ class KombinOnerIstek(BaseModel):
     hava_durumu: str
     stil_tercihi: Optional[str] = ""
 
+class KombinOlusturIstek(BaseModel):
+    user_id: str
+    isim: str
+    kiyafet_idleri: List[int]
+    aciklama: Optional[str] = None
+
 # --- Endpoints ---
 @router.post("/items")
 def kiyafet_ekle(user_id: str, istek: KiyafetEkleIstek, db: sqlite3.Connection = Depends(get_db)):
@@ -143,3 +149,20 @@ def kombin_oner(istek: KombinOnerIstek, db: sqlite3.Connection = Depends(get_db)
         "secilen_kiyafetler": secilen_kiyafetler_detay,
         "aciklama": sonuc["aciklama"],
     }
+
+@router.post("/outfit/create")
+def kombin_olustur(istek: KombinOlusturIstek, db: sqlite3.Connection = Depends(get_db)):
+    """Göstermelik kombin oluşturma (CF-11)"""
+    import time
+    mock_outfit_id = int(time.time())
+    
+    # Aslında burada kombin_onerileri veya kombinler tablona insert yapılırdı,
+    # fakat CF-11 'göstermelik' istendiği için sadece mock bir id ve başarı mesajı dönüyoruz.
+    
+    return {
+        "mesaj": "Kombin başarıyla oluşturuldu",
+        "outfit_id": mock_outfit_id,
+        "isim": istek.isim,
+        "kiyafet_sayisi": len(istek.kiyafet_idleri)
+    }
+

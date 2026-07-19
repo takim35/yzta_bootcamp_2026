@@ -7,6 +7,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/localization/locale_provider.dart';
 import 'add_item_screen.dart';
 import 'edit_item_screen.dart';
+import 'outfit_builder_screen.dart';
 
 class WardrobeScreen extends ConsumerStatefulWidget {
   const WardrobeScreen({super.key});
@@ -50,6 +51,16 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> {
         backgroundColor: AppTheme.primaryDark,
         elevation: 0,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.auto_awesome, color: AppTheme.accentPink, size: 26),
+            tooltip: s.isTr ? 'Kombin Oluştur' : 'Outfit Builder',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const OutfitBuilderScreen()),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.add_rounded, color: AppTheme.accentViolet, size: 28),
             tooltip: s.isTr ? 'Kıyafet Ekle' : 'Add Clothing',

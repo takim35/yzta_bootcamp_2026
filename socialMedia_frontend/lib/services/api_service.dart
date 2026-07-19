@@ -519,6 +519,16 @@ class ApiService {
     return await _post('/captions/analyze-item', {'image_b64': base64Image});
   }
 
+  Future<Map<String, dynamic>> createOutfit(String userId, String name, List<int> itemIds, {String? description}) async {
+    final body = {
+      'user_id': userId,
+      'isim': name,
+      'kiyafet_idleri': itemIds,
+    };
+    if (description != null) body['aciklama'] = description;
+    return await _post('/wardrobe/outfit/create', body);
+  }
+
   Future<dynamic> updateCloth(int itemId, Map<String, dynamic> itemData) async {
     return await _put('/wardrobe/items/$itemId', itemData);
   }
