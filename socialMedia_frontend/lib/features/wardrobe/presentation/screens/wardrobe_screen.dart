@@ -180,8 +180,15 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> {
                             itemCount: clothes.length,
                             itemBuilder: (context, index) {
                               final cloth = clothes[index] as Map<String, dynamic>;
-                              final imageUrl = cloth['foto_url']?.toString() ?? cloth['image_url']?.toString() ?? '';
+                              final rawImageUrl = cloth['foto_url']?.toString() ?? cloth['image_url']?.toString() ?? '';
+                              final imageUrl = ApiService.fixImageUrl(rawImageUrl);
                               
+                              final parts = <String>[];
+                              if (cloth['renk'] != null && cloth['renk'].toString().isNotEmpty) parts.add(cloth['renk'].toString());
+                              if (cloth['tur'] != null && cloth['tur'].toString().isNotEmpty) parts.add(cloth['tur'].toString());
+                              if (cloth['beden'] != null && cloth['beden'].toString().isNotEmpty) parts.add(cloth['beden'].toString());
+                              final label = parts.join(', ');
+
                               return GestureDetector(
                                 onTap: () {
                                   Navigator.push(
@@ -200,13 +207,48 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> {
                                     border: Border.all(color: AppTheme.dividerColor),
                                   ),
                                   clipBehavior: Clip.antiAlias,
-                                  child: imageUrl.isNotEmpty
-                                      ? Image.network(
-                                          imageUrl,
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (_, __, ___) => const _EmptyClothIcon(),
-                                        )
-                                      : const _EmptyClothIcon(),
+                                  child: Stack(
+                                    fit: StackFit.expand,
+                                    children: [
+                                      imageUrl.isNotEmpty
+                                          ? Image.network(
+                                              imageUrl,
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (_, __, ___) => const _EmptyClothIcon(),
+                                            )
+                                          : const _EmptyClothIcon(),
+                                      if (label.isNotEmpty)
+                                        Positioned(
+                                          bottom: 0,
+                                          left: 0,
+                                          right: 0,
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                                            decoration: BoxDecoration(
+                                              gradient: LinearGradient(
+                                                begin: Alignment.bottomCenter,
+                                                end: Alignment.topCenter,
+                                                colors: [
+                                                  Colors.black.withOpacity(0.8),
+                                                  Colors.transparent,
+                                                ],
+                                              ),
+                                            ),
+                                            child: Text(
+                                              label,
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w600,
+                                                shadows: [Shadow(color: Colors.black54, blurRadius: 2)],
+                                              ),
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
                                 ),
                               );
                             },
