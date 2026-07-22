@@ -120,7 +120,7 @@ class _NotificationsBottomSheetState extends State<NotificationsBottomSheet> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     'Bildirimler 🔔',
                     style: TextStyle(
                       color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
@@ -131,7 +131,7 @@ class _NotificationsBottomSheetState extends State<NotificationsBottomSheet> {
                   if (_notifications.any((n) => n['is_read'] == 0))
                     TextButton(
                       onPressed: _markAllRead,
-                      child: const Text(
+                      child: Text(
                         'Tümünü Okundu Yap',
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.primary,
@@ -153,7 +153,7 @@ class _NotificationsBottomSheetState extends State<NotificationsBottomSheet> {
 
   Widget _buildBody() {
     if (_isLoading) {
-      return const Center(
+      return Center(
         child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary),
       );
     }
@@ -168,7 +168,7 @@ class _NotificationsBottomSheetState extends State<NotificationsBottomSheet> {
     }
 
     if (_notifications.isEmpty) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -233,7 +233,7 @@ class _NotificationsBottomSheetState extends State<NotificationsBottomSheet> {
                   bottom: 0,
                   child: Container(
                     padding: const EdgeInsets.all(2),
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.surface,
                       shape: BoxShape.circle,
                     ),
@@ -255,7 +255,7 @@ class _NotificationsBottomSheetState extends State<NotificationsBottomSheet> {
                 : Container(
                     width: 8,
                     height: 8,
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.primary,
                       shape: BoxShape.circle,
                     ),

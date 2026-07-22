@@ -45,7 +45,7 @@ class EmptyState extends ConsumerWidget {
             // ─── Title ────────────────────────────────────────
             Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
@@ -56,7 +56,7 @@ class EmptyState extends ConsumerWidget {
             // ─── Subtitle ─────────────────────────────────────
             Text(
               subtitle,
-              style: const TextStyle(
+              style: TextStyle(
                 color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
                 fontSize: 14,
               ),

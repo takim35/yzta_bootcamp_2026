@@ -124,7 +124,7 @@ class _FollowListBottomSheetState extends ConsumerState<FollowListBottomSheet> w
 
   Widget _buildUserList(List<dynamic> users) {
     if (users.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
           'Kullanıcı bulunamadı.',
           style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey),

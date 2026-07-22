@@ -193,7 +193,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
               padding: const EdgeInsets.all(AppTheme.spacingM),
               child: Text(
                 'Yorumlar (${_comments.isNotEmpty ? _comments.length : widget.initialCommentsCount})',
-                style: const TextStyle(
+                style: TextStyle(
                   color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
@@ -238,7 +238,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 
   Widget _buildBody() {
     if (_isLoading) {
-      return const Center(
+      return Center(
         child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary),
       );
     }
@@ -253,7 +253,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
     }
 
     if (_comments.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
           'Henüz yorum yok. İlk yorumu sen yap!',
           style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
@@ -322,7 +322,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                   children: [
                     TextSpan(
                       text: '${comment.username} ',
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
@@ -330,7 +330,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                     ),
                     TextSpan(
                       text: comment.content,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
                         fontSize: 14,
                       ),
@@ -343,7 +343,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                 children: [
                   Text(
                     comment.timeAgo,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
                       fontSize: 12,
                     ),
@@ -358,7 +358,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                         });
                         _focusNode.requestFocus();
                       },
-                      child: const Text(
+                      child: Text(
                         'Yanıtla',
                         style: TextStyle(
                           color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
@@ -377,7 +377,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
           const SizedBox(width: AppTheme.spacingS),
           GestureDetector(
             onTap: () => _deleteComment(comment.commentId),
-            child: const Icon(
+            child: Icon(
               Icons.delete_outline_rounded,
               color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
               size: 18,

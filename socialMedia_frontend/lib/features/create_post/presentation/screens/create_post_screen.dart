@@ -134,7 +134,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
-      style: const TextStyle(
+      style: TextStyle(
         color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
         fontSize: 18,
         fontWeight: FontWeight.w600,
@@ -171,7 +171,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
               color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
               borderRadius: AppTheme.radiusLarge,
             ),
-            child: const Column(
+            child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
@@ -269,13 +269,13 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
           maxLines: 4,
           maxLength: 500,
           onChanged: (value) => provider.setCaption(value),
-          style: const TextStyle(
+          style: TextStyle(
             color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
             fontSize: 14,
           ),
           decoration: InputDecoration(
             hintText: 'Kombinin hakkında bir şeyler yaz...',
-            counterStyle: const TextStyle(
+            counterStyle: TextStyle(
               color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
               fontSize: 11,
             ),
@@ -352,7 +352,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
               child: GestureDetector(
                 onTap: () => provider
                     .setAiTrainingConsent(!provider.aiTrainingConsent),
-                child: const Text(
+                child: Text(
                   'Bu görsel, modelin gelişmesi için kullanılabilir',
                   style: TextStyle(
                     color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
@@ -373,7 +373,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
       padding: const EdgeInsets.only(bottom: AppTheme.spacingM),
       child: Row(
         children: [
-          const Icon(
+          Icon(
             Icons.error_outline_rounded,
             color: Theme.of(context).colorScheme.error,
             size: 16,
@@ -382,7 +382,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
           Expanded(
             child: Text(
               message,
-              style: const TextStyle(
+              style: TextStyle(
                 color: Theme.of(context).colorScheme.error,
                 fontSize: 13,
               ),

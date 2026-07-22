@@ -285,7 +285,7 @@ class PostCard extends ConsumerWidget {
               fit: BoxFit.cover,
               placeholder: (context, url) => Container(
                 color: Theme.of(context).colorScheme.surface,
-                child: const Center(
+                child: Center(
                   child: CircularProgressIndicator(
                     color: Theme.of(context).colorScheme.primary,
                     strokeWidth: 2,
@@ -294,7 +294,7 @@ class PostCard extends ConsumerWidget {
               ),
               errorWidget: (context, url, error) => Container(
                 color: Theme.of(context).colorScheme.surface,
-                child: const Column(
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
@@ -319,7 +319,7 @@ class PostCard extends ConsumerWidget {
               fit: BoxFit.cover,
               errorBuilder: (context, error, stackTrace) => Container(
                 color: Theme.of(context).colorScheme.surface,
-                child: const Column(
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
@@ -365,7 +365,7 @@ class PostCard extends ConsumerWidget {
                     onTap: onComment,
                     child: Row(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.chat_bubble_outline_rounded,
                           color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                           size: 24,
@@ -374,7 +374,7 @@ class PostCard extends ConsumerWidget {
                           const SizedBox(width: 4),
                           Text(
                             '${post.commentsCount}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                               fontWeight: FontWeight.w600,
                             ),
@@ -405,7 +405,7 @@ class PostCard extends ConsumerWidget {
                 children: [
                   TextSpan(
                     text: '${post.username} ',
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                       fontWeight: FontWeight.w600,
                       fontSize: 14,
@@ -413,7 +413,7 @@ class PostCard extends ConsumerWidget {
                   ),
                   TextSpan(
                     text: post.caption,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
                       fontSize: 14,
                     ),
@@ -431,7 +431,7 @@ class PostCard extends ConsumerWidget {
               onTap: onComment,
               child: Text(
                 '${post.commentsCount} yorumun tümünü gör',
-                style: const TextStyle(
+                style: TextStyle(
                   color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
                   fontSize: 13,
                 ),

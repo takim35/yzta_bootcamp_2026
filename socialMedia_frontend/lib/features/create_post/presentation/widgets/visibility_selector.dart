@@ -124,7 +124,7 @@ class VisibilitySelector extends ConsumerWidget {
                 .firstWhere((o) => o.value == currentValue)
                 .description,
             key: ValueKey(currentValue),
-            style: const TextStyle(
+            style: TextStyle(
               color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
               fontSize: 12,
             ),

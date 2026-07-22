@@ -136,7 +136,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       bottom: 0,
                       right: 0,
                       child: Container(
-                        decoration: const BoxDecoration(
+                        decoration: BoxDecoration(
                           color: Theme.of(context).colorScheme.primary,
                           shape: BoxShape.circle,
                         ),

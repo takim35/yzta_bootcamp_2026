@@ -98,7 +98,7 @@ class _OutfitCard extends ConsumerWidget {
                         fit: BoxFit.cover,
                         placeholder: (context, url) => Container(
                           color: Theme.of(context).colorScheme.surface,
-                          child: const Center(
+                          child: Center(
                             child: SizedBox(
                               width: 20,
                               height: 20,
@@ -111,7 +111,7 @@ class _OutfitCard extends ConsumerWidget {
                         ),
                         errorWidget: (context, url, error) => Container(
                           color: Theme.of(context).colorScheme.surface,
-                          child: const Icon(
+                          child: Icon(
                             Icons.checkroom_rounded,
                             color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
                             size: 28,
