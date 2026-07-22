@@ -113,34 +113,86 @@ class MoreScreen extends ConsumerWidget {
                 ),
                 child: Column(
                   children: [
-                    _SettingsTile(
-                      title: 'Preferences',
-                      icon: Icons.tune_rounded,
-                      onTap: () {
-                         Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const SettingsScreen()),
-                        );
-                      },
-                    ),
+                    _SettingsTile(title: 'Style Preferences', icon: Icons.palette_rounded, onTap: () {}),
+                    const Divider(height: 1, color: AppTheme.dividerColor),
+                    _SettingsTile(title: 'Location & Timezone', icon: Icons.location_on_rounded, onTap: () {}),
+                    const Divider(height: 1, color: AppTheme.dividerColor),
+                    _SettingsTile(title: 'Social Followings', icon: Icons.group_rounded, onTap: () {}),
+                    const Divider(height: 1, color: AppTheme.dividerColor),
+                    _SettingsTile(title: 'Outfit Schedule', icon: Icons.calendar_today_rounded, onTap: () {}),
+                    const Divider(height: 1, color: AppTheme.dividerColor),
+                    _SettingsTile(title: 'Try-On Photo', icon: Icons.person_rounded, onTap: () {}),
+                    const Divider(height: 1, color: AppTheme.dividerColor),
+                    _SettingsTile(title: 'Language', icon: Icons.language_rounded, onTap: () {}),
+                    const Divider(height: 1, color: AppTheme.dividerColor),
+                    _SettingsTile(title: 'Body Measurements', icon: Icons.straighten_rounded, onTap: () {}),
+                    const Divider(height: 1, color: AppTheme.dividerColor),
+                    _SettingsTile(title: 'Subscription', icon: Icons.credit_card_rounded, onTap: () {}),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              Container(
+                decoration: BoxDecoration(
+                  color: AppTheme.cardDark,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppTheme.dividerColor),
+                ),
+                child: Column(
+                  children: [
+                    _SettingsSwitch(title: 'Haptic Feedback', icon: Icons.vibration_rounded, value: true, onChanged: (v) {}),
+                    const Divider(height: 1, color: AppTheme.dividerColor),
+                    _SettingsAppearance(title: 'Appearance', icon: Icons.brightness_medium_rounded),
+                    const Divider(height: 1, color: AppTheme.dividerColor),
+                    _SettingsServer(title: 'Server', subtitle: 'app.spot.com'),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              Container(
+                decoration: BoxDecoration(
+                  color: AppTheme.cardDark,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppTheme.dividerColor),
+                ),
+                child: _SettingsTile(
+                  title: 'Sign Out',
+                  icon: Icons.logout_rounded,
+                  isCenter: true,
+                  onTap: () {
+                    ref.read(authProvider.notifier).logout();
+                  },
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              Container(
+                decoration: BoxDecoration(
+                  color: AppTheme.cardDark,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppTheme.dividerColor),
+                ),
+                child: Column(
+                  children: [
+                    _SettingsTile(title: 'Terms of Use', icon: Icons.description_rounded, hasExternalIcon: true, onTap: () {}),
+                    const Divider(height: 1, color: AppTheme.dividerColor),
+                    _SettingsTile(title: 'Privacy Policy', icon: Icons.security_rounded, hasExternalIcon: true, onTap: () {}),
                     const Divider(height: 1, color: AppTheme.dividerColor),
                     _SettingsTile(
-                      title: 'Theme',
-                      icon: Icons.dark_mode_rounded,
-                      onTap: () {},
-                    ),
-                    const Divider(height: 1, color: AppTheme.dividerColor),
-                    _SettingsTile(
-                      title: 'Sign Out',
-                      icon: Icons.logout_rounded,
+                      title: 'Delete Account',
+                      icon: Icons.delete_outline_rounded,
                       isDestructive: true,
-                      onTap: () {
-                        ref.read(authProvider.notifier).logout();
-                      },
+                      onTap: () {},
                     ),
                   ],
                 ),
               ),
+              const SizedBox(height: 100), // padding for bottom nav
             ],
           ),
         ),
@@ -154,12 +206,16 @@ class _SettingsTile extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
   final bool isDestructive;
+  final bool isCenter;
+  final bool hasExternalIcon;
 
   const _SettingsTile({
     required this.title,
     required this.icon,
     required this.onTap,
     this.isDestructive = false,
+    this.isCenter = false,
+    this.hasExternalIcon = false,
   });
 
   @override
@@ -169,6 +225,7 @@ class _SettingsTile extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         child: Row(
+          mainAxisAlignment: isCenter ? MainAxisAlignment.center : MainAxisAlignment.start,
           children: [
             Icon(
               icon,
@@ -184,10 +241,190 @@ class _SettingsTile extends StatelessWidget {
                 fontWeight: FontWeight.w500,
               ),
             ),
-            const Spacer(),
-            Icon(Icons.chevron_right_rounded, color: AppTheme.textMuted, size: 20),
+            if (!isCenter) const Spacer(),
+            if (!isCenter)
+              Icon(
+                hasExternalIcon ? Icons.open_in_new_rounded : Icons.chevron_right_rounded,
+                color: AppTheme.textMuted,
+                size: 18,
+              ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _SettingsSwitch extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  const _SettingsSwitch({
+    required this.title,
+    required this.icon,
+    required this.value,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        children: [
+          Icon(icon, size: 20, color: AppTheme.textSecondary),
+          const SizedBox(width: 16),
+          Text(
+            title,
+            style: const TextStyle(
+              color: AppTheme.textPrimary,
+              fontSize: 15,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const Spacer(),
+          Switch(
+            value: value,
+            onChanged: onChanged,
+            activeColor: AppTheme.successColor,
+            activeTrackColor: AppTheme.successColor.withValues(alpha: 0.3),
+            inactiveThumbColor: AppTheme.textMuted,
+            inactiveTrackColor: AppTheme.surfaceDark,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SettingsAppearance extends StatelessWidget {
+  final String title;
+  final IconData icon;
+
+  const _SettingsAppearance({required this.title, required this.icon});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 20, color: AppTheme.textSecondary),
+              const SizedBox(width: 16),
+              Text(
+                title,
+                style: const TextStyle(
+                  color: AppTheme.textPrimary,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(child: _SegmentItem(label: 'System', isSelected: true)),
+              const SizedBox(width: 8),
+              Expanded(child: _SegmentItem(label: 'Light', isSelected: false)),
+              const SizedBox(width: 8),
+              Expanded(child: _SegmentItem(label: 'Dark', isSelected: false)),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SegmentItem extends StatelessWidget {
+  final String label;
+  final bool isSelected;
+
+  const _SegmentItem({required this.label, required this.isSelected});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      decoration: BoxDecoration(
+        color: isSelected ? AppTheme.dividerColor : Colors.transparent,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: isSelected ? Colors.white : AppTheme.dividerColor,
+          width: 0.5,
+        ),
+      ),
+      child: Center(
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? Colors.white : AppTheme.textMuted,
+            fontSize: 13,
+            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SettingsServer extends StatelessWidget {
+  final String title;
+  final String subtitle;
+
+  const _SettingsServer({required this.title, required this.subtitle});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      child: Row(
+        children: [
+          const Icon(Icons.dns_rounded, size: 20, color: AppTheme.textSecondary),
+          const SizedBox(width: 16),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  color: AppTheme.textPrimary,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              Text(
+                subtitle,
+                style: const TextStyle(
+                  color: AppTheme.textMuted,
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          ),
+          const Spacer(),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: AppTheme.surfaceDark,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: const Text(
+              'Change',
+              style: TextStyle(
+                color: AppTheme.textSecondary,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -5,7 +5,7 @@ import '../../features/home/presentation/screens/dashboard_screen.dart';
 import '../../features/wardrobe/presentation/screens/wardrobe_screen.dart';
 import '../../features/history/presentation/screens/history_screen.dart';
 import '../../features/profile/presentation/screens/more_screen.dart';
-import '../../features/wardrobe/presentation/screens/ai_stylist_screen.dart';
+import '../../features/feed/presentation/screens/feed_screen.dart';
 
 final mainNavIndexProvider = StateProvider<int>((ref) => 0);
 
@@ -29,20 +29,20 @@ class MainNavigationScreen extends ConsumerWidget {
         index: currentIndex,
         children: screens,
       ),
-      // Central Floating Action Button
+      // Central Floating Action Button (Social Media)
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Open AI Stylist Suggestion
+          // Open Social Media Feed
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const AiStylistScreen()),
+            MaterialPageRoute(builder: (_) => const FeedScreen()),
           );
         },
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 4,
         shape: const CircleBorder(),
-        child: const Icon(Icons.auto_awesome_rounded, size: 28),
+        child: const Icon(Icons.public_rounded, size: 28), // Social media vibe icon
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       // Custom Bottom App Bar
