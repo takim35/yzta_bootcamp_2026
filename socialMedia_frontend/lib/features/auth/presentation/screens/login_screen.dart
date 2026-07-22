@@ -4,7 +4,7 @@ import 'dart:math' as math;
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/localization/locale_provider.dart';
 import '../../../../core/localization/app_strings.dart';
-import '../../../home/home_screen.dart';
+import '../../../../core/navigation/main_navigation_screen.dart';
 import '../providers/auth_provider.dart';
 import 'register_screen.dart';
 import 'forgot_password_screen.dart';
@@ -86,7 +86,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
       if (mounted) {
         Navigator.of(context).pushReplacement(
           PageRouteBuilder(
-            pageBuilder: (_, __, ___) => const HomeScreen(),
+            pageBuilder: (_, __, ___) => const MainNavigationScreen(),
             transitionsBuilder: (_, anim, __, child) =>
                 FadeTransition(opacity: anim, child: child),
             transitionDuration: const Duration(milliseconds: 500),
@@ -113,7 +113,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
       if (success && mounted) {
         Navigator.of(context).pushReplacement(
           PageRouteBuilder(
-            pageBuilder: (_, __, ___) => const HomeScreen(),
+            pageBuilder: (_, __, ___) => const MainNavigationScreen(),
             transitionsBuilder: (_, anim, __, child) =>
                 FadeTransition(opacity: anim, child: child),
             transitionDuration: const Duration(milliseconds: 500),

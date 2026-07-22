@@ -5,7 +5,6 @@ import '../../../../core/theme/theme_provider.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import 'local_profile_screen.dart';
 import 'body_measurement_screen.dart';
-import 'settings_screen.dart';
 
 class MoreScreen extends ConsumerWidget {
   const MoreScreen({super.key});

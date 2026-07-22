@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../services/api_service.dart';
 import '../providers/auth_provider.dart';
-import '../../../../features/main_home_screen.dart';
+import '../../../../core/navigation/main_navigation_screen.dart';
 
 class TwoFactorVerifyScreen extends ConsumerStatefulWidget {
   final String userId;
@@ -29,7 +29,7 @@ class _TwoFactorVerifyScreenState extends ConsumerState<TwoFactorVerifyScreen> {
         await ref.read(authProvider).finalizeLogin(widget.userId);
         if (mounted) {
           Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (_) => const MainHomeScreen()),
+            MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
             (_) => false,
           );
         }
