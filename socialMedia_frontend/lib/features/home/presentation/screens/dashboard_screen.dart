@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../feed/presentation/screens/feed_screen.dart';
 import '../../../wardrobe/presentation/screens/ai_stylist_screen.dart';
-import '../../../wardrobe/presentation/screens/outfit_builder_screen.dart';
+import '../../../wardrobe/presentation/screens/add_item_screen.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -225,13 +225,13 @@ class DashboardScreen extends ConsumerWidget {
                 children: [
                   Expanded(
                     child: _ExploreCard(
-                      icon: Icons.checkroom_rounded,
-                      title: 'Outfit Builder',
-                      subtitle: 'Create your own pairings',
+                      icon: Icons.add_circle_outline_rounded,
+                      title: 'Add Item',
+                      subtitle: 'Add clothes to wardrobe',
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (_) => const OutfitBuilderScreen()),
+                          MaterialPageRoute(builder: (_) => const AddItemScreen()),
                         );
                       },
                     ),
