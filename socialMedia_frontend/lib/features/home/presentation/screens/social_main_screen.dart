@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../feed/presentation/screens/feed_screen.dart';
-import '../../profile/presentation/screens/profile_screen.dart';
-import '../../auth/presentation/providers/auth_provider.dart';
+import '../../../../core/theme/app_theme.dart';
+import '../../../../features/feed/presentation/screens/feed_screen.dart';
+import '../../../../features/profile/presentation/screens/profile_screen.dart';
+import '../../../../features/auth/presentation/providers/auth_provider.dart';
 
 class SocialMainScreen extends ConsumerStatefulWidget {
   const SocialMainScreen({super.key});
@@ -19,7 +19,7 @@ class _SocialMainScreenState extends ConsumerState<SocialMainScreen> {
   Widget build(BuildContext context) {
     final currentUserId = ref.watch(authProvider).currentUserId;
 
-    final screens = [
+    final List<Widget> screens = [
       const FeedScreen(),
       ProfileScreen(userId: currentUserId),
     ];
@@ -33,7 +33,7 @@ class _SocialMainScreenState extends ConsumerState<SocialMainScreen> {
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: AppTheme.surfaceDark,
-          border: const Border(top: BorderSide(color: AppTheme.dividerColor, width: 0.5)),
+          border: Border(top: BorderSide(color: AppTheme.dividerColor, width: 0.5)),
         ),
         child: BottomNavigationBar(
           backgroundColor: AppTheme.surfaceDark,
