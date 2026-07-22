@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
-import 'profile_screen.dart';
+import 'local_profile_screen.dart';
 import 'settings_screen.dart';
 
 class MoreScreen extends ConsumerWidget {
@@ -34,7 +34,7 @@ class MoreScreen extends ConsumerWidget {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const ProfileScreen()),
+                    MaterialPageRoute(builder: (_) => const LocalProfileScreen()),
                   );
                 },
                 child: Container(
