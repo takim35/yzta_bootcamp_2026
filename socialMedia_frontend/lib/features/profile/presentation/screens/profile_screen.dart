@@ -89,7 +89,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         appBar: AppBar(
           title: Text(
             user.username,
-            style: const TextStyle(
+            style: TextStyle(
               color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
               fontWeight: FontWeight.bold,
             ),
@@ -207,7 +207,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   ),
                   padding: const EdgeInsets.all(3),
                   child: Container(
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: Theme.of(context).colorScheme.surface,
                     ),
@@ -245,7 +245,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             ? NetworkImage(user.avatarUrl)
                             : null,
                         child: user.avatarUrl.isEmpty
-                            ? const Icon(Icons.person,
+                            ? Icon(Icons.person,
                                 size: 44, color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey)
                             : null,
                       ),
@@ -256,7 +256,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 // Display name
                 Text(
                   user.displayName.isNotEmpty ? user.displayName : user.username,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: 20,
@@ -269,7 +269,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   Text(
                     user.bio,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                       fontSize: 15,
                       height: 1.4,
@@ -468,7 +468,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         children: [
                           Text(
                             '@${post.username}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                               fontWeight: FontWeight.bold,
                               fontSize: 14,
@@ -477,7 +477,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           const SizedBox(height: 6),
                           Text(
                             post.caption.isNotEmpty ? post.caption : (s.isTr ? 'Açıklama yok' : 'No caption'),
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
                               fontSize: 14,
                             ),
@@ -507,7 +507,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           ElevatedButton.icon(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Theme.of(context).colorScheme.error,
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                             ),
                             icon: Icon(Icons.delete_rounded, color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white, size: 18),
@@ -531,14 +531,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ? Image.network(
                   post.imageUrl,
                   fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => const Center(
+                  errorBuilder: (context, error, stackTrace) => Center(
                     child: Icon(Icons.error_outline, color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
                   ),
                 )
               : Image.file(
                   File(post.imageUrl),
                   fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => const Center(
+                  errorBuilder: (context, error, stackTrace) => Center(
                     child: Icon(Icons.error_outline, color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
                   ),
                 ),
@@ -557,7 +557,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         children: [
         Text(
           count.toString(),
-          style: const TextStyle(
+          style: TextStyle(
             color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
             fontWeight: FontWeight.bold,
             fontSize: 18,
@@ -565,7 +565,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         ),
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
             fontSize: 13,
           ),

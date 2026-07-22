@@ -7,7 +7,7 @@ import '../../../../core/navigation/main_navigation_screen.dart';
 import '../providers/auth_provider.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
-  const RegisterScreen({super.key});
+  RegisterScreen({super.key});
 
   @override
   ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
@@ -63,7 +63,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
         if (mounted) {
           Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
+            MaterialPageRoute(builder: (_) => MainNavigationScreen()),
             (route) => false,
           );
         }
@@ -94,7 +94,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       final success = await ref.read(authProvider).loginWithGoogle();
       if (success && mounted) {
         Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
+          MaterialPageRoute(builder: (_) => MainNavigationScreen()),
           (route) => false,
         );
       }
@@ -125,7 +125,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingXL),
+            padding: EdgeInsets.symmetric(horizontal: AppTheme.spacingXL),
             child: Form(
               key: _formKey,
               child: Column(
@@ -134,28 +134,28 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 children: [
                   Text(
                     s.joinSpot,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
                       color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                     ),
                   ),
-                  const SizedBox(height: AppTheme.spacingS),
+                  SizedBox(height: AppTheme.spacingS),
                   Text(
                     s.isTr
                         ? 'Aramıza katıl ve gardırobunu dijitalleştir'
                         : 'Join us and digitize your wardrobe',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
                     ),
                   ),
-                  const SizedBox(height: AppTheme.spacingXXL),
+                  SizedBox(height: AppTheme.spacingXXL),
                   
                   if (_errorMessage != null)
                     Container(
-                      padding: const EdgeInsets.all(AppTheme.spacingM),
-                      margin: const EdgeInsets.only(bottom: AppTheme.spacingM),
+                      padding: EdgeInsets.all(AppTheme.spacingM),
+                      margin: EdgeInsets.only(bottom: AppTheme.spacingM),
                       decoration: BoxDecoration(
                         color: Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
@@ -183,7 +183,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: AppTheme.spacingL),
+                  SizedBox(height: AppTheme.spacingL),
                   
                   _buildTextField(
                     controller: _passwordController,
@@ -211,7 +211,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   
                   // Şifre kuralları bilgilendirme metni
                   Padding(
-                    padding: const EdgeInsets.only(top: AppTheme.spacingS, bottom: AppTheme.spacingL),
+                    padding: EdgeInsets.only(top: AppTheme.spacingS, bottom: AppTheme.spacingL),
                     child: Text(
                       s.isTr
                           ? 'Şifreniz en az 8 karakter uzunluğunda olmalı; en az bir büyük harf, bir rakam ve bir sembol (!@#\$%^&*) içermelidir.'
@@ -245,13 +245,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: AppTheme.spacingXXL),
+                  SizedBox(height: AppTheme.spacingXXL),
 
                   // Kayıt butonu
                   GestureDetector(
                     onTap: _isLoading ? null : _onRegisterTap,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      padding: EdgeInsets.symmetric(vertical: 16),
                       decoration: BoxDecoration(
                         gradient: _isLoading ? null : AppTheme.primaryGradient,
                         color: _isLoading ? Theme.of(context).colorScheme.surface : null,
@@ -262,13 +262,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                 BoxShadow(
                                   color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
                                   blurRadius: 12,
-                                  offset: const Offset(0, 4),
+                                  offset: Offset(0, 4),
                                 ),
                               ],
                       ),
                       child: Center(
                         child: _isLoading
-                            ? const SizedBox(
+                            ? SizedBox(
                                 width: 22,
                                 height: 22,
                                 child: CircularProgressIndicator(
@@ -278,7 +278,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               )
                             : Text(
                                 s.signUp,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -288,13 +288,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     ),
                   ),
 
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
 
                   // ── Google ile Kayıt ──────────────────────────
                   GestureDetector(
                     onTap: _isLoading ? null : _onGoogleSignIn,
                     child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
+                      duration: Duration(milliseconds: 200),
                       height: 52,
                       decoration: BoxDecoration(
                         color: Theme.of(context).colorScheme.surface,
@@ -314,7 +314,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(4),
                             ),
-                            child: const Center(
+                            child: Center(
                               child: Text(
                                 'G',
                                 style: TextStyle(
@@ -325,10 +325,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               ),
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          SizedBox(width: 12),
                           Text(
                             s.isTr ? 'Google ile Devam Et' : 'Continue with Google',
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
@@ -378,7 +378,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             : null,
         filled: true,
         fillColor: Theme.of(context).colorScheme.surface,
-        contentPadding: const EdgeInsets.symmetric(vertical: 16),
+        contentPadding: EdgeInsets.symmetric(vertical: 16),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: Theme.of(context).dividerColor),

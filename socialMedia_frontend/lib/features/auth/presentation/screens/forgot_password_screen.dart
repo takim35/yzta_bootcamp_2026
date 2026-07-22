@@ -128,7 +128,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         iconTheme: IconThemeData(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
-        title: const Text(
+        title: Text(
           'Şifremi Sıfırla',
           style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white, fontWeight: FontWeight.w700),
         ),
@@ -160,19 +160,19 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
             shape: BoxShape.circle,
             color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
           ),
-          child: const Icon(
+          child: Icon(
             Icons.check_circle_rounded,
             color: Theme.of(context).colorScheme.primary,
             size: 80,
           ),
         ),
         const SizedBox(height: 32),
-        const Text(
+        Text(
           'Başarılı!',
           style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
         ),
         const SizedBox(height: 12),
-        const Text(
+        Text(
           'Şifreniz başarıyla güncellendi.',
           textAlign: TextAlign.center,
           style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey, fontSize: 16),
@@ -210,7 +210,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
               color: Theme.of(context).colorScheme.surface,
               border: Border.all(color: Theme.of(context).dividerColor, width: 1.5),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.lock_reset_rounded,
               color: Theme.of(context).colorScheme.primary,
               size: 48,
@@ -218,7 +218,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
           ),
           const SizedBox(height: 24),
 
-          const Text(
+          Text(
             'Şifrenizi Sıfırlayın',
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
@@ -341,7 +341,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
         ),
         child: Center(
           child: _isLoading
-              ? const SizedBox(
+              ? SizedBox(
                   width: 22,
                   height: 22,
                   child: CircularProgressIndicator(

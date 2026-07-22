@@ -10,7 +10,7 @@ import '../../../../services/analytics_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
-  const OnboardingScreen({super.key});
+  OnboardingScreen({super.key});
 
   @override
   ConsumerState<OnboardingScreen> createState() => _OnboardingScreenState();
@@ -32,28 +32,28 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
       'title': s.onbWardrobeTitle,
       'subtitle': s.onbWardrobeSub,
       'icon': Icons.checkroom_rounded,
-      'color': const Color(0xFF7C3AED),
+      'color': Color(0xFF7C3AED),
       'bgIcon': Icons.style_rounded,
     },
     {
       'title': s.onbARTitle,
       'subtitle': s.onbARSub,
       'icon': Icons.camera_enhance_rounded,
-      'color': const Color(0xFFDB2777),
+      'color': Color(0xFFDB2777),
       'bgIcon': Icons.view_in_ar_rounded,
     },
     {
       'title': s.onbAITitle,
       'subtitle': s.onbAISub,
       'icon': Icons.auto_awesome_rounded,
-      'color': const Color(0xFF0EA5E9),
+      'color': Color(0xFF0EA5E9),
       'bgIcon': Icons.psychology_rounded,
     },
     {
       'title': s.onbSocialTitle,
       'subtitle': s.onbSocialSub,
       'icon': Icons.diversity_3_rounded,
-      'color': const Color(0xFF10B981),
+      'color': Color(0xFF10B981),
       'bgIcon': Icons.group_rounded,
     },
   ];
@@ -69,17 +69,17 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
 
     _floatController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2500),
+      duration: Duration(milliseconds: 2500),
     )..repeat(reverse: true);
 
     _rotateController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 12),
+      duration: Duration(seconds: 12),
     )..repeat();
 
     _fadeController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 600),
+      duration: Duration(milliseconds: 600),
     )..forward();
 
     _floatAnimation = Tween<double>(begin: -12, end: 12).animate(
@@ -151,7 +151,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
               ].request();
               _finishOnboarding();
             },
-            child: Text(s.isTr ? 'İzin Ver' : 'Allow', style: const TextStyle(color: Colors.white)),
+            child: Text(s.isTr ? 'İzin Ver' : 'Allow', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -162,10 +162,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
     AnalyticsService().logOnboardingCompleted();
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
-        pageBuilder: (_, __, ___) => const LoginScreen(),
+        pageBuilder: (_, __, ___) => LoginScreen(),
         transitionsBuilder: (_, anim, __, child) =>
             FadeTransition(opacity: anim, child: child),
-        transitionDuration: const Duration(milliseconds: 500),
+        transitionDuration: Duration(milliseconds: 500),
       ),
     );
   }
@@ -175,7 +175,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
       _showPermissionPrompt();
     } else {
       _pageController.nextPage(
-        duration: const Duration(milliseconds: 400),
+        duration: Duration(milliseconds: 400),
         curve: Curves.easeInOutCubic,
       );
     }
@@ -251,7 +251,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
             top: size.height * 0.08,
             right: -20,
             child: AnimatedOpacity(
-              duration: const Duration(milliseconds: 400),
+              duration: Duration(milliseconds: 400),
               opacity: 0.04,
               child: Icon(
                 page['bgIcon'] as IconData,
@@ -266,20 +266,20 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
             child: Align(
               alignment: Alignment.topRight,
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: EdgeInsets.all(16),
                 child: _currentPage < pages.length - 1
                     ? TextButton(
                         onPressed: _onSkip,
                         child: Text(
                           s.skip,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
                             fontSize: 15,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
                       )
-                    : const SizedBox.shrink(),
+                    : SizedBox.shrink(),
               ),
             ),
           ),
@@ -287,7 +287,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
           // Main content
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32),
+              padding: EdgeInsets.symmetric(horizontal: 32),
               child: Column(
                 children: [
                   SizedBox(height: size.height * 0.1),
@@ -296,7 +296,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                   ShaderMask(
                     shaderCallback: (bounds) =>
                         AppTheme.primaryGradient.createShader(bounds),
-                    child: const Text(
+                    child: Text(
                       'SPOT',
                       style: TextStyle(
                         fontSize: 18,
@@ -316,7 +316,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                       return Transform.translate(
                         offset: Offset(0, _floatAnimation.value),
                         child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 400),
+                          duration: Duration(milliseconds: 400),
                           width: 120,
                           height: 120,
                           decoration: BoxDecoration(
@@ -367,7 +367,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                               Text(
                                 p['title'] as String,
                                 textAlign: TextAlign.center,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 28,
                                   fontWeight: FontWeight.w800,
                                   color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
@@ -375,11 +375,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                                   letterSpacing: -0.5,
                                 ),
                               ),
-                              const SizedBox(height: 16),
+                              SizedBox(height: 16),
                               Text(
                                 p['subtitle'] as String,
                                 textAlign: TextAlign.center,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 14,
                                   color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
                                   height: 1.6,
@@ -393,11 +393,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                     ),
                   ),
 
-                  const Spacer(),
+                  Spacer(),
 
                   // Dots + Next button
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 40),
+                    padding: EdgeInsets.only(bottom: 40),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -406,8 +406,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                           children: List.generate(
                             pages.length,
                             (i) => AnimatedContainer(
-                              duration: const Duration(milliseconds: 300),
-                              margin: const EdgeInsets.only(right: 6),
+                              duration: Duration(milliseconds: 300),
+                              margin: EdgeInsets.only(right: 6),
                               height: 8,
                               width: _currentPage == i ? 28 : 8,
                               decoration: BoxDecoration(
@@ -424,7 +424,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                         GestureDetector(
                           onTap: () => _onNext(pages),
                           child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 300),
+                            duration: Duration(milliseconds: 300),
                             padding: EdgeInsets.symmetric(
                               horizontal:
                                   _currentPage == pages.length - 1 ? 28 : 20,
@@ -439,7 +439,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                                 BoxShadow(
                                   color: color.withValues(alpha: 0.4),
                                   blurRadius: 14,
-                                  offset: const Offset(0, 5),
+                                  offset: Offset(0, 5),
                                 ),
                               ],
                             ),
@@ -450,14 +450,14 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                                   _currentPage == pages.length - 1
                                       ? s.letsGo
                                       : s.next,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 15,
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
-                                const SizedBox(width: 6),
-                                const Icon(
+                                SizedBox(width: 6),
+                                Icon(
                                   Icons.arrow_forward_rounded,
                                   color: Colors.white,
                                   size: 18,

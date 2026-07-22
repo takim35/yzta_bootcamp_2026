@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/theme_provider.dart';
+import '../../../../core/localization/app_strings.dart';
 import '../../../../core/localization/locale_provider.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import 'local_profile_screen.dart';
@@ -21,7 +22,7 @@ class MoreScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 strings.settings,
                 style: TextStyle(
                   color: Colors.white,
@@ -37,11 +38,11 @@ class MoreScreen extends ConsumerWidget {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const LocalProfileScreen()),
+                    MaterialPageRoute(builder: (_) => LocalProfileScreen()),
                   );
                 },
                 child: Container(
-                  padding: const EdgeInsets.all(16),
+                  padding: EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: Theme.of(context).cardColor,
                     borderRadius: BorderRadius.circular(20),
@@ -59,8 +60,8 @@ class MoreScreen extends ConsumerWidget {
                         ),
                         child: Icon(Icons.person_rounded, color: Theme.of(context).colorScheme.primary, size: 32),
                       ),
-                      const SizedBox(width: 16),
-                      const Expanded(
+                      SizedBox(width: 16),
+                      Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -91,7 +92,7 @@ class MoreScreen extends ConsumerWidget {
               
               const SizedBox(height: 32),
               
-              const Text(
+              Text(
                 strings.settings,
                 style: TextStyle(
                   color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
@@ -147,7 +148,7 @@ class MoreScreen extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: Theme.of(context).dividerColor),
                 ),
-                child: const _SettingsAppearance(title: strings.theme, icon: Icons.brightness_medium_rounded),
+                child: _SettingsAppearance(title: strings.theme, icon: Icons.brightness_medium_rounded),
               ),
 
               const SizedBox(height: 16),
@@ -309,10 +310,10 @@ class _SettingsAppearance extends ConsumerWidget {
           Row(
             children: [
               Icon(icon, size: 20, color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
-              const SizedBox(width: 16),
+              SizedBox(width: 16),
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                   fontSize: 15,
                   fontWeight: FontWeight.w500,

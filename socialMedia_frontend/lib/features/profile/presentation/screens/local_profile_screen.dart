@@ -37,14 +37,14 @@ class LocalProfileScreen extends ConsumerWidget {
                     shape: BoxShape.circle,
                     border: Border.all(color: Theme.of(context).dividerColor, width: 2),
                   ),
-                  child: const Center(
+                  child: Center(
                     child: Icon(Icons.person_rounded, size: 50, color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
                   ),
                 ),
               ),
               const SizedBox(height: 32),
               
-              const Text(
+              Text(
                 'Personal Information',
                 style: TextStyle(
                   color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
@@ -93,7 +93,7 @@ class _InfoRow extends StatelessWidget {
         children: [
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
               fontSize: 15,
               fontWeight: FontWeight.w500,
@@ -101,7 +101,7 @@ class _InfoRow extends StatelessWidget {
           ),
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
               fontSize: 15,
             ),

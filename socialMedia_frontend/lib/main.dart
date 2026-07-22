@@ -20,14 +20,14 @@ void main() async {
   await NotificationService().scheduleDailyClothesReminder(hour: 8, minute: 0);
 
   runApp(
-    const ProviderScope(
+    ProviderScope(
       child: MyApp(),
     ),
   );
 }
 
 class MyApp extends ConsumerWidget {
-  const MyApp({super.key});
+  MyApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -38,7 +38,7 @@ class MyApp extends ConsumerWidget {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: themeMode,
-      home: const _AuthGate(),
+      home: _AuthGate(),
       debugShowCheckedModeBanner: false,
     );
   }
@@ -46,7 +46,7 @@ class MyApp extends ConsumerWidget {
 
 /// Kaydedilmiş oturum varsa ana ekrana, yoksa onboarding'e yönlendir
 class _AuthGate extends ConsumerWidget {
-  const _AuthGate();
+  _AuthGate();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -64,10 +64,10 @@ class _AuthGate extends ConsumerWidget {
 
     // Giriş yapılmışsa ana ekrana git
     if (auth.isLoggedIn) {
-      return const MainNavigationScreen();
+      return MainNavigationScreen();
     }
 
     // Giriş yapılmamışsa onboarding
-    return const OnboardingScreen();
+    return OnboardingScreen();
   }
 }

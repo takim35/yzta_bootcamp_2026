@@ -154,7 +154,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
       elevation: 0,
       actions: [
         IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.notifications_outlined,
             color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
           ),
@@ -168,7 +168,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
   }
 
   Widget _buildLoadingMore() {
-    return const Padding(
+    return Padding(
       padding: EdgeInsets.all(AppTheme.spacingXL),
       child: Center(
         child: SizedBox(

@@ -6,7 +6,7 @@ import '../../../wardrobe/presentation/screens/ai_stylist_screen.dart';
 import '../../../wardrobe/presentation/screens/add_item_screen.dart';
 
 class DashboardScreen extends ConsumerWidget {
-  const DashboardScreen({super.key});
+  DashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -14,12 +14,12 @@ class DashboardScreen extends ConsumerWidget {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
+          padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Greeting
-              const Text(
+              Text(
                 'Good morning, Demo',
                 style: TextStyle(
                   color: Colors.white,
@@ -28,8 +28,8 @@ class DashboardScreen extends ConsumerWidget {
                   letterSpacing: -0.5,
                 ),
               ),
-              const SizedBox(height: 4),
-              const Text(
+              SizedBox(height: 4),
+              Text(
                 "Here's your outfit summary",
                 style: TextStyle(
                   color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
@@ -37,21 +37,21 @@ class DashboardScreen extends ConsumerWidget {
                 ),
               ),
               
-              const SizedBox(height: 24),
+              SizedBox(height: 24),
 
               // AI Stylist Banner
               GestureDetector(
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const AiStylistScreen()),
+                    MaterialPageRoute(builder: (_) => AiStylistScreen()),
                   );
                 },
                 child: Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
+                    gradient: LinearGradient(
                       colors: [Color(0xFF7C3AED), Color(0xFFDB2777)],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
@@ -59,24 +59,24 @@ class DashboardScreen extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF7C3AED).withValues(alpha: 0.3),
+                        color: Color(0xFF7C3AED).withValues(alpha: 0.3),
                         blurRadius: 12,
-                        offset: const Offset(0, 4),
+                        offset: Offset(0, 4),
                       ),
                     ],
                   ),
                   child: Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(10),
+                        padding: EdgeInsets.all(10),
                         decoration: BoxDecoration(
                           color: Colors.white.withValues(alpha: 0.2),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 24),
+                        child: Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 24),
                       ),
-                      const SizedBox(width: 16),
-                      const Expanded(
+                      SizedBox(width: 16),
+                      Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -98,17 +98,17 @@ class DashboardScreen extends ConsumerWidget {
                           ],
                         ),
                       ),
-                      const Icon(Icons.chevron_right_rounded, color: Colors.white),
+                      Icon(Icons.chevron_right_rounded, color: Colors.white),
                     ],
                   ),
                 ),
               ),
               
-              const SizedBox(height: 24),
+              SizedBox(height: 24),
               
               // Weather Card
               Container(
-                padding: const EdgeInsets.all(20),
+                padding: EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(16),
@@ -116,9 +116,9 @@ class DashboardScreen extends ConsumerWidget {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.wb_sunny_rounded, color: Colors.white, size: 28),
-                    const SizedBox(width: 16),
-                    const Column(
+                    Icon(Icons.wb_sunny_rounded, color: Colors.white, size: 28),
+                    SizedBox(width: 16),
+                    Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
@@ -138,8 +138,8 @@ class DashboardScreen extends ConsumerWidget {
                         ),
                       ],
                     ),
-                    const Spacer(),
-                    const Column(
+                    Spacer(),
+                    Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
@@ -162,10 +162,10 @@ class DashboardScreen extends ConsumerWidget {
                 ),
               ),
               
-              const SizedBox(height: 32),
+              SizedBox(height: 32),
               
               // Pending Outfits Header
-              const Row(
+              Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
@@ -185,18 +185,18 @@ class DashboardScreen extends ConsumerWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               
               // Placeholder for empty outfits
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(24),
+                padding: EdgeInsets.all(24),
                 decoration: BoxDecoration(
                   color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: Theme.of(context).dividerColor, style: BorderStyle.solid),
                 ),
-                child: const Column(
+                child: Column(
                   children: [
                     Icon(Icons.checkroom_rounded, color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey, size: 40),
                     SizedBox(height: 12),
@@ -208,10 +208,10 @@ class DashboardScreen extends ConsumerWidget {
                 ),
               ),
 
-              const SizedBox(height: 32),
+              SizedBox(height: 32),
 
               // Explore / Social Feed
-              const Text(
+              Text(
                 'Explore',
                 style: TextStyle(
                   color: Colors.white,
@@ -219,7 +219,7 @@ class DashboardScreen extends ConsumerWidget {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
 
               Row(
                 children: [
@@ -231,12 +231,12 @@ class DashboardScreen extends ConsumerWidget {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (_) => const AddItemScreen()),
+                          MaterialPageRoute(builder: (_) => AddItemScreen()),
                         );
                       },
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  SizedBox(width: 16),
                   Expanded(
                     child: _ExploreCard(
                       icon: Icons.bar_chart_rounded,
@@ -248,7 +248,7 @@ class DashboardScreen extends ConsumerWidget {
                 ],
               ),
               
-              const SizedBox(height: 100), // padding for bottom nav
+              SizedBox(height: 100), // padding for bottom nav
             ],
           ),
         ),
@@ -263,7 +263,7 @@ class _ExploreCard extends StatelessWidget {
   final String subtitle;
   final VoidCallback onTap;
 
-  const _ExploreCard({
+  _ExploreCard({
     required this.icon,
     required this.title,
     required this.subtitle,
@@ -276,7 +276,7 @@ class _ExploreCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         height: 120,
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(16),
@@ -286,19 +286,19 @@ class _ExploreCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Icon(icon, color: Colors.white, size: 24),
-            const Spacer(),
+            Spacer(),
             Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 color: Colors.white,
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
               ),
             ),
-            const SizedBox(height: 2),
+            SizedBox(height: 2),
             Text(
               subtitle,
-              style: const TextStyle(
+              style: TextStyle(
                 color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
                 fontSize: 11,
               ),

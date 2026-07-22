@@ -33,7 +33,7 @@ class TryOnComingSoonScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              const Text(
+              Text(
                 'See how clothes fit on you virtually!\nThis feature is coming very soon.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
@@ -50,7 +50,7 @@ class TryOnComingSoonScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(24),
                   border: Border.all(color: Theme.of(context).dividerColor),
                 ),
-                child: const Text(
+                child: Text(
                   'Stay Tuned 👀',
                   style: TextStyle(
                     color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,

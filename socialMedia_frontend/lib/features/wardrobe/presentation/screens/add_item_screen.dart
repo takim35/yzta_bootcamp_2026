@@ -73,7 +73,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
               }
             });
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
+              SnackBar(
                 content: Text('AI analyzed the clothing successfully! ✨'),
                 backgroundColor: Theme.of(context).colorScheme.primary,
               ),
@@ -201,7 +201,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
         iconTheme: IconThemeData(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
         actions: [
           _isLoading
-              ? const Padding(
+              ? Padding(
                   padding: EdgeInsets.all(16),
                   child: SizedBox(
                     width: 20, height: 20,
@@ -249,7 +249,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
                                 color: Colors.black.withOpacity(0.5),
                                 borderRadius: BorderRadius.circular(14),
                               ),
-                              child: const Column(
+                              child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   CircularProgressIndicator(color: Theme.of(context).colorScheme.primary),
@@ -269,10 +269,10 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
                           Icon(Icons.add_photo_alternate_rounded,
                               size: 52, color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.7)),
                           const SizedBox(height: 12),
-                          const Text('Add photo',
+                          Text('Add photo',
                               style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey, fontSize: 15)),
                           const SizedBox(height: 4),
-                          const Text('Select from camera or library',
+                          Text('Select from camera or library',
                               style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey, fontSize: 12)),
                         ],
                       ),

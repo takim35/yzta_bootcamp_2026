@@ -160,7 +160,7 @@ class _AiStylistScreenState extends ConsumerState<AiStylistScreen> {
                       color: Theme.of(context).cardColor,
                       borderRadius: BorderRadius.circular(18),
                     ),
-                    child: const SizedBox(
+                    child: SizedBox(
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(
@@ -170,7 +170,7 @@ class _AiStylistScreenState extends ConsumerState<AiStylistScreen> {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  const Text('Stilistiniz düşünüyor...',
+                  Text('Stilistiniz düşünüyor...',
                       style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey, fontSize: 12)),
                 ],
               ),

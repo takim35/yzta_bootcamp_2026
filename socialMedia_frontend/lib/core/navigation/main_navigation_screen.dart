@@ -10,17 +10,17 @@ import '../../features/home/presentation/screens/social_main_screen.dart';
 final mainNavIndexProvider = StateProvider<int>((ref) => 0);
 
 class MainNavigationScreen extends ConsumerWidget {
-  const MainNavigationScreen({super.key});
+  MainNavigationScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentIndex = ref.watch(mainNavIndexProvider);
 
     final screens = [
-      const DashboardScreen(),
-      const WardrobeScreen(),
-      const TryOnComingSoonScreen(), 
-      const MoreScreen(), 
+      DashboardScreen(),
+      WardrobeScreen(),
+      TryOnComingSoonScreen(), 
+      MoreScreen(), 
     ];
 
     return Scaffold(
@@ -35,23 +35,23 @@ class MainNavigationScreen extends ConsumerWidget {
           // Open Social Media Feed
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const SocialMainScreen()),
+            MaterialPageRoute(builder: (_) => SocialMainScreen()),
           );
         },
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 4,
-        shape: const CircleBorder(),
-        child: const Icon(Icons.public_rounded, size: 28), // Social media vibe icon
+        shape: CircleBorder(),
+        child: Icon(Icons.public_rounded, size: 28), // Social media vibe icon
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       // Custom Bottom App Bar
       bottomNavigationBar: BottomAppBar(
         color: Theme.of(context).colorScheme.surface,
-        shape: const CircularNotchedRectangle(),
+        shape: CircularNotchedRectangle(),
         notchMargin: 8.0,
         height: 70,
-        padding: const EdgeInsets.symmetric(horizontal: 12.0),
+        padding: EdgeInsets.symmetric(horizontal: 12.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -64,7 +64,7 @@ class MainNavigationScreen extends ConsumerWidget {
                   isSelected: currentIndex == 0,
                   onTap: () => ref.read(mainNavIndexProvider.notifier).state = 0,
                 ),
-                const SizedBox(width: 24),
+                SizedBox(width: 24),
                 _NavBarItem(
                   icon: Icons.checkroom_rounded,
                   label: 'Wardrobe',
@@ -82,7 +82,7 @@ class MainNavigationScreen extends ConsumerWidget {
                   isSelected: currentIndex == 2,
                   onTap: () => ref.read(mainNavIndexProvider.notifier).state = 2,
                 ),
-                const SizedBox(width: 24),
+                SizedBox(width: 24),
                 _NavBarItem(
                   icon: Icons.grid_view_rounded,
                   label: 'More',
@@ -104,7 +104,7 @@ class _NavBarItem extends StatelessWidget {
   final bool isSelected;
   final VoidCallback onTap;
 
-  const _NavBarItem({
+  _NavBarItem({
     required this.icon,
     required this.label,
     required this.isSelected,
@@ -123,7 +123,7 @@ class _NavBarItem extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(icon, color: color, size: 24),
-          const SizedBox(height: 4),
+          SizedBox(height: 4),
           Text(
             label,
             style: TextStyle(

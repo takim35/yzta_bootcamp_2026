@@ -10,7 +10,7 @@ import 'register_screen.dart';
 import 'forgot_password_screen.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
-  const LoginScreen({super.key});
+  LoginScreen({super.key});
 
   @override
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
@@ -37,18 +37,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
 
     _bgController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 8),
+      duration: Duration(seconds: 8),
     )..repeat(reverse: true);
 
     _entryController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 800),
+      duration: Duration(milliseconds: 800),
     )..forward();
 
     _bgAnimation = Tween<double>(begin: 0, end: 1).animate(_bgController);
 
     _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.3),
+      begin: Offset(0, 0.3),
       end: Offset.zero,
     ).animate(
       CurvedAnimation(parent: _entryController, curve: Curves.easeOutCubic),
@@ -86,10 +86,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
       if (mounted) {
         Navigator.of(context).pushReplacement(
           PageRouteBuilder(
-            pageBuilder: (_, __, ___) => const MainNavigationScreen(),
+            pageBuilder: (_, __, ___) => MainNavigationScreen(),
             transitionsBuilder: (_, anim, __, child) =>
                 FadeTransition(opacity: anim, child: child),
-            transitionDuration: const Duration(milliseconds: 500),
+            transitionDuration: Duration(milliseconds: 500),
           ),
         );
       }
@@ -113,10 +113,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
       if (success && mounted) {
         Navigator.of(context).pushReplacement(
           PageRouteBuilder(
-            pageBuilder: (_, __, ___) => const MainNavigationScreen(),
+            pageBuilder: (_, __, ___) => MainNavigationScreen(),
             transitionsBuilder: (_, anim, __, child) =>
                 FadeTransition(opacity: anim, child: child),
-            transitionDuration: const Duration(milliseconds: 500),
+            transitionDuration: Duration(milliseconds: 500),
           ),
         );
       }
@@ -206,7 +206,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
           SafeArea(
             child: Center(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 28),
+                padding: EdgeInsets.symmetric(horizontal: 28),
                 child: SlideTransition(
                   position: _slideAnimation,
                   child: FadeTransition(
@@ -216,7 +216,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          const SizedBox(height: 16),
+                          SizedBox(height: 16),
 
                           // Language Selector
                           Row(
@@ -228,7 +228,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                   ref.read(localeProvider.notifier).toggleLocale();
                                 },
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                                   decoration: BoxDecoration(
                                     color: Theme.of(context).colorScheme.surface,
                                     borderRadius: BorderRadius.circular(12),
@@ -237,7 +237,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                   child: Row(
                                     children: [
                                       Icon(Icons.language_rounded, color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey, size: 16),
-                                      const SizedBox(width: 8),
+                                      SizedBox(width: 8),
                                       Text(
                                         ref.watch(localeProvider) == AppLocale.tr ? 'Türkçe' : 'English',
                                         style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white, fontSize: 13, fontWeight: FontWeight.w500),
@@ -248,7 +248,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                               ),
                             ],
                           ),
-                          const SizedBox(height: 32),
+                          SizedBox(height: 32),
 
                           // Logo
                           Center(
@@ -263,51 +263,51 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                     color: Theme.of(context).colorScheme.primary
                                         .withValues(alpha: 0.45),
                                     blurRadius: 24,
-                                    offset: const Offset(0, 8),
+                                    offset: Offset(0, 8),
                                   ),
                                 ],
                               ),
-                              child: const Icon(
+                              child: Icon(
                                 Icons.checkroom_rounded,
                                 size: 38,
                                 color: Colors.white,
                               ),
                             ),
                           ),
-                          const SizedBox(height: 28),
+                          SizedBox(height: 28),
 
                           // Title
                           Text(
                             s.welcomeBack,
                             textAlign: TextAlign.center,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 30,
                               fontWeight: FontWeight.w800,
                               color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                               letterSpacing: -0.5,
                             ),
                           ),
-                          const SizedBox(height: 8),
+                          SizedBox(height: 8),
                           ShaderMask(
                             shaderCallback: (bounds) =>
                                 AppTheme.primaryGradient.createShader(bounds),
                             child: Text(
                               s.signInToSpot,
                               textAlign: TextAlign.center,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.white,
                               ),
                             ),
                           ),
-                          const SizedBox(height: 40),
+                          SizedBox(height: 40),
 
                           // Error box
                           if (_errorMessage != null) ...[
                             Container(
-                              padding: const EdgeInsets.all(14),
-                              margin: const EdgeInsets.only(bottom: 16),
+                              padding: EdgeInsets.all(14),
+                              margin: EdgeInsets.only(bottom: 16),
                               decoration: BoxDecoration(
                                 color:
                                     Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
@@ -319,13 +319,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                               ),
                               child: Row(
                                 children: [
-                                  const Icon(Icons.error_outline_rounded,
+                                  Icon(Icons.error_outline_rounded,
                                       color: Theme.of(context).colorScheme.error, size: 18),
-                                  const SizedBox(width: 10),
+                                  SizedBox(width: 10),
                                   Expanded(
                                     child: Text(
                                       _errorMessage!,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                           color: Theme.of(context).colorScheme.error,
                                           fontSize: 13),
                                     ),
@@ -351,7 +351,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                               return null;
                             },
                           ),
-                          const SizedBox(height: 16),
+                          SizedBox(height: 16),
 
                           // Password field
                           _buildTextField(
@@ -374,13 +374,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                               onPressed: () {
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
-                                    builder: (_) => const ForgotPasswordScreen(),
+                                    builder: (_) => ForgotPasswordScreen(),
                                   ),
                                 );
                               },
                               child: Text(
                                 s.forgotPassword,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: Theme.of(context).colorScheme.secondary,
                                   fontWeight: FontWeight.w600,
                                   fontSize: 13,
@@ -388,18 +388,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                               ),
                             ),
                           ),
-                          const SizedBox(height: 8),
+                          SizedBox(height: 8),
 
                           // Sign in button
                           _buildSignInButton(s),
 
-                          const SizedBox(height: 28),
+                          SizedBox(height: 28),
 
                           // ── Google Sign-In Butonu ───────────
                           GestureDetector(
                             onTap: _isLoading ? null : _onGoogleSignIn,
                             child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
+                              duration: Duration(milliseconds: 200),
                               height: 52,
                               decoration: BoxDecoration(
                                 color: Theme.of(context).colorScheme.surface,
@@ -420,7 +420,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                       color: Colors.white,
                                       borderRadius: BorderRadius.circular(4),
                                     ),
-                                    child: const Center(
+                                    child: Center(
                                       child: Text(
                                         'G',
                                         style: TextStyle(
@@ -431,10 +431,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                       ),
                                     ),
                                   ),
-                                  const SizedBox(width: 12),
+                                  SizedBox(width: 12),
                                   Text(
                                     s.isTr ? 'Google ile Giriş Yap' : 'Continue with Google',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                                       fontSize: 15,
                                       fontWeight: FontWeight.w600,
@@ -445,7 +445,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                             ),
                           ),
 
-                          const SizedBox(height: 24),
+                          SizedBox(height: 24),
 
                           // Divider
                           Row(
@@ -456,10 +456,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                       thickness: 1)),
                               Padding(
                                 padding:
-                                    const EdgeInsets.symmetric(horizontal: 16),
+                                    EdgeInsets.symmetric(horizontal: 16),
                                 child: Text(
                                   s.isTr ? 'veya' : 'or',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey, fontSize: 13),
                                 ),
                               ),
@@ -470,7 +470,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                             ],
                           ),
 
-                          const SizedBox(height: 28),
+                          SizedBox(height: 28),
 
                           // Register
                           Row(
@@ -478,7 +478,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                             children: [
                               Text(
                                 s.noAccount,
-                                style: const TextStyle(
+                                style: TextStyle(
                                     color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
                                     fontSize: 14),
                               ),
@@ -487,16 +487,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                   Navigator.of(context).push(
                                     MaterialPageRoute(
                                         builder: (_) =>
-                                            const RegisterScreen()),
+                                            RegisterScreen()),
                                   );
                                 },
                                 style: TextButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(
+                                  padding: EdgeInsets.symmetric(
                                       horizontal: 8),
                                 ),
                                 child: Text(
                                   s.signUp,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     color: Theme.of(context).colorScheme.primary,
                                     fontWeight: FontWeight.w700,
                                     fontSize: 14,
@@ -505,7 +505,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                               ),
                             ],
                           ),
-                          const SizedBox(height: 16),
+                          SizedBox(height: 16),
                         ],
                       ),
                     ),
@@ -523,7 +523,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     return GestureDetector(
       onTap: _isLoading ? null : _onLoginTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+        duration: Duration(milliseconds: 200),
         height: 54,
         decoration: BoxDecoration(
           gradient: _isLoading ? null : AppTheme.primaryGradient,
@@ -535,13 +535,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                   BoxShadow(
                     color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.4),
                     blurRadius: 16,
-                    offset: const Offset(0, 6),
+                    offset: Offset(0, 6),
                   ),
                 ],
         ),
         child: Center(
           child: _isLoading
-              ? const SizedBox(
+              ? SizedBox(
                   width: 22,
                   height: 22,
                   child: CircularProgressIndicator(
@@ -551,7 +551,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                 )
               : Text(
                   s.signIn,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white,
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
@@ -598,7 +598,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
         filled: true,
         fillColor: Theme.of(context).colorScheme.surface,
         contentPadding:
-            const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+            EdgeInsets.symmetric(vertical: 16, horizontal: 16),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide(color: Theme.of(context).dividerColor),

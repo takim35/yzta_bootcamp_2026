@@ -116,7 +116,7 @@ class PostCard extends ConsumerWidget {
                           post.username.isNotEmpty
                               ? post.username[0].toUpperCase()
                               : '?',
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                             fontWeight: FontWeight.w600,
                           ),
@@ -137,7 +137,7 @@ class PostCard extends ConsumerWidget {
                 children: [
                   Text(
                     post.username,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                       fontWeight: FontWeight.w600,
                       fontSize: 14,
@@ -147,7 +147,7 @@ class PostCard extends ConsumerWidget {
                   const SizedBox(height: 2),
                   Text(
                     post.timeAgo,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
                       fontSize: 12,
                     ),
@@ -159,7 +159,7 @@ class PostCard extends ConsumerWidget {
           ),
             // More options
             IconButton(
-              icon: const Icon(
+              icon: Icon(
                 Icons.more_horiz_rounded,
                 color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
                 size: 20,
@@ -222,7 +222,7 @@ class PostCard extends ConsumerWidget {
                             onTap: () {
                               Navigator.pop(context);
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
+                                SnackBar(
                                   content: Text('Bu tarz gönderiler daha az gösterilecek.'),
                                   backgroundColor: Theme.of(context).colorScheme.surface,
                                 ),
