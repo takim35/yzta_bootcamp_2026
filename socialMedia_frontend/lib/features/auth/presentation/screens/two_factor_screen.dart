@@ -119,20 +119,20 @@ class _TwoFactorSetupScreenState extends ConsumerState<TwoFactorSetupScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.primaryDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppTheme.primaryDark,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
-        iconTheme: const IconThemeData(color: AppTheme.textPrimary),
+        iconTheme: IconThemeData(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
         title: const Text(
           'İki Faktörlü Doğrulama',
-          style: TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.w700),
+          style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white, fontWeight: FontWeight.w700),
         ),
       ),
       body: SafeArea(
         child: _isLoading
             ? const Center(
-                child: CircularProgressIndicator(color: AppTheme.accentViolet),
+                child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary),
               )
             : _isEnabled
                 ? _buildSuccessView()
@@ -162,7 +162,7 @@ class _TwoFactorSetupScreenState extends ConsumerState<TwoFactorSetupScreen>
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: AppTheme.accentViolet.withValues(alpha: 0.4),
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.4),
                     blurRadius: 20,
                     offset: const Offset(0, 8),
                   ),
@@ -176,14 +176,14 @@ class _TwoFactorSetupScreenState extends ConsumerState<TwoFactorSetupScreen>
               style: TextStyle(
                 fontSize: 26,
                 fontWeight: FontWeight.w800,
-                color: AppTheme.textPrimary,
+                color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
               ),
             ),
             const SizedBox(height: 12),
             const Text(
               'Hesabınız artık iki faktörlü doğrulamayla korunuyor.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: AppTheme.textSecondary, fontSize: 15),
+              style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey, fontSize: 15),
             ),
             const SizedBox(height: 36),
             SizedBox(
@@ -192,7 +192,7 @@ class _TwoFactorSetupScreenState extends ConsumerState<TwoFactorSetupScreen>
               child: ElevatedButton(
                 onPressed: () => Navigator.of(context).pop(),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.accentViolet,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                 ),
                 child: const Text(
@@ -217,18 +217,18 @@ class _TwoFactorSetupScreenState extends ConsumerState<TwoFactorSetupScreen>
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: AppTheme.accentViolet.withValues(alpha: 0.1),
+              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppTheme.accentViolet.withValues(alpha: 0.3)),
+              border: Border.all(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3)),
             ),
             child: const Row(
               children: [
-                Icon(Icons.shield_rounded, color: AppTheme.accentViolet, size: 24),
+                Icon(Icons.shield_rounded, color: Theme.of(context).colorScheme.primary, size: 24),
                 SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     'Google Authenticator veya Authy uygulamasıyla QR kodu tarayın.',
-                    style: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
+                    style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey, fontSize: 13),
                   ),
                 ),
               ],
@@ -241,7 +241,7 @@ class _TwoFactorSetupScreenState extends ConsumerState<TwoFactorSetupScreen>
             const Text(
               '1. QR Kodu Tarayın',
               style: TextStyle(
-                color: AppTheme.textPrimary,
+                color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
               ),
@@ -268,7 +268,7 @@ class _TwoFactorSetupScreenState extends ConsumerState<TwoFactorSetupScreen>
             const Text(
               'QR tarayamıyor musunuz? Manuel olarak girin:',
               textAlign: TextAlign.center,
-              style: TextStyle(color: AppTheme.textMuted, fontSize: 13),
+              style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey, fontSize: 13),
             ),
             const SizedBox(height: 8),
             GestureDetector(
@@ -276,9 +276,9 @@ class _TwoFactorSetupScreenState extends ConsumerState<TwoFactorSetupScreen>
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
-                  color: AppTheme.surfaceDark,
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppTheme.dividerColor),
+                  border: Border.all(color: Theme.of(context).dividerColor),
                 ),
                 child: Row(
                   children: [
@@ -286,14 +286,14 @@ class _TwoFactorSetupScreenState extends ConsumerState<TwoFactorSetupScreen>
                       child: Text(
                         _secret ?? '',
                         style: const TextStyle(
-                          color: AppTheme.accentViolet,
+                          color: Theme.of(context).colorScheme.primary,
                           fontSize: 14,
                           fontFamily: 'monospace',
                           letterSpacing: 2,
                         ),
                       ),
                     ),
-                    const Icon(Icons.copy_rounded, color: AppTheme.textMuted, size: 18),
+                    Icon(Icons.copy_rounded, color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey, size: 18),
                   ],
                 ),
               ),
@@ -305,7 +305,7 @@ class _TwoFactorSetupScreenState extends ConsumerState<TwoFactorSetupScreen>
           const Text(
             '2. Doğrulama Kodunu Girin',
             style: TextStyle(
-              color: AppTheme.textPrimary,
+              color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
               fontSize: 16,
               fontWeight: FontWeight.w700,
             ),
@@ -313,7 +313,7 @@ class _TwoFactorSetupScreenState extends ConsumerState<TwoFactorSetupScreen>
           const SizedBox(height: 8),
           const Text(
             'Authenticator uygulamasındaki 6 haneli kodu girin.',
-            style: TextStyle(color: AppTheme.textMuted, fontSize: 13),
+            style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey, fontSize: 13),
           ),
           const SizedBox(height: 16),
 
@@ -323,13 +323,13 @@ class _TwoFactorSetupScreenState extends ConsumerState<TwoFactorSetupScreen>
               padding: const EdgeInsets.all(12),
               margin: const EdgeInsets.only(bottom: 12),
               decoration: BoxDecoration(
-                color: AppTheme.errorColor.withValues(alpha: 0.1),
+                color: Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppTheme.errorColor.withValues(alpha: 0.4)),
+                border: Border.all(color: Theme.of(context).colorScheme.error.withValues(alpha: 0.4)),
               ),
               child: Text(
                 _errorMessage!,
-                style: const TextStyle(color: AppTheme.errorColor, fontSize: 13),
+                style: TextStyle(color: Theme.of(context).colorScheme.error, fontSize: 13),
               ),
             ),
           ],
@@ -341,29 +341,29 @@ class _TwoFactorSetupScreenState extends ConsumerState<TwoFactorSetupScreen>
             maxLength: 6,
             textAlign: TextAlign.center,
             style: const TextStyle(
-              color: AppTheme.textPrimary,
+              color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
               fontSize: 22,
               fontWeight: FontWeight.w700,
               letterSpacing: 8,
             ),
             decoration: InputDecoration(
               hintText: '000000',
-              hintStyle: const TextStyle(color: AppTheme.textMuted, letterSpacing: 8, fontSize: 22),
+              hintStyle: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey, letterSpacing: 8, fontSize: 22),
               counterText: '',
               filled: true,
-              fillColor: AppTheme.surfaceDark,
+              fillColor: Theme.of(context).colorScheme.surface,
               contentPadding: const EdgeInsets.symmetric(vertical: 18),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
-                borderSide: const BorderSide(color: AppTheme.dividerColor),
+                borderSide: BorderSide(color: Theme.of(context).dividerColor),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
-                borderSide: const BorderSide(color: AppTheme.dividerColor),
+                borderSide: BorderSide(color: Theme.of(context).dividerColor),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
-                borderSide: const BorderSide(color: AppTheme.accentViolet, width: 2),
+                borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2),
               ),
             ),
           ),
@@ -377,13 +377,13 @@ class _TwoFactorSetupScreenState extends ConsumerState<TwoFactorSetupScreen>
               height: 54,
               decoration: BoxDecoration(
                 gradient: _isVerifying ? null : AppTheme.primaryGradient,
-                color: _isVerifying ? AppTheme.surfaceDark : null,
+                color: _isVerifying ? Theme.of(context).colorScheme.surface : null,
                 borderRadius: BorderRadius.circular(14),
                 boxShadow: _isVerifying
                     ? []
                     : [
                         BoxShadow(
-                          color: AppTheme.accentViolet.withValues(alpha: 0.4),
+                          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.4),
                           blurRadius: 16,
                           offset: const Offset(0, 6),
                         ),
@@ -395,7 +395,7 @@ class _TwoFactorSetupScreenState extends ConsumerState<TwoFactorSetupScreen>
                         width: 22,
                         height: 22,
                         child: CircularProgressIndicator(
-                          color: AppTheme.accentViolet,
+                          color: Theme.of(context).colorScheme.primary,
                           strokeWidth: 2.5,
                         ),
                       )

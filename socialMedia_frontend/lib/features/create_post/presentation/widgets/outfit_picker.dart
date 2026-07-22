@@ -72,15 +72,15 @@ class _OutfitCard extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
                   border: Border.all(
                     color: isSelected
-                        ? AppTheme.accentViolet
-                        : AppTheme.dividerColor,
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).dividerColor,
                     width: isSelected ? 2.5 : 1,
                   ),
                   boxShadow: isSelected
                       ? [
                           BoxShadow(
                             color:
-                                AppTheme.accentViolet.withValues(alpha: 0.3),
+                                Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
                             blurRadius: 12,
                             offset: const Offset(0, 4),
                           ),
@@ -97,23 +97,23 @@ class _OutfitCard extends ConsumerWidget {
                         imageUrl: item.imageUrl,
                         fit: BoxFit.cover,
                         placeholder: (context, url) => Container(
-                          color: AppTheme.surfaceDark,
+                          color: Theme.of(context).colorScheme.surface,
                           child: const Center(
                             child: SizedBox(
                               width: 20,
                               height: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                color: AppTheme.accentViolet,
+                                color: Theme.of(context).colorScheme.primary,
                               ),
                             ),
                           ),
                         ),
                         errorWidget: (context, url, error) => Container(
-                          color: AppTheme.surfaceDark,
+                          color: Theme.of(context).colorScheme.surface,
                           child: const Icon(
                             Icons.checkroom_rounded,
-                            color: AppTheme.textMuted,
+                            color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
                             size: 28,
                           ),
                         ),
@@ -122,7 +122,7 @@ class _OutfitCard extends ConsumerWidget {
                       if (isSelected)
                         Container(
                           decoration: BoxDecoration(
-                            color: AppTheme.accentViolet.withValues(alpha: 0.3),
+                            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
                           ),
                           child: const Center(
                             child: Icon(
@@ -143,7 +143,7 @@ class _OutfitCard extends ConsumerWidget {
                 style: TextStyle(
                   color: isSelected
                       ? AppTheme.accentPurple
-                      : AppTheme.textSecondary,
+                      : Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
                   fontSize: 11,
                   fontWeight:
                       isSelected ? FontWeight.w600 : FontWeight.w400,

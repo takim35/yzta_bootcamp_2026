@@ -28,7 +28,7 @@ class CommentsBottomSheet extends StatefulWidget {
     return showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: AppTheme.surfaceDark,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -143,17 +143,17 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: AppTheme.surfaceDark,
-        title: const Text('Yorumu Sil', style: TextStyle(color: AppTheme.textPrimary)),
-        content: const Text('Bu yorumu silmek istediğinize emin misiniz?', style: TextStyle(color: AppTheme.textSecondary)),
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        title: Text('Yorumu Sil', style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white)),
+        content: Text('Bu yorumu silmek istediğinize emin misiniz?', style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('İptal', style: TextStyle(color: AppTheme.textMuted)),
+            child: Text('İptal', style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Sil', style: TextStyle(color: AppTheme.errorColor)),
+            child: Text('Sil', style: TextStyle(color: Theme.of(context).colorScheme.error)),
           ),
         ],
       ),
@@ -185,7 +185,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: AppTheme.dividerColor,
+                color: Theme.of(context).dividerColor,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -194,25 +194,25 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
               child: Text(
                 'Yorumlar (${_comments.isNotEmpty ? _comments.length : widget.initialCommentsCount})',
                 style: const TextStyle(
-                  color: AppTheme.textPrimary,
+                  color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                 ),
               ),
             ),
-            const Divider(height: 1, color: AppTheme.dividerColor),
+            Divider(height: 1, color: Theme.of(context).dividerColor),
             Expanded(child: _buildBody()),
-            const Divider(height: 1, color: AppTheme.dividerColor),
+            Divider(height: 1, color: Theme.of(context).dividerColor),
             if (_replyingToUsername != null) ...[
               Container(
-                color: AppTheme.cardDark.withOpacity(0.5),
+                color: Theme.of(context).cardColor.withOpacity(0.5),
                 padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingM, vertical: 8),
                 child: Row(
                   children: [
                     Expanded(
                       child: Text(
                         '@$_replyingToUsername kullanıcısına yanıt veriliyor...',
-                        style: const TextStyle(color: AppTheme.textMuted, fontSize: 13),
+                        style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey, fontSize: 13),
                       ),
                     ),
                     GestureDetector(
@@ -222,12 +222,12 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                           _replyingToUsername = null;
                         });
                       },
-                      child: const Icon(Icons.close_rounded, color: AppTheme.textMuted, size: 18),
+                      child: Icon(Icons.close_rounded, color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey, size: 18),
                     ),
                   ],
                 ),
               ),
-              const Divider(height: 1, color: AppTheme.dividerColor),
+              Divider(height: 1, color: Theme.of(context).dividerColor),
             ],
             _buildInput(),
           ],
@@ -239,7 +239,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
   Widget _buildBody() {
     if (_isLoading) {
       return const Center(
-        child: CircularProgressIndicator(color: AppTheme.accentViolet),
+        child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary),
       );
     }
 
@@ -247,7 +247,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
       return Center(
         child: Text(
           _errorMessage!,
-          style: const TextStyle(color: AppTheme.errorColor),
+          style: TextStyle(color: Theme.of(context).colorScheme.error),
         ),
       );
     }
@@ -256,7 +256,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
       return const Center(
         child: Text(
           'Henüz yorum yok. İlk yorumu sen yap!',
-          style: TextStyle(color: AppTheme.textSecondary),
+          style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
         ),
       );
     }
@@ -298,7 +298,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
       children: [
         CircleAvatar(
           radius: isReply ? 12 : 16,
-          backgroundColor: AppTheme.cardDark,
+          backgroundColor: Theme.of(context).cardColor,
           backgroundImage: comment.avatarUrl != null && comment.avatarUrl!.isNotEmpty
               ? CachedNetworkImageProvider(comment.avatarUrl!)
               : null,
@@ -306,7 +306,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
               ? Text(
                   comment.username.isNotEmpty ? comment.username[0].toUpperCase() : '?',
                   style: TextStyle(
-                    color: AppTheme.textPrimary,
+                    color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                     fontSize: isReply ? 10 : 12,
                   ),
                 )
@@ -323,7 +323,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                     TextSpan(
                       text: '${comment.username} ',
                       style: const TextStyle(
-                        color: AppTheme.textPrimary,
+                        color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
                       ),
@@ -331,7 +331,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                     TextSpan(
                       text: comment.content,
                       style: const TextStyle(
-                        color: AppTheme.textSecondary,
+                        color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
                         fontSize: 14,
                       ),
                     ),
@@ -344,7 +344,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                   Text(
                     comment.timeAgo,
                     style: const TextStyle(
-                      color: AppTheme.textMuted,
+                      color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
                       fontSize: 12,
                     ),
                   ),
@@ -361,7 +361,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                       child: const Text(
                         'Yanıtla',
                         style: TextStyle(
-                          color: AppTheme.textMuted,
+                          color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                         ),
@@ -379,7 +379,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
             onTap: () => _deleteComment(comment.commentId),
             child: const Icon(
               Icons.delete_outline_rounded,
-              color: AppTheme.textMuted,
+              color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
               size: 18,
             ),
           ),
@@ -397,12 +397,12 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
             child: TextField(
               controller: _controller,
               focusNode: _focusNode,
-              style: const TextStyle(color: AppTheme.textPrimary),
+              style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
               decoration: InputDecoration(
                 hintText: _replyingToUsername != null ? 'Yanıt ekle...' : 'Yorum ekle...',
-                hintStyle: const TextStyle(color: AppTheme.textMuted),
+                hintStyle: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey),
                 filled: true,
-                fillColor: AppTheme.cardDark,
+                fillColor: Theme.of(context).cardColor,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(24),
                   borderSide: BorderSide.none,
@@ -425,7 +425,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                     height: 20,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                : const Icon(Icons.send_rounded, color: AppTheme.accentViolet),
+                : Icon(Icons.send_rounded, color: Theme.of(context).colorScheme.primary),
           ),
         ],
       ),

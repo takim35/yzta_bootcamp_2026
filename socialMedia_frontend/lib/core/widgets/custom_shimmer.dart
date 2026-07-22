@@ -59,9 +59,9 @@ class _CustomShimmerState extends State<CustomShimmer>
               end: Alignment.bottomRight,
               stops: const [0.0, 0.5, 1.0],
               colors: [
-                AppTheme.surfaceDark.withValues(alpha: 0.3),
-                AppTheme.surfaceDark.withValues(alpha: 0.7),
-                AppTheme.surfaceDark.withValues(alpha: 0.3),
+                Theme.of(context).colorScheme.surface.withValues(alpha: 0.3),
+                Theme.of(context).colorScheme.surface.withValues(alpha: 0.7),
+                Theme.of(context).colorScheme.surface.withValues(alpha: 0.3),
               ],
               transform: GradientRotation(_animation.value),
             ),

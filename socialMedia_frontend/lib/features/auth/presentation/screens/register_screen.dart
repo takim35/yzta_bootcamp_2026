@@ -113,12 +113,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final s = ref.watch(stringsProvider);
 
     return Scaffold(
-      backgroundColor: AppTheme.primaryDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppTheme.textPrimary),
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -137,7 +137,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     style: const TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: AppTheme.textPrimary,
+                      color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                     ),
                   ),
                   const SizedBox(height: AppTheme.spacingS),
@@ -147,7 +147,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         : 'Join us and digitize your wardrobe',
                     style: const TextStyle(
                       fontSize: 16,
-                      color: AppTheme.textSecondary,
+                      color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
                     ),
                   ),
                   const SizedBox(height: AppTheme.spacingXXL),
@@ -157,13 +157,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       padding: const EdgeInsets.all(AppTheme.spacingM),
                       margin: const EdgeInsets.only(bottom: AppTheme.spacingM),
                       decoration: BoxDecoration(
-                        color: AppTheme.errorColor.withValues(alpha: 0.1),
+                        color: Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
-                        border: Border.all(color: AppTheme.errorColor.withValues(alpha: 0.5)),
+                        border: Border.all(color: Theme.of(context).colorScheme.error.withValues(alpha: 0.5)),
                       ),
                       child: Text(
                         _errorMessage!,
-                        style: const TextStyle(color: AppTheme.errorColor),
+                        style: TextStyle(color: Theme.of(context).colorScheme.error),
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -218,7 +218,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           : 'Password must be at least 8 characters long, containing at least one uppercase letter, one digit, and one symbol (!@#\$%^&*).',
                       style: TextStyle(
                         fontSize: 12,
-                        color: AppTheme.textSecondary.withValues(alpha: 0.6),
+                        color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey.withValues(alpha: 0.6),
                         height: 1.4,
                       ),
                     ),
@@ -254,13 +254,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       decoration: BoxDecoration(
                         gradient: _isLoading ? null : AppTheme.primaryGradient,
-                        color: _isLoading ? AppTheme.surfaceDark : null,
+                        color: _isLoading ? Theme.of(context).colorScheme.surface : null,
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: _isLoading
                             ? []
                             : [
                                 BoxShadow(
-                                  color: AppTheme.accentViolet.withValues(alpha: 0.3),
+                                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
                                   blurRadius: 12,
                                   offset: const Offset(0, 4),
                                 ),
@@ -272,7 +272,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                 width: 22,
                                 height: 22,
                                 child: CircularProgressIndicator(
-                                  color: AppTheme.accentViolet,
+                                  color: Theme.of(context).colorScheme.primary,
                                   strokeWidth: 2.5,
                                 ),
                               )
@@ -297,10 +297,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       duration: const Duration(milliseconds: 200),
                       height: 52,
                       decoration: BoxDecoration(
-                        color: AppTheme.surfaceDark,
+                        color: Theme.of(context).colorScheme.surface,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: AppTheme.dividerColor,
+                          color: Theme.of(context).dividerColor,
                           width: 1.5,
                         ),
                       ),
@@ -329,7 +329,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           Text(
                             s.isTr ? 'Google ile Devam Et' : 'Continue with Google',
                             style: const TextStyle(
-                              color: AppTheme.textPrimary,
+                              color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
                             ),
@@ -361,43 +361,43 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       controller: controller,
       obscureText: isPassword && !isPasswordVisible,
       keyboardType: keyboardType,
-      style: const TextStyle(color: AppTheme.textPrimary),
+      style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
       validator: validator,
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: const TextStyle(color: AppTheme.textSecondary),
-        prefixIcon: Icon(icon, color: AppTheme.textSecondary),
+        hintStyle: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+        prefixIcon: Icon(icon, color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
         suffixIcon: isPassword
             ? IconButton(
                 icon: Icon(
                   isPasswordVisible ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                  color: AppTheme.textSecondary,
+                  color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
                 ),
                 onPressed: onVisibilityToggle,
               )
             : null,
         filled: true,
-        fillColor: AppTheme.surfaceDark,
+        fillColor: Theme.of(context).colorScheme.surface,
         contentPadding: const EdgeInsets.symmetric(vertical: 16),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppTheme.dividerColor),
+          borderSide: BorderSide(color: Theme.of(context).dividerColor),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppTheme.dividerColor),
+          borderSide: BorderSide(color: Theme.of(context).dividerColor),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppTheme.accentViolet),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppTheme.errorColor),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.error),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppTheme.errorColor),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.error),
         ),
       ),
     );

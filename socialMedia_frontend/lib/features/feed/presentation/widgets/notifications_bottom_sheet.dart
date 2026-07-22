@@ -18,7 +18,7 @@ class NotificationsBottomSheet extends StatefulWidget {
     return showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: AppTheme.surfaceDark,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -108,7 +108,7 @@ class _NotificationsBottomSheetState extends State<NotificationsBottomSheet> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: AppTheme.dividerColor,
+                color: Theme.of(context).dividerColor,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -123,7 +123,7 @@ class _NotificationsBottomSheetState extends State<NotificationsBottomSheet> {
                   const Text(
                     'Bildirimler 🔔',
                     style: TextStyle(
-                      color: AppTheme.textPrimary,
+                      color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
                     ),
@@ -134,7 +134,7 @@ class _NotificationsBottomSheetState extends State<NotificationsBottomSheet> {
                       child: const Text(
                         'Tümünü Okundu Yap',
                         style: TextStyle(
-                          color: AppTheme.accentViolet,
+                          color: Theme.of(context).colorScheme.primary,
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                         ),
@@ -143,7 +143,7 @@ class _NotificationsBottomSheetState extends State<NotificationsBottomSheet> {
                 ],
               ),
             ),
-            const Divider(height: 1, color: AppTheme.dividerColor),
+            Divider(height: 1, color: Theme.of(context).dividerColor),
             Expanded(child: _buildBody()),
           ],
         ),
@@ -154,7 +154,7 @@ class _NotificationsBottomSheetState extends State<NotificationsBottomSheet> {
   Widget _buildBody() {
     if (_isLoading) {
       return const Center(
-        child: CircularProgressIndicator(color: AppTheme.accentViolet),
+        child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary),
       );
     }
 
@@ -162,7 +162,7 @@ class _NotificationsBottomSheetState extends State<NotificationsBottomSheet> {
       return Center(
         child: Text(
           _errorMessage!,
-          style: const TextStyle(color: AppTheme.errorColor),
+          style: TextStyle(color: Theme.of(context).colorScheme.error),
         ),
       );
     }
@@ -172,11 +172,11 @@ class _NotificationsBottomSheetState extends State<NotificationsBottomSheet> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.notifications_off_outlined, size: 48, color: AppTheme.textMuted),
+            Icon(Icons.notifications_off_outlined, size: 48, color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey),
             SizedBox(height: 12),
             Text(
               'Henüz bildirimin yok ✨',
-              style: TextStyle(color: AppTheme.textSecondary, fontSize: 15),
+              style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey, fontSize: 15),
             ),
           ],
         ),
@@ -199,14 +199,14 @@ class _NotificationsBottomSheetState extends State<NotificationsBottomSheet> {
         if (type == 'like') {
           iconBadge = const Icon(Icons.favorite_rounded, color: Colors.pinkAccent, size: 14);
         } else if (type == 'comment') {
-          iconBadge = const Icon(Icons.chat_bubble_rounded, color: AppTheme.accentViolet, size: 14);
+          iconBadge = Icon(Icons.chat_bubble_rounded, color: Theme.of(context).colorScheme.primary, size: 14);
         } else {
           iconBadge = const Icon(Icons.person_add_rounded, color: Colors.blueAccent, size: 14);
         }
 
         return Container(
           decoration: BoxDecoration(
-            color: isRead ? Colors.transparent : AppTheme.cardDark.withOpacity(0.6),
+            color: isRead ? Colors.transparent : Theme.of(context).cardColor.withOpacity(0.6),
             borderRadius: BorderRadius.circular(12),
           ),
           child: ListTile(
@@ -219,12 +219,12 @@ class _NotificationsBottomSheetState extends State<NotificationsBottomSheet> {
               children: [
                 CircleAvatar(
                   radius: 20,
-                  backgroundColor: AppTheme.cardDark,
+                  backgroundColor: Theme.of(context).cardColor,
                   backgroundImage: avatarUrl.isNotEmpty ? CachedNetworkImageProvider(avatarUrl) : null,
                   child: avatarUrl.isEmpty
                       ? Text(
                           actorName.isNotEmpty ? actorName[0].toUpperCase() : '?',
-                          style: const TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.bold),
+                          style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white, fontWeight: FontWeight.bold),
                         )
                       : null,
                 ),
@@ -234,7 +234,7 @@ class _NotificationsBottomSheetState extends State<NotificationsBottomSheet> {
                   child: Container(
                     padding: const EdgeInsets.all(2),
                     decoration: const BoxDecoration(
-                      color: AppTheme.surfaceDark,
+                      color: Theme.of(context).colorScheme.surface,
                       shape: BoxShape.circle,
                     ),
                     child: iconBadge,
@@ -245,7 +245,7 @@ class _NotificationsBottomSheetState extends State<NotificationsBottomSheet> {
             title: Text(
               message,
               style: TextStyle(
-                color: AppTheme.textPrimary,
+                color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                 fontSize: 14,
                 fontWeight: isRead ? FontWeight.normal : FontWeight.w600,
               ),
@@ -256,7 +256,7 @@ class _NotificationsBottomSheetState extends State<NotificationsBottomSheet> {
                     width: 8,
                     height: 8,
                     decoration: const BoxDecoration(
-                      color: AppTheme.accentViolet,
+                      color: Theme.of(context).colorScheme.primary,
                       shape: BoxShape.circle,
                     ),
                   ),

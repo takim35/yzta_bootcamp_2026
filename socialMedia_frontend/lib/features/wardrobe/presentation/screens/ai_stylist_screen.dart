@@ -109,7 +109,7 @@ class _AiStylistScreenState extends ConsumerState<AiStylistScreen> {
     final s = ref.watch(stringsProvider);
 
     return Scaffold(
-      backgroundColor: AppTheme.primaryDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: Row(
           children: [
@@ -122,10 +122,10 @@ class _AiStylistScreenState extends ConsumerState<AiStylistScreen> {
               child: const Icon(Icons.auto_awesome, color: Colors.white, size: 18),
             ),
             const SizedBox(width: 10),
-            Text(s.aiStylist, style: const TextStyle(color: AppTheme.textPrimary)),
+            Text(s.aiStylist, style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white)),
           ],
         ),
-        backgroundColor: AppTheme.primaryDark,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
       ),
       body: Column(
@@ -133,7 +133,7 @@ class _AiStylistScreenState extends ConsumerState<AiStylistScreen> {
           // ── Mesaj Listesi ───────────────────────────────────
           Expanded(
             child: !_historyLoaded
-                ? const Center(child: CircularProgressIndicator(color: AppTheme.accentViolet))
+                ? Center(child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary))
                 : _messages.isEmpty
                     ? _buildEmptyState(s)
                     : ListView.builder(
@@ -157,7 +157,7 @@ class _AiStylistScreenState extends ConsumerState<AiStylistScreen> {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: AppTheme.cardDark,
+                      color: Theme.of(context).cardColor,
                       borderRadius: BorderRadius.circular(18),
                     ),
                     child: const SizedBox(
@@ -165,13 +165,13 @@ class _AiStylistScreenState extends ConsumerState<AiStylistScreen> {
                       height: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        color: AppTheme.accentViolet,
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
                   ),
                   const SizedBox(width: 8),
                   const Text('Stilistiniz düşünüyor...',
-                      style: TextStyle(color: AppTheme.textMuted, fontSize: 12)),
+                      style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey, fontSize: 12)),
                 ],
               ),
             ),
@@ -180,23 +180,23 @@ class _AiStylistScreenState extends ConsumerState<AiStylistScreen> {
           Container(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
             decoration: BoxDecoration(
-              color: AppTheme.surfaceDark,
-              border: Border(top: BorderSide(color: AppTheme.dividerColor)),
+              color: Theme.of(context).colorScheme.surface,
+              border: Border(top: BorderSide(color: Theme.of(context).dividerColor)),
             ),
             child: Row(
               children: [
                 Expanded(
                   child: TextField(
                     controller: _messageController,
-                    style: const TextStyle(color: AppTheme.textPrimary),
+                    style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
                     maxLines: null,
                     textInputAction: TextInputAction.send,
                     onSubmitted: (_) => _sendMessage(),
                     decoration: InputDecoration(
                       hintText: s.askForSuggestions,
-                      hintStyle: const TextStyle(color: AppTheme.textMuted),
+                      hintStyle: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey),
                       filled: true,
-                      fillColor: AppTheme.cardDark,
+                      fillColor: Theme.of(context).cardColor,
                       contentPadding:
                           const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       border: OutlineInputBorder(
@@ -252,7 +252,7 @@ class _AiStylistScreenState extends ConsumerState<AiStylistScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
                 gradient: isUser ? AppTheme.primaryGradient : null,
-                color: isUser ? null : AppTheme.cardDark,
+                color: isUser ? null : Theme.of(context).cardColor,
                 borderRadius: BorderRadius.only(
                   topLeft: const Radius.circular(18),
                   topRight: const Radius.circular(18),
@@ -263,7 +263,7 @@ class _AiStylistScreenState extends ConsumerState<AiStylistScreen> {
               child: Text(
                 msg['text'] ?? '',
                 style: TextStyle(
-                  color: isUser ? Colors.white : AppTheme.textPrimary,
+                  color: isUser ? Colors.white : Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                   fontSize: 14,
                   height: 1.4,
                 ),
@@ -293,18 +293,18 @@ class _AiStylistScreenState extends ConsumerState<AiStylistScreen> {
           const SizedBox(height: 20),
           Text(
             s.aiStylist,
-            style: const TextStyle(
-              color: AppTheme.textPrimary,
+            style: TextStyle(
+              color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 8),
-          const Padding(
+          Padding(
             padding: EdgeInsets.symmetric(horizontal: 40),
             child: Text(
               'Merhaba! Bugün ne giyeceğinizi birlikte seçelim. Nereye gidiyorsunuz?',
-              style: TextStyle(color: AppTheme.textMuted, fontSize: 14),
+              style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey, fontSize: 14),
               textAlign: TextAlign.center,
             ),
           ),

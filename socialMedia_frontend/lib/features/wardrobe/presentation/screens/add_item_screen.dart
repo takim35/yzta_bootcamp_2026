@@ -75,7 +75,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('AI analyzed the clothing successfully! ✨'),
-                backgroundColor: AppTheme.accentViolet,
+                backgroundColor: Theme.of(context).colorScheme.primary,
               ),
             );
           }
@@ -149,7 +149,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
   void _showImageSourceSheet() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppTheme.cardDark,
+      backgroundColor: Theme.of(context).cardColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -161,22 +161,22 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
             Container(
               width: 40, height: 4,
               decoration: BoxDecoration(
-                color: AppTheme.textMuted,
+                color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
             const SizedBox(height: 16),
             ListTile(
-              leading: const Icon(Icons.camera_alt_rounded, color: AppTheme.accentViolet),
-              title: const Text('Camera', style: TextStyle(color: AppTheme.textPrimary)),
+              leading: Icon(Icons.camera_alt_rounded, color: Theme.of(context).colorScheme.primary),
+              title: Text('Camera', style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white)),
               onTap: () {
                 Navigator.pop(context);
                 _pickImage(ImageSource.camera);
               },
             ),
             ListTile(
-              leading: const Icon(Icons.photo_library_rounded, color: AppTheme.accentPink),
-              title: const Text('Photo Library', style: TextStyle(color: AppTheme.textPrimary)),
+              leading: Icon(Icons.photo_library_rounded, color: Theme.of(context).colorScheme.secondary),
+              title: Text('Photo Library', style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white)),
               onTap: () {
                 Navigator.pop(context);
                 _pickImage(ImageSource.gallery);
@@ -193,24 +193,24 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
   Widget build(BuildContext context) {
     final s = ref.watch(stringsProvider);
     return Scaffold(
-      backgroundColor: AppTheme.primaryDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('Add Clothing', style: TextStyle(color: AppTheme.textPrimary)),
-        backgroundColor: AppTheme.primaryDark,
+        title: Text('Add Clothing', style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white)),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
-        iconTheme: const IconThemeData(color: AppTheme.textPrimary),
+        iconTheme: IconThemeData(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
         actions: [
           _isLoading
               ? const Padding(
                   padding: EdgeInsets.all(16),
                   child: SizedBox(
                     width: 20, height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.accentViolet),
+                    child: CircularProgressIndicator(strokeWidth: 2, color: Theme.of(context).colorScheme.primary),
                   ),
                 )
               : TextButton(
                   onPressed: _submit,
-                  child: const Text('Save', style: TextStyle(color: AppTheme.accentViolet, fontWeight: FontWeight.bold)),
+                  child: Text('Save', style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold)),
                 ),
         ],
       ),
@@ -226,12 +226,12 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
                 width: double.infinity,
                 height: 200,
                 decoration: BoxDecoration(
-                  color: AppTheme.surfaceDark,
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
                     color: _selectedImage != null
-                        ? AppTheme.accentViolet
-                        : AppTheme.dividerColor,
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).dividerColor,
                     width: 2,
                   ),
                 ),
@@ -252,7 +252,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
                               child: const Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  CircularProgressIndicator(color: AppTheme.accentViolet),
+                                  CircularProgressIndicator(color: Theme.of(context).colorScheme.primary),
                                   SizedBox(height: 12),
                                   Text(
                                     'AI Analyzing...',
@@ -267,13 +267,13 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.add_photo_alternate_rounded,
-                              size: 52, color: AppTheme.accentViolet.withValues(alpha: 0.7)),
+                              size: 52, color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.7)),
                           const SizedBox(height: 12),
                           const Text('Add photo',
-                              style: TextStyle(color: AppTheme.textMuted, fontSize: 15)),
+                              style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey, fontSize: 15)),
                           const SizedBox(height: 4),
                           const Text('Select from camera or library',
-                              style: TextStyle(color: AppTheme.textMuted, fontSize: 12)),
+                              style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey, fontSize: 12)),
                         ],
                       ),
               ),
@@ -333,7 +333,7 @@ class _AddItemScreenState extends ConsumerState<AddItemScreen> {
               child: ElevatedButton(
                 onPressed: _isLoading ? null : _submit,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.accentViolet,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                 ),
                 child: _isLoading
@@ -360,7 +360,7 @@ class _SectionLabel extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Text(text,
-          style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13, fontWeight: FontWeight.w500)),
+          style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey, fontSize: 13, fontWeight: FontWeight.w500)),
     );
   }
 }
@@ -383,16 +383,16 @@ class _DropdownField extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceDark,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.dividerColor),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: DropdownButton<String>(
         value: value,
         isExpanded: true,
         underline: const SizedBox(),
-        dropdownColor: AppTheme.cardDark,
-        style: const TextStyle(color: AppTheme.textPrimary, fontSize: 15),
+        dropdownColor: Theme.of(context).cardColor,
+        style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white, fontSize: 15),
         items: items
             .map((e) => DropdownMenuItem(
                 value: e,
@@ -414,23 +414,23 @@ class _TextField extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextField(
       controller: controller,
-      style: const TextStyle(color: AppTheme.textPrimary),
+      style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: const TextStyle(color: AppTheme.textMuted),
+        hintStyle: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey),
         filled: true,
-        fillColor: AppTheme.surfaceDark,
+        fillColor: Theme.of(context).colorScheme.surface,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppTheme.dividerColor),
+          borderSide: BorderSide(color: Theme.of(context).dividerColor),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppTheme.dividerColor),
+          borderSide: BorderSide(color: Theme.of(context).dividerColor),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppTheme.accentViolet),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
         ),
       ),
     );

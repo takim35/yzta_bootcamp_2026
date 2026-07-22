@@ -30,9 +30,9 @@ class AppNavigator extends ConsumerWidget {
         currentIndex: currentIndex,
         onTap: (index) => ref.read(bottomNavIndexProvider.notifier).state = index,
         type: BottomNavigationBarType.fixed,
-        backgroundColor: AppTheme.surfaceDark,
-        selectedItemColor: AppTheme.accentViolet,
-        unselectedItemColor: AppTheme.textMuted,
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        selectedItemColor: Theme.of(context).colorScheme.primary,
+        unselectedItemColor: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
         items: [
           BottomNavigationBarItem(icon: const Icon(Icons.home_rounded), label: s.navFeed),
           BottomNavigationBarItem(icon: const Icon(Icons.search_rounded), label: s.isTr ? 'Ara' : 'Search'),

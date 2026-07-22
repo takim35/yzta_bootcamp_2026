@@ -12,7 +12,7 @@ class MoreScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      backgroundColor: AppTheme.primaryDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
@@ -41,9 +41,9 @@ class MoreScreen extends ConsumerWidget {
                 child: Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: AppTheme.cardDark,
+                    color: Theme.of(context).cardColor,
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: AppTheme.dividerColor),
+                    border: Border.all(color: Theme.of(context).dividerColor),
                   ),
                   child: Row(
                     children: [
@@ -51,11 +51,11 @@ class MoreScreen extends ConsumerWidget {
                         width: 60,
                         height: 60,
                         decoration: BoxDecoration(
-                          color: AppTheme.surfaceDark,
+                          color: Theme.of(context).colorScheme.surface,
                           shape: BoxShape.circle,
-                          border: Border.all(color: AppTheme.accentViolet, width: 2),
+                          border: Border.all(color: Theme.of(context).colorScheme.primary, width: 2),
                         ),
-                        child: const Icon(Icons.person_rounded, color: AppTheme.accentViolet, size: 32),
+                        child: Icon(Icons.person_rounded, color: Theme.of(context).colorScheme.primary, size: 32),
                       ),
                       const SizedBox(width: 16),
                       const Expanded(
@@ -74,14 +74,14 @@ class MoreScreen extends ConsumerWidget {
                             Text(
                               'Manage your account',
                               style: TextStyle(
-                                color: AppTheme.textMuted,
+                                color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
                                 fontSize: 13,
                               ),
                             ),
                           ],
                         ),
                       ),
-                      const Icon(Icons.chevron_right_rounded, color: AppTheme.textMuted),
+                      Icon(Icons.chevron_right_rounded, color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey),
                     ],
                   ),
                 ),
@@ -92,7 +92,7 @@ class MoreScreen extends ConsumerWidget {
               const Text(
                 'Settings',
                 style: TextStyle(
-                  color: AppTheme.textPrimary,
+                  color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
@@ -101,18 +101,18 @@ class MoreScreen extends ConsumerWidget {
               
               Container(
                 decoration: BoxDecoration(
-                  color: AppTheme.cardDark,
+                  color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppTheme.dividerColor),
+                  border: Border.all(color: Theme.of(context).dividerColor),
                 ),
                 child: Column(
                   children: [
                     _SettingsTile(title: 'Style Preferences', icon: Icons.palette_rounded, onTap: () {}),
-                    const Divider(height: 1, color: AppTheme.dividerColor),
+                    Divider(height: 1, color: Theme.of(context).dividerColor),
                     _SettingsTile(title: 'Location & Timezone', icon: Icons.location_on_rounded, onTap: () {}),
-                    const Divider(height: 1, color: AppTheme.dividerColor),
+                    Divider(height: 1, color: Theme.of(context).dividerColor),
                     _SettingsTile(title: 'Outfit Schedule', icon: Icons.calendar_today_rounded, onTap: () {}),
-                    const Divider(height: 1, color: AppTheme.dividerColor),
+                    Divider(height: 1, color: Theme.of(context).dividerColor),
                     _SettingsTile(
                       title: 'Language', 
                       icon: Icons.language_rounded, 
@@ -120,7 +120,7 @@ class MoreScreen extends ConsumerWidget {
                         _showLanguageDialog(context);
                       }
                     ),
-                    const Divider(height: 1, color: AppTheme.dividerColor),
+                    Divider(height: 1, color: Theme.of(context).dividerColor),
                     _SettingsTile(
                       title: 'Body Measurements', 
                       icon: Icons.straighten_rounded, 
@@ -131,7 +131,7 @@ class MoreScreen extends ConsumerWidget {
                         );
                       }
                     ),
-                    const Divider(height: 1, color: AppTheme.dividerColor),
+                    Divider(height: 1, color: Theme.of(context).dividerColor),
                     _SettingsTile(title: 'Subscription', icon: Icons.credit_card_rounded, onTap: () {}),
                   ],
                 ),
@@ -141,9 +141,9 @@ class MoreScreen extends ConsumerWidget {
 
               Container(
                 decoration: BoxDecoration(
-                  color: AppTheme.cardDark,
+                  color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppTheme.dividerColor),
+                  border: Border.all(color: Theme.of(context).dividerColor),
                 ),
                 child: const _SettingsAppearance(title: 'Appearance', icon: Icons.brightness_medium_rounded),
               ),
@@ -152,9 +152,9 @@ class MoreScreen extends ConsumerWidget {
 
               Container(
                 decoration: BoxDecoration(
-                  color: AppTheme.cardDark,
+                  color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppTheme.dividerColor),
+                  border: Border.all(color: Theme.of(context).dividerColor),
                 ),
                 child: _SettingsTile(
                   title: 'Sign Out',
@@ -170,16 +170,16 @@ class MoreScreen extends ConsumerWidget {
 
               Container(
                 decoration: BoxDecoration(
-                  color: AppTheme.cardDark,
+                  color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppTheme.dividerColor),
+                  border: Border.all(color: Theme.of(context).dividerColor),
                 ),
                 child: Column(
                   children: [
                     _SettingsTile(title: 'Terms of Use', icon: Icons.description_rounded, hasExternalIcon: true, onTap: () {}),
-                    const Divider(height: 1, color: AppTheme.dividerColor),
+                    Divider(height: 1, color: Theme.of(context).dividerColor),
                     _SettingsTile(title: 'Privacy Policy', icon: Icons.security_rounded, hasExternalIcon: true, onTap: () {}),
-                    const Divider(height: 1, color: AppTheme.dividerColor),
+                    Divider(height: 1, color: Theme.of(context).dividerColor),
                     _SettingsTile(
                       title: 'Delete Account',
                       icon: Icons.delete_outline_rounded,
@@ -202,8 +202,8 @@ class MoreScreen extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppTheme.cardDark,
-        title: const Text('Select Language', style: TextStyle(color: AppTheme.textPrimary)),
+        backgroundColor: Theme.of(context).cardColor,
+        title: Text('Select Language', style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white)),
         content: SizedBox(
           width: double.maxFinite,
           child: ListView.builder(
@@ -211,7 +211,7 @@ class MoreScreen extends ConsumerWidget {
             itemCount: languages.length,
             itemBuilder: (context, index) {
               return ListTile(
-                title: Text(languages[index], style: const TextStyle(color: AppTheme.textSecondary)),
+                title: Text(languages[index], style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey)),
                 onTap: () {
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -256,13 +256,13 @@ class _SettingsTile extends StatelessWidget {
             Icon(
               icon,
               size: 20,
-              color: isDestructive ? AppTheme.errorColor : AppTheme.textSecondary,
+              color: isDestructive ? Theme.of(context).colorScheme.error : Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
             ),
             const SizedBox(width: 16),
             Text(
               title,
               style: TextStyle(
-                color: isDestructive ? AppTheme.errorColor : AppTheme.textPrimary,
+                color: isDestructive ? Theme.of(context).colorScheme.error : Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                 fontSize: 15,
                 fontWeight: FontWeight.w500,
               ),
@@ -271,7 +271,7 @@ class _SettingsTile extends StatelessWidget {
             if (!isCenter)
               Icon(
                 hasExternalIcon ? Icons.open_in_new_rounded : Icons.chevron_right_rounded,
-                color: AppTheme.textMuted,
+                color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
                 size: 18,
               ),
           ],
@@ -298,12 +298,12 @@ class _SettingsAppearance extends ConsumerWidget {
         children: [
           Row(
             children: [
-              Icon(icon, size: 20, color: AppTheme.textSecondary),
+              Icon(icon, size: 20, color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
               const SizedBox(width: 16),
               Text(
                 title,
                 style: const TextStyle(
-                  color: AppTheme.textPrimary,
+                  color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                   fontSize: 15,
                   fontWeight: FontWeight.w500,
                 ),
@@ -352,10 +352,10 @@ class _SegmentItem extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
-        color: isSelected ? AppTheme.dividerColor : Colors.transparent,
+        color: isSelected ? Theme.of(context).dividerColor : Colors.transparent,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: isSelected ? Colors.white : AppTheme.dividerColor,
+          color: isSelected ? Colors.white : Theme.of(context).dividerColor,
           width: 0.5,
         ),
       ),
@@ -363,7 +363,7 @@ class _SegmentItem extends StatelessWidget {
         child: Text(
           label,
           style: TextStyle(
-            color: isSelected ? Colors.white : AppTheme.textMuted,
+            color: isSelected ? Colors.white : Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
             fontSize: 13,
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
           ),

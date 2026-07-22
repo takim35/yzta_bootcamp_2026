@@ -114,17 +114,17 @@ class _EditItemScreenState extends ConsumerState<EditItemScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppTheme.cardDark,
-        title: const Text('Delete Clothing', style: TextStyle(color: AppTheme.errorColor)),
-        content: const Text('Are you sure you want to delete this clothing from your wardrobe?', style: TextStyle(color: AppTheme.textPrimary)),
+        backgroundColor: Theme.of(context).cardColor,
+        title: Text('Delete Clothing', style: TextStyle(color: Theme.of(context).colorScheme.error)),
+        content: Text('Are you sure you want to delete this clothing from your wardrobe?', style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel', style: TextStyle(color: AppTheme.textMuted)),
+            child: Text('Cancel', style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Delete', style: TextStyle(color: AppTheme.errorColor)),
+            child: Text('Delete', style: TextStyle(color: Theme.of(context).colorScheme.error)),
           ),
         ],
       ),
@@ -155,22 +155,22 @@ class _EditItemScreenState extends ConsumerState<EditItemScreen> {
   void _showImageSourceSheet() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppTheme.cardDark,
+      backgroundColor: Theme.of(context).cardColor,
       builder: (_) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: const Icon(Icons.camera_alt_rounded, color: AppTheme.accentViolet),
-              title: const Text('Camera', style: TextStyle(color: AppTheme.textPrimary)),
+              leading: Icon(Icons.camera_alt_rounded, color: Theme.of(context).colorScheme.primary),
+              title: Text('Camera', style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white)),
               onTap: () {
                 Navigator.pop(context);
                 _pickImage(ImageSource.camera);
               },
             ),
             ListTile(
-              leading: const Icon(Icons.photo_library_rounded, color: AppTheme.accentPink),
-              title: const Text('Photo Library', style: TextStyle(color: AppTheme.textPrimary)),
+              leading: Icon(Icons.photo_library_rounded, color: Theme.of(context).colorScheme.secondary),
+              title: Text('Photo Library', style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white)),
               onTap: () {
                 Navigator.pop(context);
                 _pickImage(ImageSource.gallery);
@@ -187,30 +187,30 @@ class _EditItemScreenState extends ConsumerState<EditItemScreen> {
     final s = ref.watch(stringsProvider);
     final fotoUrl = widget.initialItem['foto_url'] as String?;
     return Scaffold(
-      backgroundColor: AppTheme.primaryDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text(s.isTr ? 'Kıyafeti Düzenle' : 'Edit Clothing', style: const TextStyle(color: AppTheme.textPrimary)),
-        backgroundColor: AppTheme.primaryDark,
+        title: Text(s.isTr ? 'Kıyafeti Düzenle' : 'Edit Clothing', style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white)),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
-        iconTheme: const IconThemeData(color: AppTheme.textPrimary),
+        iconTheme: IconThemeData(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
         actions: [
           _isDeleting 
-            ? const Padding(padding: EdgeInsets.all(16), child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: AppTheme.errorColor, strokeWidth: 2)))
+            ? Padding(padding: EdgeInsets.all(16), child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Theme.of(context).colorScheme.error, strokeWidth: 2)))
             : IconButton(
-                icon: const Icon(Icons.delete_outline, color: AppTheme.errorColor),
+                icon: Icon(Icons.delete_outline, color: Theme.of(context).colorScheme.error),
                 onPressed: _deleteItem,
               ),
           _isLoading
-              ? const Padding(
+              ? Padding(
                   padding: EdgeInsets.all(16),
                   child: SizedBox(
                     width: 20, height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.accentViolet),
+                    child: CircularProgressIndicator(strokeWidth: 2, color: Theme.of(context).colorScheme.primary),
                   ),
                 )
               : TextButton(
                   onPressed: _submit,
-                  child: Text(s.isTr ? 'Kaydet' : 'Save', style: const TextStyle(color: AppTheme.accentViolet, fontWeight: FontWeight.bold)),
+                  child: Text(s.isTr ? 'Kaydet' : 'Save', style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold)),
                 ),
         ],
       ),
@@ -225,9 +225,9 @@ class _EditItemScreenState extends ConsumerState<EditItemScreen> {
                 width: double.infinity,
                 height: 200,
                 decoration: BoxDecoration(
-                  color: AppTheme.surfaceDark,
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppTheme.dividerColor, width: 2),
+                  border: Border.all(color: Theme.of(context).dividerColor, width: 2),
                 ),
                 child: _selectedImage != null
                     ? ClipRRect(borderRadius: BorderRadius.circular(14), child: Image.file(_selectedImage!, fit: BoxFit.cover))
@@ -236,9 +236,9 @@ class _EditItemScreenState extends ConsumerState<EditItemScreen> {
                         : Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.add_photo_alternate_rounded, size: 52, color: AppTheme.accentViolet.withValues(alpha: 0.7)),
+                              Icon(Icons.add_photo_alternate_rounded, size: 52, color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.7)),
                               const SizedBox(height: 12),
-                              Text(s.isTr ? 'Fotoğraf değiştir' : 'Change photo', style: const TextStyle(color: AppTheme.textMuted, fontSize: 15)),
+                              Text(s.isTr ? 'Fotoğraf değiştir' : 'Change photo', style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey, fontSize: 15)),
                             ],
                           ),
               ),
@@ -256,14 +256,14 @@ class _EditItemScreenState extends ConsumerState<EditItemScreen> {
             const _SectionLabel(text: 'Brand'),
             TextField(
               controller: _markaCtrl,
-              style: const TextStyle(color: AppTheme.textPrimary),
+              style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
               decoration: _inputDeco('Enter brand'),
             ),
             const SizedBox(height: 16),
             const _SectionLabel(text: 'Size'),
             TextField(
               controller: _bedenCtrl,
-              style: const TextStyle(color: AppTheme.textPrimary),
+              style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
               decoration: _inputDeco('Size (e.g. M, 38)'),
             ),
             const SizedBox(height: 40),
@@ -276,9 +276,9 @@ class _EditItemScreenState extends ConsumerState<EditItemScreen> {
   InputDecoration _inputDeco(String hint) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: const TextStyle(color: AppTheme.textMuted),
+      hintStyle: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey),
       filled: true,
-      fillColor: AppTheme.surfaceDark,
+      fillColor: Theme.of(context).colorScheme.surface,
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
@@ -295,7 +295,7 @@ class _SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8, left: 4),
-      child: Text(text, style: const TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.bold)),
+      child: Text(text, style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white, fontWeight: FontWeight.bold)),
     );
   }
 }
@@ -325,16 +325,16 @@ class _ChipsField extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: isSelected ? AppTheme.accentViolet : AppTheme.surfaceDark,
+              color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: isSelected ? AppTheme.accentViolet : AppTheme.dividerColor,
+                color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).dividerColor,
               ),
             ),
             child: Text(
               displayTranslator != null ? displayTranslator!(item) : item,
               style: TextStyle(
-                color: isSelected ? AppTheme.textPrimary : AppTheme.textPrimary,
+                color: isSelected ? Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white : Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 fontSize: 13,
               ),

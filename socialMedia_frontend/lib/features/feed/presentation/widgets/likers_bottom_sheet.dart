@@ -60,7 +60,7 @@ class _LikersBottomSheetState extends State<LikersBottomSheet> {
     return Container(
       height: MediaQuery.of(context).size.height * 0.6,
       decoration: BoxDecoration(
-        color: AppTheme.surfaceDark,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
@@ -72,7 +72,7 @@ class _LikersBottomSheetState extends State<LikersBottomSheet> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: AppTheme.textPrimary.withValues(alpha: 0.24),
+                color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withValues(alpha: 0.24),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -80,21 +80,21 @@ class _LikersBottomSheetState extends State<LikersBottomSheet> {
           const Text(
             'Beğenenler',
             style: TextStyle(
-              color: AppTheme.textPrimary,
+              color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 16),
-          const Divider(color: AppTheme.dividerColor, height: 1),
+          Divider(color: Theme.of(context).dividerColor, height: 1),
           
           Expanded(
             child: _isLoading
-                ? const Center(child: CircularProgressIndicator(color: AppTheme.accentViolet))
+                ? Center(child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary))
                 : _error.isNotEmpty
-                    ? Center(child: Text(_error, style: const TextStyle(color: AppTheme.errorColor)))
+                    ? Center(child: Text(_error, style: TextStyle(color: Theme.of(context).colorScheme.error)))
                     : _likers.isEmpty
-                        ? const Center(child: Text('Henüz beğenen yok.', style: TextStyle(color: AppTheme.textMuted)))
+                        ? Center(child: Text('Henüz beğenen yok.', style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey)))
                         : ListView.builder(
                             padding: const EdgeInsets.symmetric(vertical: 8),
                             itemCount: _likers.length,
@@ -102,24 +102,24 @@ class _LikersBottomSheetState extends State<LikersBottomSheet> {
                               final liker = _likers[index];
                               return ListTile(
                                 leading: CircleAvatar(
-                                  backgroundColor: AppTheme.accentViolet,
+                                  backgroundColor: Theme.of(context).colorScheme.primary,
                                   backgroundImage: liker['avatar_url'] != null
                                       ? CachedNetworkImageProvider(liker['avatar_url'])
                                       : null,
                                   child: liker['avatar_url'] == null
-                                      ? const Icon(Icons.person, color: AppTheme.textPrimary)
+                                      ? Icon(Icons.person, color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white)
                                       : null,
                                 ),
                                 title: Text(
                                   liker['username'] ?? '',
                                   style: const TextStyle(
-                                    color: AppTheme.textPrimary,
+                                    color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
                                 subtitle: Text(
                                   liker['display_name'] ?? '',
-                                  style: const TextStyle(color: AppTheme.textMuted),
+                                  style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey),
                                 ),
                                 onTap: () {
                                   Navigator.pop(context);

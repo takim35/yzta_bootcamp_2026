@@ -11,7 +11,7 @@ class DashboardScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      backgroundColor: AppTheme.primaryDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
@@ -32,7 +32,7 @@ class DashboardScreen extends ConsumerWidget {
               const Text(
                 "Here's your outfit summary",
                 style: TextStyle(
-                  color: AppTheme.textMuted,
+                  color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
                   fontSize: 14,
                 ),
               ),
@@ -110,9 +110,9 @@ class DashboardScreen extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: AppTheme.cardDark,
+                  color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppTheme.dividerColor),
+                  border: Border.all(color: Theme.of(context).dividerColor),
                 ),
                 child: Row(
                   children: [
@@ -132,7 +132,7 @@ class DashboardScreen extends ConsumerWidget {
                         Text(
                           'Mostly Sunny',
                           style: TextStyle(
-                            color: AppTheme.textMuted,
+                            color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
                             fontSize: 12,
                           ),
                         ),
@@ -145,14 +145,14 @@ class DashboardScreen extends ConsumerWidget {
                         Text(
                           'feels 31°',
                           style: TextStyle(
-                            color: AppTheme.textSecondary,
+                            color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
                             fontSize: 12,
                           ),
                         ),
                         Text(
                           '2% chance of rain',
                           style: TextStyle(
-                            color: AppTheme.textMuted,
+                            color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
                             fontSize: 12,
                           ),
                         ),
@@ -179,7 +179,7 @@ class DashboardScreen extends ConsumerWidget {
                   Text(
                     '0 total',
                     style: TextStyle(
-                      color: AppTheme.textMuted,
+                      color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
                       fontSize: 12,
                     ),
                   ),
@@ -192,17 +192,17 @@ class DashboardScreen extends ConsumerWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: AppTheme.cardDark,
+                  color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppTheme.dividerColor, style: BorderStyle.solid),
+                  border: Border.all(color: Theme.of(context).dividerColor, style: BorderStyle.solid),
                 ),
                 child: const Column(
                   children: [
-                    Icon(Icons.checkroom_rounded, color: AppTheme.textMuted, size: 40),
+                    Icon(Icons.checkroom_rounded, color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey, size: 40),
                     SizedBox(height: 12),
                     Text(
                       "No pending outfits",
-                      style: TextStyle(color: AppTheme.textSecondary, fontSize: 14),
+                      style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey, fontSize: 14),
                     ),
                   ],
                 ),
@@ -278,9 +278,9 @@ class _ExploreCard extends StatelessWidget {
         height: 120,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppTheme.cardDark,
+          color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppTheme.dividerColor),
+          border: Border.all(color: Theme.of(context).dividerColor),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -299,7 +299,7 @@ class _ExploreCard extends StatelessWidget {
             Text(
               subtitle,
               style: const TextStyle(
-                color: AppTheme.textMuted,
+                color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
                 fontSize: 11,
               ),
             ),

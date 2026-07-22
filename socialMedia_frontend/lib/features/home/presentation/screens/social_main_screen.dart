@@ -25,21 +25,21 @@ class _SocialMainScreenState extends ConsumerState<SocialMainScreen> {
     ];
 
     return Scaffold(
-      backgroundColor: AppTheme.primaryDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: IndexedStack(
         index: _currentIndex,
         children: screens,
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: AppTheme.surfaceDark,
-          border: Border(top: BorderSide(color: AppTheme.dividerColor, width: 0.5)),
+          color: Theme.of(context).colorScheme.surface,
+          border: Border(top: BorderSide(color: Theme.of(context).dividerColor, width: 0.5)),
         ),
         child: BottomNavigationBar(
-          backgroundColor: AppTheme.surfaceDark,
+          backgroundColor: Theme.of(context).colorScheme.surface,
           currentIndex: _currentIndex,
           selectedItemColor: Colors.white,
-          unselectedItemColor: AppTheme.textMuted,
+          unselectedItemColor: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
           showSelectedLabels: true,
           showUnselectedLabels: true,
           type: BottomNavigationBarType.fixed,

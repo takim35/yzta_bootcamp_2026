@@ -39,7 +39,7 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.primaryDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -80,21 +80,21 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> {
               child: Container(
                 height: 40,
                 decoration: BoxDecoration(
-                  color: AppTheme.cardDark,
+                  color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: AppTheme.dividerColor),
+                  border: Border.all(color: Theme.of(context).dividerColor),
                 ),
                 child: Row(
                   children: [
                     const SizedBox(width: 12),
-                    const Icon(Icons.search_rounded, color: AppTheme.textMuted, size: 20),
+                    Icon(Icons.search_rounded, color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey, size: 20),
                     const SizedBox(width: 8),
                     Expanded(
                       child: TextField(
                         style: const TextStyle(color: Colors.white, fontSize: 14),
                         decoration: InputDecoration(
                           hintText: 'Search items...',
-                          hintStyle: const TextStyle(color: AppTheme.textMuted),
+                          hintStyle: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey),
                           border: InputBorder.none,
                           isDense: true,
                           contentPadding: const EdgeInsets.symmetric(vertical: 10),
@@ -138,7 +138,7 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> {
                     return Center(
                       child: Text(
                         'Error: ${snapshot.error}',
-                        style: const TextStyle(color: AppTheme.errorColor),
+                        style: TextStyle(color: Theme.of(context).colorScheme.error),
                       ),
                     );
                   }
@@ -152,18 +152,18 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
                         child: Text(
                           '${clothes.length} items',
-                          style: const TextStyle(
-                            color: AppTheme.textMuted,
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
                             fontSize: 12,
                           ),
                         ),
                       ),
                       if (clothes.isEmpty)
-                        const Expanded(
+                        Expanded(
                           child: Center(
                             child: Text(
                               'No clothes found',
-                              style: TextStyle(color: AppTheme.textSecondary),
+                              style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
                             ),
                           ),
                         )
@@ -202,9 +202,9 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> {
                                 },
                                 child: Container(
                                   decoration: BoxDecoration(
-                                    color: AppTheme.cardDark,
+                                    color: Theme.of(context).cardColor,
                                     borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(color: AppTheme.dividerColor),
+                                    border: Border.all(color: Theme.of(context).dividerColor),
                                   ),
                                   clipBehavior: Clip.antiAlias,
                                   child: Stack(
@@ -272,9 +272,9 @@ class _EmptyClothIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: AppTheme.surfaceDark,
-      child: const Center(
-        child: Icon(Icons.checkroom_rounded, size: 52, color: AppTheme.textMuted),
+      color: Theme.of(context).colorScheme.surface,
+      child: Center(
+        child: Icon(Icons.checkroom_rounded, size: 52, color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey),
       ),
     );
   }
@@ -291,9 +291,9 @@ class _FilterChip extends StatelessWidget {
       margin: const EdgeInsets.only(right: 8.0),
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       decoration: BoxDecoration(
-        color: AppTheme.cardDark,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppTheme.dividerColor),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Text(
         label,

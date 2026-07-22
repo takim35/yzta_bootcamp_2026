@@ -123,14 +123,14 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.primaryDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppTheme.primaryDark,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
-        iconTheme: const IconThemeData(color: AppTheme.textPrimary),
+        iconTheme: IconThemeData(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
         title: const Text(
           'Şifremi Sıfırla',
-          style: TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.w700),
+          style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white, fontWeight: FontWeight.w700),
         ),
       ),
       body: SafeArea(
@@ -158,24 +158,24 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: AppTheme.accentViolet.withValues(alpha: 0.15),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
           ),
           child: const Icon(
             Icons.check_circle_rounded,
-            color: AppTheme.accentViolet,
+            color: Theme.of(context).colorScheme.primary,
             size: 80,
           ),
         ),
         const SizedBox(height: 32),
         const Text(
           'Başarılı!',
-          style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: AppTheme.textPrimary),
+          style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
         ),
         const SizedBox(height: 12),
         const Text(
           'Şifreniz başarıyla güncellendi.',
           textAlign: TextAlign.center,
-          style: TextStyle(color: AppTheme.textSecondary, fontSize: 16),
+          style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey, fontSize: 16),
         ),
         const SizedBox(height: 48),
         GestureDetector(
@@ -207,12 +207,12 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppTheme.surfaceDark,
-              border: Border.all(color: AppTheme.dividerColor, width: 1.5),
+              color: Theme.of(context).colorScheme.surface,
+              border: Border.all(color: Theme.of(context).dividerColor, width: 1.5),
             ),
             child: const Icon(
               Icons.lock_reset_rounded,
-              color: AppTheme.accentViolet,
+              color: Theme.of(context).colorScheme.primary,
               size: 48,
             ),
           ),
@@ -221,7 +221,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
           const Text(
             'Şifrenizi Sıfırlayın',
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: AppTheme.textPrimary),
+            style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
           ),
           const SizedBox(height: 8),
           Text(
@@ -231,7 +231,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
                     ? 'E-postanıza gelen 6 haneli kodu girin.'
                     : 'Yeni şifrenizi belirleyin.',
             textAlign: TextAlign.center,
-            style: const TextStyle(color: AppTheme.textSecondary, fontSize: 14),
+            style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey, fontSize: 14),
           ),
           const SizedBox(height: 36),
 
@@ -240,18 +240,18 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
               padding: const EdgeInsets.all(14),
               margin: const EdgeInsets.only(bottom: 16),
               decoration: BoxDecoration(
-                color: AppTheme.errorColor.withValues(alpha: 0.1),
+                color: Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppTheme.errorColor.withValues(alpha: 0.4)),
+                border: Border.all(color: Theme.of(context).colorScheme.error.withValues(alpha: 0.4)),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.error_outline_rounded, color: AppTheme.errorColor, size: 18),
+                  Icon(Icons.error_outline_rounded, color: Theme.of(context).colorScheme.error, size: 18),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
                       _errorMessage!,
-                      style: const TextStyle(color: AppTheme.errorColor, fontSize: 13),
+                      style: TextStyle(color: Theme.of(context).colorScheme.error, fontSize: 13),
                     ),
                   ),
                 ],
@@ -327,13 +327,13 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
         height: 54,
         decoration: BoxDecoration(
           gradient: _isLoading ? null : AppTheme.primaryGradient,
-          color: _isLoading ? AppTheme.surfaceDark : null,
+          color: _isLoading ? Theme.of(context).colorScheme.surface : null,
           borderRadius: BorderRadius.circular(14),
           boxShadow: _isLoading
               ? []
               : [
                   BoxShadow(
-                    color: AppTheme.accentViolet.withValues(alpha: 0.4),
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.4),
                     blurRadius: 16,
                     offset: const Offset(0, 6),
                   ),
@@ -345,7 +345,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
                   width: 22,
                   height: 22,
                   child: CircularProgressIndicator(
-                    color: AppTheme.accentViolet,
+                    color: Theme.of(context).colorScheme.primary,
                     strokeWidth: 2.5,
                   ),
                 )
@@ -377,44 +377,44 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
       controller: controller,
       obscureText: isPassword && !isVisible,
       keyboardType: keyboardType,
-      style: const TextStyle(color: AppTheme.textPrimary, fontSize: 15),
+      style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white, fontSize: 15),
       validator: validator,
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: const TextStyle(color: AppTheme.textMuted, fontSize: 15),
-        prefixIcon: Icon(icon, color: AppTheme.textMuted, size: 20),
+        hintStyle: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey, fontSize: 15),
+        prefixIcon: Icon(icon, color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey, size: 20),
         suffixIcon: isPassword
             ? IconButton(
                 icon: Icon(
                   isVisible ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                  color: AppTheme.textMuted,
+                  color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
                   size: 20,
                 ),
                 onPressed: onToggleVisibility,
               )
             : null,
         filled: true,
-        fillColor: AppTheme.surfaceDark,
+        fillColor: Theme.of(context).colorScheme.surface,
         contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppTheme.dividerColor),
+          borderSide: BorderSide(color: Theme.of(context).dividerColor),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppTheme.dividerColor),
+          borderSide: BorderSide(color: Theme.of(context).dividerColor),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppTheme.accentViolet, width: 1.5),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppTheme.errorColor),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.error),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppTheme.errorColor, width: 1.5),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.error, width: 1.5),
         ),
       ),
     );

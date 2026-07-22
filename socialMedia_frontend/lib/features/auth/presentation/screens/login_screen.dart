@@ -136,7 +136,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     final s = ref.watch(stringsProvider);
 
     return Scaffold(
-      backgroundColor: AppTheme.primaryDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Stack(
         children: [
           // ── Animated background ───────────────────────────────
@@ -155,8 +155,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                         shape: BoxShape.circle,
                         gradient: RadialGradient(
                           colors: [
-                            AppTheme.accentViolet.withValues(alpha: 0.28),
-                            AppTheme.accentViolet.withValues(alpha: 0),
+                            Theme.of(context).colorScheme.primary.withValues(alpha: 0.28),
+                            Theme.of(context).colorScheme.primary.withValues(alpha: 0),
                           ],
                         ),
                       ),
@@ -172,8 +172,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                         shape: BoxShape.circle,
                         gradient: RadialGradient(
                           colors: [
-                            AppTheme.accentPink.withValues(alpha: 0.2),
-                            AppTheme.accentPink.withValues(alpha: 0),
+                            Theme.of(context).colorScheme.secondary.withValues(alpha: 0.2),
+                            Theme.of(context).colorScheme.secondary.withValues(alpha: 0),
                           ],
                         ),
                       ),
@@ -230,17 +230,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                                   decoration: BoxDecoration(
-                                    color: AppTheme.surfaceDark,
+                                    color: Theme.of(context).colorScheme.surface,
                                     borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(color: AppTheme.dividerColor),
+                                    border: Border.all(color: Theme.of(context).dividerColor),
                                   ),
                                   child: Row(
                                     children: [
-                                      const Icon(Icons.language_rounded, color: AppTheme.textSecondary, size: 16),
+                                      Icon(Icons.language_rounded, color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey, size: 16),
                                       const SizedBox(width: 8),
                                       Text(
                                         ref.watch(localeProvider) == AppLocale.tr ? 'Türkçe' : 'English',
-                                        style: const TextStyle(color: AppTheme.textPrimary, fontSize: 13, fontWeight: FontWeight.w500),
+                                        style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white, fontSize: 13, fontWeight: FontWeight.w500),
                                       ),
                                     ],
                                   ),
@@ -260,7 +260,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                 borderRadius: BorderRadius.circular(20),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: AppTheme.accentViolet
+                                    color: Theme.of(context).colorScheme.primary
                                         .withValues(alpha: 0.45),
                                     blurRadius: 24,
                                     offset: const Offset(0, 8),
@@ -283,7 +283,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                             style: const TextStyle(
                               fontSize: 30,
                               fontWeight: FontWeight.w800,
-                              color: AppTheme.textPrimary,
+                              color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                               letterSpacing: -0.5,
                             ),
                           ),
@@ -310,23 +310,23 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                               margin: const EdgeInsets.only(bottom: 16),
                               decoration: BoxDecoration(
                                 color:
-                                    AppTheme.errorColor.withValues(alpha: 0.1),
+                                    Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
-                                  color: AppTheme.errorColor
+                                  color: Theme.of(context).colorScheme.error
                                       .withValues(alpha: 0.4),
                                 ),
                               ),
                               child: Row(
                                 children: [
                                   const Icon(Icons.error_outline_rounded,
-                                      color: AppTheme.errorColor, size: 18),
+                                      color: Theme.of(context).colorScheme.error, size: 18),
                                   const SizedBox(width: 10),
                                   Expanded(
                                     child: Text(
                                       _errorMessage!,
                                       style: const TextStyle(
-                                          color: AppTheme.errorColor,
+                                          color: Theme.of(context).colorScheme.error,
                                           fontSize: 13),
                                     ),
                                   ),
@@ -381,7 +381,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                               child: Text(
                                 s.forgotPassword,
                                 style: const TextStyle(
-                                  color: AppTheme.accentPink,
+                                  color: Theme.of(context).colorScheme.secondary,
                                   fontWeight: FontWeight.w600,
                                   fontSize: 13,
                                 ),
@@ -402,10 +402,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                               duration: const Duration(milliseconds: 200),
                               height: 52,
                               decoration: BoxDecoration(
-                                color: AppTheme.surfaceDark,
+                                color: Theme.of(context).colorScheme.surface,
                                 borderRadius: BorderRadius.circular(14),
                                 border: Border.all(
-                                  color: AppTheme.dividerColor,
+                                  color: Theme.of(context).dividerColor,
                                   width: 1.5,
                                 ),
                               ),
@@ -435,7 +435,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                   Text(
                                     s.isTr ? 'Google ile Giriş Yap' : 'Continue with Google',
                                     style: const TextStyle(
-                                      color: AppTheme.textPrimary,
+                                      color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                                       fontSize: 15,
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -452,7 +452,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                             children: [
                               Expanded(
                                   child: Divider(
-                                      color: AppTheme.dividerColor,
+                                      color: Theme.of(context).dividerColor,
                                       thickness: 1)),
                               Padding(
                                 padding:
@@ -460,12 +460,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                 child: Text(
                                   s.isTr ? 'veya' : 'or',
                                   style: const TextStyle(
-                                      color: AppTheme.textMuted, fontSize: 13),
+                                      color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey, fontSize: 13),
                                 ),
                               ),
                               Expanded(
                                   child: Divider(
-                                      color: AppTheme.dividerColor,
+                                      color: Theme.of(context).dividerColor,
                                       thickness: 1)),
                             ],
                           ),
@@ -479,7 +479,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                               Text(
                                 s.noAccount,
                                 style: const TextStyle(
-                                    color: AppTheme.textSecondary,
+                                    color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
                                     fontSize: 14),
                               ),
                               TextButton(
@@ -497,7 +497,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                 child: Text(
                                   s.signUp,
                                   style: const TextStyle(
-                                    color: AppTheme.accentViolet,
+                                    color: Theme.of(context).colorScheme.primary,
                                     fontWeight: FontWeight.w700,
                                     fontSize: 14,
                                   ),
@@ -527,13 +527,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
         height: 54,
         decoration: BoxDecoration(
           gradient: _isLoading ? null : AppTheme.primaryGradient,
-          color: _isLoading ? AppTheme.surfaceDark : null,
+          color: _isLoading ? Theme.of(context).colorScheme.surface : null,
           borderRadius: BorderRadius.circular(14),
           boxShadow: _isLoading
               ? []
               : [
                   BoxShadow(
-                    color: AppTheme.accentViolet.withValues(alpha: 0.4),
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.4),
                     blurRadius: 16,
                     offset: const Offset(0, 6),
                   ),
@@ -545,7 +545,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                   width: 22,
                   height: 22,
                   child: CircularProgressIndicator(
-                    color: AppTheme.accentViolet,
+                    color: Theme.of(context).colorScheme.primary,
                     strokeWidth: 2.5,
                   ),
                 )
@@ -575,20 +575,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
       controller: controller,
       obscureText: isPassword && !_isPasswordVisible,
       keyboardType: keyboardType,
-      style: const TextStyle(color: AppTheme.textPrimary, fontSize: 15),
+      style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white, fontSize: 15),
       validator: validator,
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: const TextStyle(color: AppTheme.textMuted, fontSize: 15),
+        hintStyle: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey, fontSize: 15),
         prefixIcon:
-            Icon(icon, color: AppTheme.textMuted, size: 20),
+            Icon(icon, color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey, size: 20),
         suffixIcon: isPassword
             ? IconButton(
                 icon: Icon(
                   _isPasswordVisible
                       ? Icons.visibility_off_outlined
                       : Icons.visibility_outlined,
-                  color: AppTheme.textMuted,
+                  color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
                   size: 20,
                 ),
                 onPressed: () =>
@@ -596,29 +596,29 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
               )
             : null,
         filled: true,
-        fillColor: AppTheme.surfaceDark,
+        fillColor: Theme.of(context).colorScheme.surface,
         contentPadding:
             const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppTheme.dividerColor),
+          borderSide: BorderSide(color: Theme.of(context).dividerColor),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppTheme.dividerColor),
+          borderSide: BorderSide(color: Theme.of(context).dividerColor),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
           borderSide:
-              const BorderSide(color: AppTheme.accentViolet, width: 1.5),
+              BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppTheme.errorColor),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.error),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppTheme.errorColor, width: 1.5),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.error, width: 1.5),
         ),
       ),
     );

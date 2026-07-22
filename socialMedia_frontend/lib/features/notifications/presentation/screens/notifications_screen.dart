@@ -73,13 +73,13 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       case 'like':
         return Colors.redAccent;
       case 'comment':
-        return AppTheme.accentViolet;
+        return Theme.of(context).colorScheme.primary;
       case 'follow':
         return Colors.blueAccent;
       case 'mention':
         return Colors.orangeAccent;
       default:
-        return AppTheme.textMuted;
+        return Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey;
     }
   }
 
@@ -99,44 +99,44 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     final hasUnread = _notifications.any((n) => n['is_read'] == false);
 
     return Scaffold(
-      backgroundColor: AppTheme.primaryDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
           s.isTr ? 'Bildirimler' : 'Notifications',
-          style: const TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.bold),
+          style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white, fontWeight: FontWeight.bold),
         ),
-        backgroundColor: AppTheme.primaryDark,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
-        iconTheme: const IconThemeData(color: AppTheme.textPrimary),
+        iconTheme: IconThemeData(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
         actions: [
           if (hasUnread)
             TextButton(
               onPressed: _markAllRead,
               child: Text(
                 s.isTr ? 'Tümünü Oku' : 'Read All',
-                style: const TextStyle(color: AppTheme.accentViolet, fontSize: 13),
+                style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 13),
               ),
             ),
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: AppTheme.accentViolet))
+          ? Center(child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary))
           : _notifications.isEmpty
               ? Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.notifications_off_rounded, size: 64, color: AppTheme.textMuted),
+                      Icon(Icons.notifications_off_rounded, size: 64, color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey),
                       const SizedBox(height: 16),
                       Text(
                         s.isTr ? 'Henüz bildiriminiz yok' : 'No notifications yet',
-                        style: const TextStyle(color: AppTheme.textMuted, fontSize: 16),
+                        style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey, fontSize: 16),
                       ),
                     ],
                   ),
                 )
               : RefreshIndicator(
-                  color: AppTheme.accentViolet,
+                  color: Theme.of(context).colorScheme.primary,
                   onRefresh: _loadNotifications,
                   child: ListView.builder(
                     itemCount: _notifications.length,
@@ -149,19 +149,19 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                       final postImageUrl = notif['post_image_url'] as String?;
 
                       return Container(
-                        color: isRead ? Colors.transparent : AppTheme.accentViolet.withValues(alpha: 0.05),
+                        color: isRead ? Colors.transparent : Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
                         child: ListTile(
                           leading: Stack(
                             clipBehavior: Clip.none,
                             children: [
                               CircleAvatar(
                                 radius: 22,
-                                backgroundColor: AppTheme.surfaceDark,
+                                backgroundColor: Theme.of(context).colorScheme.surface,
                                 backgroundImage: actorAvatar != null && actorAvatar.isNotEmpty
                                     ? NetworkImage(actorAvatar)
                                     : null,
                                 child: actorAvatar == null || actorAvatar.isEmpty
-                                    ? const Icon(Icons.person, color: AppTheme.textSecondary)
+                                    ? Icon(Icons.person, color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey)
                                     : null,
                               ),
                               Positioned(
@@ -170,7 +170,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                                 child: Container(
                                   padding: const EdgeInsets.all(2),
                                   decoration: const BoxDecoration(
-                                    color: AppTheme.primaryDark,
+                                    color: Theme.of(context).scaffoldBackgroundColor,
                                     shape: BoxShape.circle,
                                   ),
                                   child: Icon(
@@ -185,14 +185,14 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                           title: Text(
                             message,
                             style: TextStyle(
-                              color: AppTheme.textPrimary,
+                              color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                               fontSize: 14,
                               fontWeight: isRead ? FontWeight.normal : FontWeight.w600,
                             ),
                           ),
                           subtitle: Text(
                             _timeAgo(notif['created_at'] as String?),
-                            style: const TextStyle(color: AppTheme.textMuted, fontSize: 12),
+                            style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey, fontSize: 12),
                           ),
                           trailing: postImageUrl != null && postImageUrl.isNotEmpty
                               ? ClipRRect(

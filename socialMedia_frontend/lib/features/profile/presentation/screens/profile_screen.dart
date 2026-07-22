@@ -50,7 +50,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
     if (provider.isLoading && provider.user == null) {
       return Scaffold(
-        backgroundColor: AppTheme.primaryDark,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: SafeArea(
           child: Column(
             children: [
@@ -68,13 +68,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
     if (provider.hasError || provider.user == null) {
       return Scaffold(
-        backgroundColor: AppTheme.primaryDark,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: Center(
           child: Text(
             provider.errorMessage.isNotEmpty
                 ? provider.errorMessage
                 : 'Profile could not be loaded',
-            style: const TextStyle(color: AppTheme.errorColor),
+            style: TextStyle(color: Theme.of(context).colorScheme.error),
           ),
         ),
       );
@@ -85,16 +85,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     return DefaultTabController(
       length: provider.isOwnProfile ? 2 : 1,
       child: Scaffold(
-        backgroundColor: AppTheme.primaryDark,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: AppBar(
           title: Text(
             user.username,
             style: const TextStyle(
-              color: AppTheme.textPrimary,
+              color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
               fontWeight: FontWeight.bold,
             ),
           ),
-          backgroundColor: AppTheme.primaryDark,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           elevation: 0,
         ),
         floatingActionButton: provider.isOwnProfile 
@@ -105,14 +105,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     MaterialPageRoute(builder: (_) => const CreatePostScreen()),
                   );
                 },
-                backgroundColor: AppTheme.accentViolet,
-                child: const Icon(Icons.add, color: AppTheme.primaryDark),
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                child: Icon(Icons.add, color: Theme.of(context).scaffoldBackgroundColor),
               )
             : null,
         body: RefreshIndicator(
           onRefresh: _loadProfile,
-          color: AppTheme.accentViolet,
-          backgroundColor: AppTheme.surfaceDark,
+          color: Theme.of(context).colorScheme.primary,
+          backgroundColor: Theme.of(context).colorScheme.surface,
           child: NestedScrollView(
             headerSliverBuilder: (context, innerBoxIsScrolled) => [
             SliverToBoxAdapter(child: _buildHeader(user, provider, s)),
@@ -120,9 +120,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               pinned: true,
               delegate: _TabBarDelegate(
                 TabBar(
-                  indicatorColor: AppTheme.accentViolet,
-                  labelColor: AppTheme.textPrimary,
-                  unselectedLabelColor: AppTheme.textMuted,
+                  indicatorColor: Theme.of(context).colorScheme.primary,
+                  labelColor: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+                  unselectedLabelColor: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
                   tabs: [
                     const Tab(icon: Icon(Icons.style_rounded)),
                     if (provider.isOwnProfile)
@@ -168,20 +168,20 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  AppTheme.surfaceDark.withValues(alpha: 0.8),
-                  AppTheme.cardDark.withValues(alpha: 0.9),
+                  Theme.of(context).colorScheme.surface.withValues(alpha: 0.8),
+                  Theme.of(context).cardColor.withValues(alpha: 0.9),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               borderRadius: BorderRadius.circular(24),
               border: Border.all(
-                color: AppTheme.accentViolet.withValues(alpha: 0.3),
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
                 width: 1,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: AppTheme.accentViolet.withValues(alpha: 0.1),
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                   blurRadius: 20,
                   spreadRadius: 2,
                 ),
@@ -209,7 +209,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   child: Container(
                     decoration: const BoxDecoration(
                       shape: BoxShape.circle,
-                      color: AppTheme.surfaceDark,
+                      color: Theme.of(context).colorScheme.surface,
                     ),
                     child: GestureDetector(
                       onTap: user.avatarUrl.isNotEmpty ? () {
@@ -240,13 +240,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       } : null,
                       child: CircleAvatar(
                         radius: 44,
-                        backgroundColor: AppTheme.cardDark,
+                        backgroundColor: Theme.of(context).cardColor,
                         backgroundImage: user.avatarUrl.isNotEmpty
                             ? NetworkImage(user.avatarUrl)
                             : null,
                         child: user.avatarUrl.isEmpty
                             ? const Icon(Icons.person,
-                                size: 44, color: AppTheme.textSecondary)
+                                size: 44, color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey)
                             : null,
                       ),
                     ),
@@ -257,7 +257,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 Text(
                   user.displayName.isNotEmpty ? user.displayName : user.username,
                   style: const TextStyle(
-                    color: AppTheme.textPrimary,
+                    color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: 20,
                     letterSpacing: 0.5,
@@ -270,7 +270,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     user.bio,
                     textAlign: TextAlign.center,
                     style: const TextStyle(
-                      color: AppTheme.textPrimary,
+                      color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                       fontSize: 15,
                       height: 1.4,
                     ),
@@ -281,7 +281,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   decoration: BoxDecoration(
-                    color: AppTheme.primaryDark.withValues(alpha: 0.5),
+                    color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Row(
@@ -323,8 +323,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             );
                           },
                           style: OutlinedButton.styleFrom(
-                            foregroundColor: AppTheme.textPrimary,
-                            side: const BorderSide(color: AppTheme.dividerColor),
+                            foregroundColor: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+                            side: BorderSide(color: Theme.of(context).dividerColor),
                             padding: const EdgeInsets.symmetric(vertical: AppTheme.spacingS),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
@@ -338,8 +338,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         child: OutlinedButton(
                           onPressed: () {},
                           style: OutlinedButton.styleFrom(
-                            foregroundColor: AppTheme.textPrimary,
-                            side: const BorderSide(color: AppTheme.dividerColor),
+                            foregroundColor: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+                            side: BorderSide(color: Theme.of(context).dividerColor),
                             padding: const EdgeInsets.symmetric(vertical: AppTheme.spacingS),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
@@ -357,12 +357,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         child: ElevatedButton(
                           onPressed: () => provider.toggleFollow(),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: user.isFollowing ? AppTheme.surfaceDark : AppTheme.accentViolet,
-                            foregroundColor: AppTheme.textPrimary,
+                            backgroundColor: user.isFollowing ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.primary,
+                            foregroundColor: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: AppTheme.spacingS),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
-                              side: user.isFollowing ? const BorderSide(color: AppTheme.dividerColor) : BorderSide.none,
+                              side: user.isFollowing ? BorderSide(color: Theme.of(context).dividerColor) : BorderSide.none,
                             ),
                             elevation: user.isFollowing ? 0 : 2,
                           ),
@@ -386,16 +386,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.lock_outline_rounded, size: 48, color: AppTheme.textMuted),
+            Icon(Icons.lock_outline_rounded, size: 48, color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey),
             const SizedBox(height: 12),
             Text(
               s.isTr ? 'Bu profil gizlidir' : 'This profile is private',
-              style: const TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.bold),
+              style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 4),
             Text(
               s.isTr ? 'Gönderilerini görmek için takip et.' : 'Follow to see their posts.',
-              style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
+              style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey, fontSize: 13),
             ),
           ],
         ),
@@ -408,11 +408,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(Icons.photo_library_outlined,
-                size: 48, color: AppTheme.textMuted.withValues(alpha: 0.4)),
+                size: 48, color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey.withValues(alpha: 0.4)),
             const SizedBox(height: 12),
             Text(
               emptyMessage ?? s.noPostsYet,
-              style: const TextStyle(color: AppTheme.textSecondary),
+              style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
             ),
           ],
         ),
@@ -459,9 +459,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       margin: const EdgeInsets.only(top: 12),
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: AppTheme.surfaceDark,
+                        color: Theme.of(context).colorScheme.surface,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: AppTheme.dividerColor),
+                        border: Border.all(color: Theme.of(context).dividerColor),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -469,7 +469,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           Text(
                             '@${post.username}',
                             style: const TextStyle(
-                              color: AppTheme.textPrimary,
+                              color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                               fontWeight: FontWeight.bold,
                               fontSize: 14,
                             ),
@@ -478,7 +478,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           Text(
                             post.caption.isNotEmpty ? post.caption : (s.isTr ? 'Açıklama yok' : 'No caption'),
                             style: const TextStyle(
-                              color: AppTheme.textSecondary,
+                              color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
                               fontSize: 14,
                             ),
                           ),
@@ -492,12 +492,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         children: [
                           ElevatedButton.icon(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: AppTheme.accentViolet,
+                              backgroundColor: Theme.of(context).colorScheme.primary,
                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                             ),
-                            icon: const Icon(Icons.edit_rounded, color: AppTheme.textPrimary, size: 18),
-                            label: Text(s.isTr ? 'Düzenle' : 'Edit', style: const TextStyle(color: AppTheme.textPrimary)),
+                            icon: Icon(Icons.edit_rounded, color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white, size: 18),
+                            label: Text(s.isTr ? 'Düzenle' : 'Edit', style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white)),
                             onPressed: () {
                               Navigator.pop(ctx);
                               _showProfileEditDialog(context, post);
@@ -506,12 +506,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           const SizedBox(width: 16),
                           ElevatedButton.icon(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: AppTheme.errorColor,
+                              backgroundColor: Theme.of(context).colorScheme.error,
                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                             ),
-                            icon: const Icon(Icons.delete_rounded, color: AppTheme.textPrimary, size: 18),
-                            label: Text(s.isTr ? 'Sil' : 'Delete', style: const TextStyle(color: AppTheme.textPrimary)),
+                            icon: Icon(Icons.delete_rounded, color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white, size: 18),
+                            label: Text(s.isTr ? 'Sil' : 'Delete', style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white)),
                             onPressed: () {
                               Navigator.pop(ctx);
                               _showProfileDeleteConfirm(context, post);
@@ -526,20 +526,20 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             );
           },
           child: Container(
-            color: AppTheme.surfaceDark,
+            color: Theme.of(context).colorScheme.surface,
             child: post.imageUrl.startsWith('http')
               ? Image.network(
                   post.imageUrl,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) => const Center(
-                    child: Icon(Icons.error_outline, color: AppTheme.textSecondary),
+                    child: Icon(Icons.error_outline, color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
                   ),
                 )
               : Image.file(
                   File(post.imageUrl),
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) => const Center(
-                    child: Icon(Icons.error_outline, color: AppTheme.textSecondary),
+                    child: Icon(Icons.error_outline, color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
                   ),
                 ),
           ),
@@ -558,7 +558,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         Text(
           count.toString(),
           style: const TextStyle(
-            color: AppTheme.textPrimary,
+            color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
             fontWeight: FontWeight.bold,
             fontSize: 18,
           ),
@@ -566,7 +566,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         Text(
           label,
           style: const TextStyle(
-            color: AppTheme.textSecondary,
+            color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
             fontSize: 13,
           ),
         ),
@@ -581,21 +581,21 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: AppTheme.surfaceDark,
-        title: Text(isTr ? 'Gönderiyi Düzenle' : 'Edit Post', style: const TextStyle(color: AppTheme.textPrimary)),
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        title: Text(isTr ? 'Gönderiyi Düzenle' : 'Edit Post', style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white)),
         content: TextField(
           controller: controller,
           maxLines: 3,
-          style: const TextStyle(color: AppTheme.textPrimary),
+          style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
           decoration: InputDecoration(
             hintText: isTr ? 'Yeni açıklama...' : 'New caption...',
-            hintStyle: const TextStyle(color: AppTheme.textMuted),
+            hintStyle: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey),
             enabledBorder: OutlineInputBorder(
-              borderSide: const BorderSide(color: AppTheme.dividerColor),
+              borderSide: BorderSide(color: Theme.of(context).dividerColor),
               borderRadius: BorderRadius.circular(8),
             ),
             focusedBorder: OutlineInputBorder(
-              borderSide: const BorderSide(color: AppTheme.accentViolet),
+              borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
               borderRadius: BorderRadius.circular(8),
             ),
           ),
@@ -603,11 +603,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text(isTr ? 'İptal' : 'Cancel', style: const TextStyle(color: AppTheme.textMuted)),
+            child: Text(isTr ? 'İptal' : 'Cancel', style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text(isTr ? 'Kaydet' : 'Save', style: const TextStyle(color: AppTheme.accentViolet)),
+            child: Text(isTr ? 'Kaydet' : 'Save', style: TextStyle(color: Theme.of(context).colorScheme.primary)),
           ),
         ],
       ),
@@ -639,22 +639,22 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: AppTheme.surfaceDark,
-        title: Text(isTr ? 'Gönderiyi Sil' : 'Delete Post', style: const TextStyle(color: AppTheme.textPrimary)),
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        title: Text(isTr ? 'Gönderiyi Sil' : 'Delete Post', style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white)),
         content: Text(
           isTr 
             ? 'Bu gönderiyi kalıcı olarak silmek istediğinize emin misiniz?' 
             : 'Are you sure you want to permanently delete this post?', 
-          style: const TextStyle(color: AppTheme.textSecondary)
+          style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey)
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text(isTr ? 'İptal' : 'Cancel', style: const TextStyle(color: AppTheme.textMuted)),
+            child: Text(isTr ? 'İptal' : 'Cancel', style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text(isTr ? 'Sil' : 'Delete', style: const TextStyle(color: AppTheme.errorColor)),
+            child: Text(isTr ? 'Sil' : 'Delete', style: TextStyle(color: Theme.of(context).colorScheme.error)),
           ),
         ],
       ),
@@ -694,7 +694,7 @@ class _TabBarDelegate extends SliverPersistentHeaderDelegate {
 
   @override
   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Container(color: AppTheme.primaryDark, child: tabBar);
+    return Container(color: Theme.of(context).scaffoldBackgroundColor, child: tabBar);
   }
 
   @override

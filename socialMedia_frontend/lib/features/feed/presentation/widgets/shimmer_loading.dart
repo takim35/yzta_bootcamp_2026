@@ -12,8 +12,8 @@ class FeedShimmer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Shimmer.fromColors(
-      baseColor: AppTheme.cardDark,
-      highlightColor: AppTheme.dividerColor,
+      baseColor: Theme.of(context).cardColor,
+      highlightColor: Theme.of(context).dividerColor,
       child: ListView.builder(
         physics: const NeverScrollableScrollPhysics(),
         shrinkWrap: true,
@@ -36,7 +36,7 @@ class _FeedCardShimmer extends ConsumerWidget {
         vertical: AppTheme.spacingS,
       ),
       decoration: BoxDecoration(
-        color: AppTheme.cardDark,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
       ),
       child: Column(
@@ -158,8 +158,8 @@ class ProfileGridShimmer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Shimmer.fromColors(
-      baseColor: AppTheme.cardDark,
-      highlightColor: AppTheme.dividerColor,
+      baseColor: Theme.of(context).cardColor,
+      highlightColor: Theme.of(context).dividerColor,
       child: GridView.builder(
         physics: const NeverScrollableScrollPhysics(),
         shrinkWrap: true,

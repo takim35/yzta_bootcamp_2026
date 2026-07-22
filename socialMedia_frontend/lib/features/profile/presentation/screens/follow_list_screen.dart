@@ -79,7 +79,7 @@ class _FollowListBottomSheetState extends ConsumerState<FollowListBottomSheet> w
     return Container(
       height: MediaQuery.of(context).size.height * 0.7,
       decoration: BoxDecoration(
-        color: AppTheme.primaryDark,
+        color: Theme.of(context).scaffoldBackgroundColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
@@ -97,18 +97,18 @@ class _FollowListBottomSheetState extends ConsumerState<FollowListBottomSheet> w
           ),
           TabBar(
             controller: _tabController,
-            indicatorColor: AppTheme.accentViolet,
-            labelColor: AppTheme.textPrimary,
-            unselectedLabelColor: AppTheme.textMuted,
+            indicatorColor: Theme.of(context).colorScheme.primary,
+            labelColor: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+            unselectedLabelColor: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
             tabs: const [
               Tab(text: 'Takipçiler'),
               Tab(text: 'Takip Edilenler'),
             ],
           ),
-          const Divider(color: AppTheme.dividerColor, height: 1),
+          Divider(color: Theme.of(context).dividerColor, height: 1),
           Expanded(
             child: _isLoading
-                ? const Center(child: CircularProgressIndicator(color: AppTheme.accentViolet))
+                ? Center(child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary))
                 : TabBarView(
                     controller: _tabController,
                     children: [
@@ -127,7 +127,7 @@ class _FollowListBottomSheetState extends ConsumerState<FollowListBottomSheet> w
       return const Center(
         child: Text(
           'Kullanıcı bulunamadı.',
-          style: TextStyle(color: AppTheme.textMuted),
+          style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey),
         ),
       );
     }
@@ -141,21 +141,21 @@ class _FollowListBottomSheetState extends ConsumerState<FollowListBottomSheet> w
         
         return ListTile(
           leading: CircleAvatar(
-            backgroundColor: AppTheme.cardDark,
+            backgroundColor: Theme.of(context).cardColor,
             backgroundImage: avatarUrl != null && avatarUrl.isNotEmpty
                 ? NetworkImage(avatarUrl)
                 : null,
             child: avatarUrl == null || avatarUrl.isEmpty
-                ? const Icon(Icons.person, color: AppTheme.textSecondary)
+                ? Icon(Icons.person, color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey)
                 : null,
           ),
           title: Text(
             user['username'] ?? '',
-            style: const TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.bold),
+            style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white, fontWeight: FontWeight.bold),
           ),
           subtitle: Text(
             user['display_name'] ?? '',
-            style: const TextStyle(color: AppTheme.textSecondary),
+            style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
           ),
           onTap: () => _navigateToProfile(user['user_id'] ?? user['id']),
         );

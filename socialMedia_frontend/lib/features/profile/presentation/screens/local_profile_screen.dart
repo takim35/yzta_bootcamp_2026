@@ -12,7 +12,7 @@ class LocalProfileScreen extends ConsumerWidget {
     final userId = authState.currentUserId ?? "Unknown ID";
 
     return Scaffold(
-      backgroundColor: AppTheme.primaryDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -33,12 +33,12 @@ class LocalProfileScreen extends ConsumerWidget {
                   width: 100,
                   height: 100,
                   decoration: BoxDecoration(
-                    color: AppTheme.cardDark,
+                    color: Theme.of(context).cardColor,
                     shape: BoxShape.circle,
-                    border: Border.all(color: AppTheme.dividerColor, width: 2),
+                    border: Border.all(color: Theme.of(context).dividerColor, width: 2),
                   ),
                   child: const Center(
-                    child: Icon(Icons.person_rounded, size: 50, color: AppTheme.textSecondary),
+                    child: Icon(Icons.person_rounded, size: 50, color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
                   ),
                 ),
               ),
@@ -47,7 +47,7 @@ class LocalProfileScreen extends ConsumerWidget {
               const Text(
                 'Personal Information',
                 style: TextStyle(
-                  color: AppTheme.textSecondary,
+                  color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                 ),
@@ -56,16 +56,16 @@ class LocalProfileScreen extends ConsumerWidget {
               
               Container(
                 decoration: BoxDecoration(
-                  color: AppTheme.cardDark,
+                  color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppTheme.dividerColor),
+                  border: Border.all(color: Theme.of(context).dividerColor),
                 ),
                 child: Column(
                   children: [
                     _InfoRow(label: 'Username', value: 'DemoUser'),
-                    const Divider(height: 1, color: AppTheme.dividerColor),
+                    Divider(height: 1, color: Theme.of(context).dividerColor),
                     _InfoRow(label: 'Email', value: 'demo@spot.com'),
-                    const Divider(height: 1, color: AppTheme.dividerColor),
+                    Divider(height: 1, color: Theme.of(context).dividerColor),
                     _InfoRow(label: 'User ID', value: userId),
                   ],
                 ),
@@ -94,7 +94,7 @@ class _InfoRow extends StatelessWidget {
           Text(
             label,
             style: const TextStyle(
-              color: AppTheme.textPrimary,
+              color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
               fontSize: 15,
               fontWeight: FontWeight.w500,
             ),
@@ -102,7 +102,7 @@ class _InfoRow extends StatelessWidget {
           Text(
             value,
             style: const TextStyle(
-              color: AppTheme.textMuted,
+              color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
               fontSize: 15,
             ),
           ),

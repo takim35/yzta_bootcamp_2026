@@ -24,7 +24,7 @@ class MainNavigationScreen extends ConsumerWidget {
     ];
 
     return Scaffold(
-      backgroundColor: AppTheme.primaryDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: IndexedStack(
         index: currentIndex,
         children: screens,
@@ -47,7 +47,7 @@ class MainNavigationScreen extends ConsumerWidget {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       // Custom Bottom App Bar
       bottomNavigationBar: BottomAppBar(
-        color: AppTheme.surfaceDark,
+        color: Theme.of(context).colorScheme.surface,
         shape: const CircularNotchedRectangle(),
         notchMargin: 8.0,
         height: 70,
@@ -113,7 +113,7 @@ class _NavBarItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isSelected ? Colors.white : AppTheme.textMuted;
+    final color = isSelected ? Colors.white : Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey;
     
     return GestureDetector(
       onTap: onTap,

@@ -33,23 +33,23 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final searchState = ref.watch(searchProvider);
 
     return Scaffold(
-      backgroundColor: AppTheme.primaryDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppTheme.primaryDark,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         title: TextField(
           controller: _searchController,
           focusNode: _focusNode,
           onChanged: _onSearchChanged,
-          style: const TextStyle(color: AppTheme.textPrimary),
+          style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
           decoration: InputDecoration(
             hintText: s.isTr ? 'Kullanıcı Ara...' : 'Search Users...',
-            hintStyle: const TextStyle(color: AppTheme.textMuted),
+            hintStyle: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey),
             border: InputBorder.none,
-            prefixIcon: const Icon(Icons.search, color: AppTheme.textMuted),
+            prefixIcon: Icon(Icons.search, color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey),
             suffixIcon: _searchController.text.isNotEmpty
                 ? IconButton(
-                    icon: const Icon(Icons.clear, color: AppTheme.textMuted),
+                    icon: Icon(Icons.clear, color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey),
                     onPressed: () {
                       _searchController.clear();
                       ref.read(searchProvider).clearSearch();
@@ -66,14 +66,14 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
   Widget _buildBody(SearchProvider searchState, bool isTr) {
     if (searchState.isLoading) {
-      return const Center(child: CircularProgressIndicator(color: AppTheme.accentViolet));
+      return Center(child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary));
     }
 
     if (searchState.errorMessage.isNotEmpty) {
       return Center(
         child: Text(
           searchState.errorMessage,
-          style: const TextStyle(color: AppTheme.errorColor),
+          style: TextStyle(color: Theme.of(context).colorScheme.error),
         ),
       );
     }
@@ -83,11 +83,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.search_rounded, size: 64, color: AppTheme.textMuted.withValues(alpha: 0.3)),
+            Icon(Icons.search_rounded, size: 64, color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey.withValues(alpha: 0.3)),
             const SizedBox(height: 16),
             Text(
               isTr ? 'Kişileri bulmak için arama yapın' : 'Search to find people',
-              style: const TextStyle(color: AppTheme.textMuted),
+              style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey),
             ),
           ],
         ),
@@ -98,7 +98,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       return Center(
         child: Text(
           isTr ? 'Sonuç bulunamadı' : 'No results found',
-          style: const TextStyle(color: AppTheme.textMuted),
+          style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey),
         ),
       );
     }
@@ -106,7 +106,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     return ListView.separated(
       padding: const EdgeInsets.all(AppTheme.spacingM),
       itemCount: searchState.searchResults.length,
-      separatorBuilder: (context, index) => const Divider(color: AppTheme.dividerColor),
+      separatorBuilder: (context, index) => Divider(color: Theme.of(context).dividerColor),
       itemBuilder: (context, index) {
         final user = searchState.searchResults[index];
         return ListTile(
@@ -119,27 +119,27 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             );
           },
           leading: CircleAvatar(
-            backgroundColor: AppTheme.surfaceDark,
+            backgroundColor: Theme.of(context).colorScheme.surface,
             backgroundImage: user.avatarUrl.isNotEmpty ? NetworkImage(user.avatarUrl) : null,
-            child: user.avatarUrl.isEmpty ? const Icon(Icons.person, color: AppTheme.textSecondary) : null,
+            child: user.avatarUrl.isEmpty ? Icon(Icons.person, color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey) : null,
           ),
           title: Text(
             user.username,
-            style: const TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.bold),
+            style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white, fontWeight: FontWeight.bold),
           ),
           subtitle: Text(
             user.displayName,
-            style: const TextStyle(color: AppTheme.textSecondary),
+            style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
           ),
           trailing: ElevatedButton(
             onPressed: () => searchState.toggleFollow(user.userId, user.isFollowing),
             style: ElevatedButton.styleFrom(
-              backgroundColor: user.isFollowing ? AppTheme.surfaceDark : AppTheme.accentViolet,
-              foregroundColor: AppTheme.textPrimary,
+              backgroundColor: user.isFollowing ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.primary,
+              foregroundColor: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
               elevation: 0,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
-                side: user.isFollowing ? const BorderSide(color: AppTheme.dividerColor) : BorderSide.none,
+                side: user.isFollowing ? BorderSide(color: Theme.of(context).dividerColor) : BorderSide.none,
               ),
             ),
             child: Text(

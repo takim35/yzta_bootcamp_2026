@@ -55,10 +55,10 @@ class VisibilitySelector extends ConsumerWidget {
         // ─── Segmented Buttons ────────────────────────────────
         Container(
           decoration: BoxDecoration(
-            color: AppTheme.surfaceDark,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
             border: Border.all(
-              color: AppTheme.dividerColor,
+              color: Theme.of(context).dividerColor,
               width: 1,
             ),
           ),
@@ -96,7 +96,7 @@ class VisibilitySelector extends ConsumerWidget {
                             style: TextStyle(
                               color: isSelected
                                   ? Colors.white
-                                  : AppTheme.textSecondary,
+                                  : Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
                               fontSize: 11,
                               fontWeight: isSelected
                                   ? FontWeight.w600
@@ -125,7 +125,7 @@ class VisibilitySelector extends ConsumerWidget {
                 .description,
             key: ValueKey(currentValue),
             style: const TextStyle(
-              color: AppTheme.textMuted,
+              color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
               fontSize: 12,
             ),
           ),

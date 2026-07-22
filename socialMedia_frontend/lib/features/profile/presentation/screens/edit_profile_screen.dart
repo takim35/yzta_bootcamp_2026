@@ -99,18 +99,18 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     final s = ref.watch(stringsProvider);
     
     return Scaffold(
-      backgroundColor: AppTheme.primaryDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text(s.isTr ? 'Profili Düzenle' : 'Edit Profile', style: const TextStyle(color: AppTheme.textPrimary)),
-        backgroundColor: AppTheme.primaryDark,
+        title: Text(s.isTr ? 'Profili Düzenle' : 'Edit Profile', style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white)),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
-        iconTheme: const IconThemeData(color: AppTheme.textPrimary),
+        iconTheme: IconThemeData(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
         actions: [
           TextButton(
             onPressed: _isLoading ? null : _saveProfile,
             child: _isLoading 
-              ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.accentViolet))
-              : Text(s.isTr ? 'Kaydet' : 'Save', style: const TextStyle(color: AppTheme.accentViolet, fontWeight: FontWeight.bold)),
+              ? SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Theme.of(context).colorScheme.primary))
+              : Text(s.isTr ? 'Kaydet' : 'Save', style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -125,19 +125,19 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   children: [
                     CircleAvatar(
                       radius: 50,
-                      backgroundColor: AppTheme.surfaceDark,
+                      backgroundColor: Theme.of(context).colorScheme.surface,
                       backgroundImage: _selectedImage != null 
                           ? FileImage(_selectedImage!) as ImageProvider
                           : (_avatarUrlController.text.isNotEmpty ? NetworkImage(_avatarUrlController.text) : null),
                       child: (_selectedImage == null && _avatarUrlController.text.isEmpty) 
-                          ? const Icon(Icons.person, size: 50, color: AppTheme.textSecondary) : null,
+                          ? Icon(Icons.person, size: 50, color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey) : null,
                     ),
                     Positioned(
                       bottom: 0,
                       right: 0,
                       child: Container(
                         decoration: const BoxDecoration(
-                          color: AppTheme.accentViolet,
+                          color: Theme.of(context).colorScheme.primary,
                           shape: BoxShape.circle,
                         ),
                         padding: const EdgeInsets.all(8),
@@ -151,35 +151,35 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             const SizedBox(height: 32),
             TextField(
               controller: _displayNameController,
-              style: const TextStyle(color: AppTheme.textPrimary),
+              style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
               decoration: InputDecoration(
                 labelText: s.isTr ? 'Görünen Ad' : 'Display Name',
-                labelStyle: const TextStyle(color: AppTheme.textMuted),
-                enabledBorder: const UnderlineInputBorder(borderSide: BorderSide(color: AppTheme.dividerColor)),
-                focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: AppTheme.accentViolet)),
+                labelStyle: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey),
+                enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Theme.of(context).dividerColor)),
+                focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.primary)),
               ),
             ),
             const SizedBox(height: 24),
             TextField(
               controller: _bioController,
-              style: const TextStyle(color: AppTheme.textPrimary),
+              style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
               maxLines: 3,
               decoration: InputDecoration(
                 labelText: s.isTr ? 'Biyografi' : 'Bio',
-                labelStyle: const TextStyle(color: AppTheme.textMuted),
-                enabledBorder: const UnderlineInputBorder(borderSide: BorderSide(color: AppTheme.dividerColor)),
-                focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: AppTheme.accentViolet)),
+                labelStyle: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey),
+                enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Theme.of(context).dividerColor)),
+                focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.primary)),
               ),
             ),
             const SizedBox(height: 24),
             TextField(
               controller: _avatarUrlController,
-              style: const TextStyle(color: AppTheme.textPrimary),
+              style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
               decoration: InputDecoration(
                 labelText: s.isTr ? 'Profil Fotoğrafı URL' : 'Avatar URL',
-                labelStyle: const TextStyle(color: AppTheme.textMuted),
-                enabledBorder: const UnderlineInputBorder(borderSide: BorderSide(color: AppTheme.dividerColor)),
-                focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: AppTheme.accentViolet)),
+                labelStyle: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey),
+                enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Theme.of(context).dividerColor)),
+                focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.primary)),
               ),
               onChanged: (val) => setState(() {}),
             ),

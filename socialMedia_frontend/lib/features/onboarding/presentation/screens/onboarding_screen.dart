@@ -113,17 +113,17 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
       context: context,
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppTheme.cardDark,
+        backgroundColor: Theme.of(context).cardColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
           s.isTr ? 'İzinler Gerekli' : 'Permissions Required',
-          style: const TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.bold),
+          style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white, fontWeight: FontWeight.bold),
         ),
         content: Text(
           s.isTr 
               ? 'Dijital Gardrop deneyimini tam anlamıyla yaşayabilmen için kamerana ve fotoğraf galerine erişim iznine ihtiyacımız var. (Kıyafetlerini yükleyebilmen için)' 
               : 'To fully experience Digital Wardrobe, we need access to your camera and photo gallery. (So you can upload your clothes)',
-          style: const TextStyle(color: AppTheme.textSecondary, height: 1.4),
+          style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey, height: 1.4),
         ),
         actions: [
           TextButton(
@@ -132,11 +132,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
               AnalyticsService().logEvent('permission_prompt_skipped');
               _finishOnboarding();
             },
-            child: Text(s.isTr ? 'Atla' : 'Skip', style: const TextStyle(color: AppTheme.textMuted)),
+            child: Text(s.isTr ? 'Atla' : 'Skip', style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.accentViolet,
+              backgroundColor: Theme.of(context).colorScheme.primary,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
             onPressed: () async {
@@ -195,7 +195,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
-      backgroundColor: AppTheme.primaryDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Stack(
         children: [
           // Animated background blobs
@@ -273,7 +273,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                         child: Text(
                           s.skip,
                           style: const TextStyle(
-                            color: AppTheme.textSecondary,
+                            color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
                             fontSize: 15,
                             fontWeight: FontWeight.w500,
                           ),
@@ -370,7 +370,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                                 style: const TextStyle(
                                   fontSize: 28,
                                   fontWeight: FontWeight.w800,
-                                  color: AppTheme.textPrimary,
+                                  color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                                   height: 1.15,
                                   letterSpacing: -0.5,
                                 ),
@@ -381,7 +381,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                                 textAlign: TextAlign.center,
                                 style: const TextStyle(
                                   fontSize: 14,
-                                  color: AppTheme.textSecondary,
+                                  color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
                                   height: 1.6,
                                 ),
                               ),
@@ -413,7 +413,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                               decoration: BoxDecoration(
                                 color: _currentPage == i
                                     ? color
-                                    : AppTheme.dividerColor,
+                                    : Theme.of(context).dividerColor,
                                 borderRadius: BorderRadius.circular(4),
                               ),
                             ),

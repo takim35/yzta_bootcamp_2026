@@ -54,10 +54,10 @@ class _AuthGate extends ConsumerWidget {
 
     // Oturum bilgisi yüklenirken splash göster
     if (auth.isInitializing) {
-      return const Scaffold(
-        backgroundColor: AppTheme.primaryDark,
+      return Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: Center(
-          child: CircularProgressIndicator(color: AppTheme.accentViolet),
+          child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary),
         ),
       );
     }

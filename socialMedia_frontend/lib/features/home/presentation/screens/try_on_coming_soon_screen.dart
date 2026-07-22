@@ -7,7 +7,7 @@ class TryOnComingSoonScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.primaryDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Center(
           child: Column(
@@ -17,11 +17,11 @@ class TryOnComingSoonScreen extends StatelessWidget {
                 width: 100,
                 height: 100,
                 decoration: BoxDecoration(
-                  color: AppTheme.surfaceDark,
+                  color: Theme.of(context).colorScheme.surface,
                   shape: BoxShape.circle,
-                  border: Border.all(color: AppTheme.accentPink, width: 2),
+                  border: Border.all(color: Theme.of(context).colorScheme.secondary, width: 2),
                 ),
-                child: const Icon(Icons.auto_awesome_rounded, color: AppTheme.accentPink, size: 48),
+                child: Icon(Icons.auto_awesome_rounded, color: Theme.of(context).colorScheme.secondary, size: 48),
               ),
               const SizedBox(height: 32),
               const Text(
@@ -37,7 +37,7 @@ class TryOnComingSoonScreen extends StatelessWidget {
                 'See how clothes fit on you virtually!\nThis feature is coming very soon.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: AppTheme.textMuted,
+                  color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
                   fontSize: 16,
                   height: 1.5,
                 ),
@@ -46,14 +46,14 @@ class TryOnComingSoonScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 decoration: BoxDecoration(
-                  color: AppTheme.cardDark,
+                  color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: AppTheme.dividerColor),
+                  border: Border.all(color: Theme.of(context).dividerColor),
                 ),
                 child: const Text(
                   'Stay Tuned 👀',
                   style: TextStyle(
-                    color: AppTheme.textSecondary,
+                    color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
                     fontWeight: FontWeight.w600,
                   ),
                 ),

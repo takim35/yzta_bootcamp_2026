@@ -81,8 +81,8 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
 
           return RefreshIndicator(
             onRefresh: () => provider.refresh(),
-            color: AppTheme.accentViolet,
-            backgroundColor: AppTheme.surfaceDark,
+            color: Theme.of(context).colorScheme.primary,
+            backgroundColor: Theme.of(context).colorScheme.surface,
             child: ListView.builder(
               controller: _scrollController,
               physics: const AlwaysScrollableScrollPhysics(
@@ -150,13 +150,13 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
           semanticsLabel: 'Spot Online ana sayfa',
         ),
       ),
-      backgroundColor: AppTheme.primaryDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       elevation: 0,
       actions: [
         IconButton(
           icon: const Icon(
             Icons.notifications_outlined,
-            color: AppTheme.textPrimary,
+            color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
           ),
           onPressed: () {
             NotificationsBottomSheet.show(context, currentUserId: currentUserId);
@@ -176,7 +176,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
           height: 24,
           child: CircularProgressIndicator(
             strokeWidth: 2,
-            color: AppTheme.accentViolet,
+            color: Theme.of(context).colorScheme.primary,
           ),
         ),
       ),

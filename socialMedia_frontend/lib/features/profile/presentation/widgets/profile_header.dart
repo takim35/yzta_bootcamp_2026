@@ -54,7 +54,7 @@ class ProfileHeader extends ConsumerWidget {
         ),
         child: CircleAvatar(
           radius: 40,
-          backgroundColor: AppTheme.cardDark,
+          backgroundColor: Theme.of(context).cardColor,
           backgroundImage: user.avatarUrl.isNotEmpty
               ? CachedNetworkImageProvider(user.avatarUrl)
               : null,
@@ -64,7 +64,7 @@ class ProfileHeader extends ConsumerWidget {
                       ? user.displayName[0].toUpperCase()
                       : '?',
                   style: const TextStyle(
-                    color: AppTheme.textPrimary,
+                    color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                     fontSize: 28,
                     fontWeight: FontWeight.w700,
                   ),
@@ -107,7 +107,7 @@ class ProfileHeader extends ConsumerWidget {
           Text(
             user.displayName,
             style: const TextStyle(
-              color: AppTheme.textPrimary,
+              color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
               fontSize: 16,
               fontWeight: FontWeight.w700,
             ),
@@ -117,7 +117,7 @@ class ProfileHeader extends ConsumerWidget {
           Text(
             '@${user.username}',
             style: const TextStyle(
-              color: AppTheme.textMuted,
+              color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
               fontSize: 14,
             ),
             semanticsLabel: 'Kullanıcı adı: ${user.username}',
@@ -127,7 +127,7 @@ class ProfileHeader extends ConsumerWidget {
             Text(
               user.bio,
               style: const TextStyle(
-                color: AppTheme.textSecondary,
+                color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
                 fontSize: 14,
                 height: 1.4,
               ),
@@ -148,7 +148,7 @@ class ProfileHeader extends ConsumerWidget {
             ? BoxDecoration(
                 borderRadius: BorderRadius.circular(AppTheme.radiusRound),
                 border: Border.all(
-                  color: AppTheme.dividerColor,
+                  color: Theme.of(context).dividerColor,
                   width: 1.5,
                 ),
               )
@@ -170,7 +170,7 @@ class ProfileHeader extends ConsumerWidget {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: user.isFollowing
-                        ? AppTheme.textSecondary
+                        ? Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey
                         : Colors.white,
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -206,7 +206,7 @@ class _StatColumn extends ConsumerWidget {
           Text(
             _formatCount(count),
             style: const TextStyle(
-              color: AppTheme.textPrimary,
+              color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
               fontSize: 18,
               fontWeight: FontWeight.w700,
             ),
@@ -215,7 +215,7 @@ class _StatColumn extends ConsumerWidget {
           Text(
             label,
             style: const TextStyle(
-              color: AppTheme.textSecondary,
+              color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
               fontSize: 12,
             ),
           ),

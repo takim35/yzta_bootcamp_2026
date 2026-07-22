@@ -44,29 +44,29 @@ class _TwoFactorVerifyScreenState extends ConsumerState<TwoFactorVerifyScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.primaryDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: const IconThemeData(color: AppTheme.textPrimary),
+        iconTheme: IconThemeData(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
       ),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Icon(Icons.security_rounded, size: 64, color: AppTheme.accentViolet),
+            Icon(Icons.security_rounded, size: 64, color: Theme.of(context).colorScheme.primary),
             const SizedBox(height: 24),
             const Text(
               'İki Aşamalı Doğrulama',
               textAlign: TextAlign.center,
-              style: TextStyle(color: AppTheme.textPrimary, fontSize: 24, fontWeight: FontWeight.bold),
+              style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             const Text(
               'Kimlik Doğrulayıcı (Authenticator) uygulamanızdaki 6 haneli kodu girin.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: AppTheme.textMuted, fontSize: 14),
+              style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey, fontSize: 14),
             ),
             const SizedBox(height: 32),
             if (_errorMessage != null)
@@ -74,29 +74,29 @@ class _TwoFactorVerifyScreenState extends ConsumerState<TwoFactorVerifyScreen> {
                 padding: const EdgeInsets.all(12),
                 margin: const EdgeInsets.only(bottom: 16),
                 decoration: BoxDecoration(
-                  color: AppTheme.errorColor.withOpacity(0.1),
+                  color: Theme.of(context).colorScheme.error.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Text(_errorMessage!, style: const TextStyle(color: AppTheme.errorColor)),
+                child: Text(_errorMessage!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
               ),
             TextField(
               controller: _codeController,
               keyboardType: TextInputType.number,
-              style: const TextStyle(color: AppTheme.textPrimary, letterSpacing: 8, fontSize: 24),
+              style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white, letterSpacing: 8, fontSize: 24),
               textAlign: TextAlign.center,
               maxLength: 6,
               decoration: InputDecoration(
                 hintText: '000000',
-                hintStyle: TextStyle(color: AppTheme.textMuted.withOpacity(0.5)),
+                hintStyle: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey.withOpacity(0.5)),
                 filled: true,
-                fillColor: AppTheme.surfaceDark,
+                fillColor: Theme.of(context).colorScheme.surface,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
-                  borderSide: const BorderSide(color: AppTheme.dividerColor),
+                  borderSide: BorderSide(color: Theme.of(context).dividerColor),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
-                  borderSide: const BorderSide(color: AppTheme.accentViolet),
+                  borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
                 ),
                 counterText: '',
               ),
@@ -105,7 +105,7 @@ class _TwoFactorVerifyScreenState extends ConsumerState<TwoFactorVerifyScreen> {
             ElevatedButton(
               onPressed: _isLoading ? null : _verify,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.accentViolet,
+                backgroundColor: Theme.of(context).colorScheme.primary,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               ),

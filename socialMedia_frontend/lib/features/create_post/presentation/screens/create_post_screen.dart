@@ -54,7 +54,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
           'Yeni Paylaşım',
           semanticsLabel: 'Yeni paylaşım oluştur',
         ),
-        backgroundColor: AppTheme.primaryDark,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         leading: IconButton(
           icon: const Icon(Icons.close_rounded),
           onPressed: () {
@@ -135,7 +135,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
     return Text(
       title,
       style: const TextStyle(
-        color: AppTheme.textPrimary,
+        color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
         fontSize: 18,
         fontWeight: FontWeight.w600,
       ),
@@ -160,15 +160,15 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
             border: Border.all(
-              color: AppTheme.accentViolet.withValues(alpha: 0.4),
+              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.4),
               width: 2,
               strokeAlign: BorderSide.strokeAlignInside,
             ),
-            color: AppTheme.accentViolet.withValues(alpha: 0.05),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
           ),
           child: CustomPaint(
             painter: _DashedBorderPainter(
-              color: AppTheme.accentViolet.withValues(alpha: 0.3),
+              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
               borderRadius: AppTheme.radiusLarge,
             ),
             child: const Column(
@@ -177,7 +177,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                 Icon(
                   Icons.add_photo_alternate_rounded,
                   size: 56,
-                  color: AppTheme.accentViolet,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
                 SizedBox(height: AppTheme.spacingM),
                 Text(
@@ -192,7 +192,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                 Text(
                   'Kombinini paylaşmak için bir fotoğraf seç',
                   style: TextStyle(
-                    color: AppTheme.textMuted,
+                    color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
                     fontSize: 12,
                   ),
                 ),
@@ -270,29 +270,29 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
           maxLength: 500,
           onChanged: (value) => provider.setCaption(value),
           style: const TextStyle(
-            color: AppTheme.textPrimary,
+            color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
             fontSize: 14,
           ),
           decoration: InputDecoration(
             hintText: 'Kombinin hakkında bir şeyler yaz...',
             counterStyle: const TextStyle(
-              color: AppTheme.textMuted,
+              color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
               fontSize: 11,
             ),
             filled: true,
-            fillColor: AppTheme.surfaceDark,
+            fillColor: Theme.of(context).colorScheme.surface,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-              borderSide: const BorderSide(color: AppTheme.dividerColor),
+              borderSide: BorderSide(color: Theme.of(context).dividerColor),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-              borderSide: const BorderSide(color: AppTheme.dividerColor),
+              borderSide: BorderSide(color: Theme.of(context).dividerColor),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
               borderSide:
-                  const BorderSide(color: AppTheme.accentViolet, width: 1.5),
+                  BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.5),
             ),
           ),
         ),
@@ -355,7 +355,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                 child: const Text(
                   'Bu görsel, modelin gelişmesi için kullanılabilir',
                   style: TextStyle(
-                    color: AppTheme.textSecondary,
+                    color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
                     fontSize: 13,
                     height: 1.4,
                   ),
@@ -375,7 +375,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
         children: [
           const Icon(
             Icons.error_outline_rounded,
-            color: AppTheme.errorColor,
+            color: Theme.of(context).colorScheme.error,
             size: 16,
           ),
           const SizedBox(width: AppTheme.spacingS),
@@ -383,7 +383,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
             child: Text(
               message,
               style: const TextStyle(
-                color: AppTheme.errorColor,
+                color: Theme.of(context).colorScheme.error,
                 fontSize: 13,
               ),
             ),
@@ -448,12 +448,12 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
           content: const Row(
             children: [
               Icon(Icons.check_circle_rounded,
-                  color: AppTheme.successColor, size: 20),
+                  color: Colors.green, size: 20),
               SizedBox(width: AppTheme.spacingS),
               Text('Paylaşım başarıyla oluşturuldu! 🎉'),
             ],
           ),
-          backgroundColor: AppTheme.cardDark,
+          backgroundColor: Theme.of(context).cardColor,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
