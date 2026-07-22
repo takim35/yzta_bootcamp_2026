@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../feed/presentation/screens/feed_screen.dart';
-import '../../wardrobe/presentation/screens/ai_stylist_screen.dart';
-import '../../wardrobe/presentation/screens/outfit_builder_screen.dart';
+import '../../../wardrobe/presentation/screens/ai_stylist_screen.dart';
+import '../../../wardrobe/presentation/screens/outfit_builder_screen.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
