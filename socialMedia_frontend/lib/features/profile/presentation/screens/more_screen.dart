@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/theme_provider.dart';
+import '../../../../core/localization/locale_provider.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import 'local_profile_screen.dart';
 import 'body_measurement_screen.dart';
@@ -11,6 +12,7 @@ class MoreScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final strings = ref.watch(stringsProvider);
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
@@ -20,7 +22,7 @@ class MoreScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                'More',
+                strings.settings,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 28,
@@ -63,7 +65,7 @@ class MoreScreen extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'My Profile',
+                              strings.navProfile,
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,
@@ -90,7 +92,7 @@ class MoreScreen extends ConsumerWidget {
               const SizedBox(height: 32),
               
               const Text(
-                'Settings',
+                strings.settings,
                 style: TextStyle(
                   color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                   fontSize: 16,
@@ -114,15 +116,15 @@ class MoreScreen extends ConsumerWidget {
                     _SettingsTile(title: 'Outfit Schedule', icon: Icons.calendar_today_rounded, onTap: () {}),
                     Divider(height: 1, color: Theme.of(context).dividerColor),
                     _SettingsTile(
-                      title: 'Language', 
+                      title: strings.language, 
                       icon: Icons.language_rounded, 
                       onTap: () {
-                        _showLanguageDialog(context);
+                        _showLanguageDialog(context, ref);
                       }
                     ),
                     Divider(height: 1, color: Theme.of(context).dividerColor),
                     _SettingsTile(
-                      title: 'Body Measurements', 
+                      title: strings.bodyMeasurements, 
                       icon: Icons.straighten_rounded, 
                       onTap: () {
                         Navigator.push(
@@ -145,7 +147,7 @@ class MoreScreen extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: Theme.of(context).dividerColor),
                 ),
-                child: const _SettingsAppearance(title: 'Appearance', icon: Icons.brightness_medium_rounded),
+                child: const _SettingsAppearance(title: strings.theme, icon: Icons.brightness_medium_rounded),
               ),
 
               const SizedBox(height: 16),
@@ -157,7 +159,7 @@ class MoreScreen extends ConsumerWidget {
                   border: Border.all(color: Theme.of(context).dividerColor),
                 ),
                 child: _SettingsTile(
-                  title: 'Sign Out',
+                  title: strings.logout,
                   icon: Icons.logout_rounded,
                   isCenter: true,
                   onTap: () {
@@ -197,26 +199,33 @@ class MoreScreen extends ConsumerWidget {
     );
   }
 
-  void _showLanguageDialog(BuildContext context) {
-    final languages = ['Türkçe', 'English', 'Deutsch', 'Français', '日本語', '한국어', '中文'];
+  void _showLanguageDialog(BuildContext context, WidgetRef ref) {
+    final languages = [
+      {'name': 'Türkçe', 'locale': AppLocale.tr},
+      {'name': 'English', 'locale': AppLocale.en},
+      {'name': 'Deutsch', 'locale': AppLocale.de},
+      {'name': 'Français', 'locale': AppLocale.fr},
+      {'name': '日本語', 'locale': AppLocale.ja},
+      {'name': '한국어', 'locale': AppLocale.ko},
+      {'name': '中文', 'locale': AppLocale.zh},
+    ];
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: Theme.of(context).cardColor,
-        title: Text('Select Language', style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white)),
+        title: Text(ref.watch(stringsProvider).languageTitle, style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white)),
         content: SizedBox(
           width: double.maxFinite,
           child: ListView.builder(
             shrinkWrap: true,
             itemCount: languages.length,
             itemBuilder: (context, index) {
+              final lang = languages[index];
               return ListTile(
-                title: Text(languages[index], style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey)),
+                title: Text(lang['name'] as String, style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey)),
                 onTap: () {
+                  ref.read(localeProvider.notifier).setLocale(lang['locale'] as AppLocale);
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Language changed to ${languages[index]}')),
-                  );
                 },
               );
             },
@@ -289,6 +298,7 @@ class _SettingsAppearance extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final strings = ref.watch(stringsProvider);
     final currentTheme = ref.watch(themeProvider);
     
     return Padding(
@@ -316,21 +326,21 @@ class _SettingsAppearance extends ConsumerWidget {
               Expanded(
                 child: GestureDetector(
                   onTap: () => ref.read(themeProvider.notifier).setTheme(ThemeMode.system),
-                  child: _SegmentItem(label: 'System', isSelected: currentTheme == ThemeMode.system),
+                  child: _SegmentItem(label: strings.systemTheme, isSelected: currentTheme == ThemeMode.system),
                 )
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: GestureDetector(
                   onTap: () => ref.read(themeProvider.notifier).setTheme(ThemeMode.light),
-                  child: _SegmentItem(label: 'Light', isSelected: currentTheme == ThemeMode.light),
+                  child: _SegmentItem(label: strings.lightTheme, isSelected: currentTheme == ThemeMode.light),
                 )
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: GestureDetector(
                   onTap: () => ref.read(themeProvider.notifier).setTheme(ThemeMode.dark),
-                  child: _SegmentItem(label: 'Dark', isSelected: currentTheme == ThemeMode.dark),
+                  child: _SegmentItem(label: strings.darkTheme, isSelected: currentTheme == ThemeMode.dark),
                 )
               ),
             ],

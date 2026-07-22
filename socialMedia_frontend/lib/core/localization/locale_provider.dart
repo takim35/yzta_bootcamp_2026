@@ -10,8 +10,10 @@ class LocaleNotifier extends StateNotifier<AppLocale> {
   LocaleNotifier() : super(AppLocale.en); // default: English
 
   void setLocale(AppLocale locale) => state = locale;
-  void toggleLocale() =>
-      state = state == AppLocale.en ? AppLocale.tr : AppLocale.en;
+  void toggleLocale() {
+    // Basic toggle no longer makes sense with 7 langs, but keeping for compatibility
+    state = state == AppLocale.en ? AppLocale.tr : AppLocale.en;
+  }
 }
 
 /// Convenience provider — use this in widgets
