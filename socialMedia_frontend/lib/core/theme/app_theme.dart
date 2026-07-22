@@ -60,12 +60,44 @@ class AppTheme {
   static ThemeData get darkTheme {
     return ThemeData(
       brightness: Brightness.dark,
-      primaryColor: accentViolet,
+      primaryColor: primaryDark,
       scaffoldBackgroundColor: primaryDark,
+      fontFamily: 'Inter',
       appBarTheme: const AppBarTheme(
         backgroundColor: primaryDark,
         elevation: 0,
+        centerTitle: false,
       ),
+      colorScheme: const ColorScheme.dark(
+        primary: accentViolet,
+        secondary: accentPink,
+        surface: surfaceDark,
+        error: errorColor,
+      ),
+      useMaterial3: true,
+    );
+  }
+
+  static ThemeData get lightTheme {
+    return ThemeData(
+      brightness: Brightness.light,
+      primaryColor: Colors.white,
+      scaffoldBackgroundColor: const Color(0xFFF5F5F7), // Soft light gray
+      fontFamily: 'Inter',
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: false,
+        iconTheme: IconThemeData(color: Color(0xFF1E1A29)),
+        titleTextStyle: TextStyle(color: Color(0xFF1E1A29), fontSize: 18, fontWeight: FontWeight.w600),
+      ),
+      colorScheme: const ColorScheme.light(
+        primary: accentPurple,
+        secondary: accentPink,
+        surface: Colors.white,
+        error: errorColor,
+      ),
+      useMaterial3: true,
     );
   }
 }

@@ -3,9 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../theme/app_theme.dart';
 import '../../features/home/presentation/screens/dashboard_screen.dart';
 import '../../features/wardrobe/presentation/screens/wardrobe_screen.dart';
-import '../../features/history/presentation/screens/history_screen.dart';
 import '../../features/profile/presentation/screens/more_screen.dart';
-import '../../features/feed/presentation/screens/feed_screen.dart';
+import '../../features/home/presentation/screens/try_on_coming_soon_screen.dart';
+import '../../features/home/presentation/screens/social_main_screen.dart';
 
 final mainNavIndexProvider = StateProvider<int>((ref) => 0);
 
@@ -19,8 +19,8 @@ class MainNavigationScreen extends ConsumerWidget {
     final screens = [
       const DashboardScreen(),
       const WardrobeScreen(),
-      const HistoryScreen(), // Placeholder for now
-      const MoreScreen(), // Merged Profile/Settings
+      const TryOnComingSoonScreen(), 
+      const MoreScreen(), 
     ];
 
     return Scaffold(
@@ -35,7 +35,7 @@ class MainNavigationScreen extends ConsumerWidget {
           // Open Social Media Feed
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const FeedScreen()),
+            MaterialPageRoute(builder: (_) => const SocialMainScreen()),
           );
         },
         backgroundColor: Colors.white,
@@ -77,8 +77,8 @@ class MainNavigationScreen extends ConsumerWidget {
             Row(
               children: [
                 _NavBarItem(
-                  icon: Icons.calendar_month_rounded,
-                  label: 'History',
+                  icon: Icons.auto_awesome_rounded,
+                  label: 'Try-On',
                   isSelected: currentIndex == 2,
                   onTap: () => ref.read(mainNavIndexProvider.notifier).state = 2,
                 ),

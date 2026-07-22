@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/theme_provider.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import 'local_profile_screen.dart';
+import 'body_measurement_screen.dart';
 import 'settings_screen.dart';
 
 class MoreScreen extends ConsumerWidget {
@@ -41,52 +43,45 @@ class MoreScreen extends ConsumerWidget {
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: AppTheme.cardDark,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(20),
                     border: Border.all(color: AppTheme.dividerColor),
                   ),
                   child: Row(
                     children: [
                       Container(
-                        width: 48,
-                        height: 48,
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
+                        width: 60,
+                        height: 60,
+                        decoration: BoxDecoration(
+                          color: AppTheme.surfaceDark,
                           shape: BoxShape.circle,
+                          border: Border.all(color: AppTheme.accentViolet, width: 2),
                         ),
-                        child: const Center(
-                          child: Text(
-                            'U', // User initial placeholder
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 20,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
+                        child: const Icon(Icons.person_rounded, color: AppTheme.accentViolet, size: 32),
                       ),
                       const SizedBox(width: 16),
-                      const Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'My Profile',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
+                      const Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'My Profile',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
-                          ),
-                          SizedBox(height: 4),
-                          Text(
-                            'View your posts & podium',
-                            style: TextStyle(
-                              color: AppTheme.textMuted,
-                              fontSize: 13,
+                            SizedBox(height: 4),
+                            Text(
+                              'Manage your account',
+                              style: TextStyle(
+                                color: AppTheme.textMuted,
+                                fontSize: 13,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                      const Spacer(),
                       const Icon(Icons.chevron_right_rounded, color: AppTheme.textMuted),
                     ],
                   ),
@@ -117,15 +112,26 @@ class MoreScreen extends ConsumerWidget {
                     const Divider(height: 1, color: AppTheme.dividerColor),
                     _SettingsTile(title: 'Location & Timezone', icon: Icons.location_on_rounded, onTap: () {}),
                     const Divider(height: 1, color: AppTheme.dividerColor),
-                    _SettingsTile(title: 'Social Followings', icon: Icons.group_rounded, onTap: () {}),
-                    const Divider(height: 1, color: AppTheme.dividerColor),
                     _SettingsTile(title: 'Outfit Schedule', icon: Icons.calendar_today_rounded, onTap: () {}),
                     const Divider(height: 1, color: AppTheme.dividerColor),
-                    _SettingsTile(title: 'Try-On Photo', icon: Icons.person_rounded, onTap: () {}),
+                    _SettingsTile(
+                      title: 'Language', 
+                      icon: Icons.language_rounded, 
+                      onTap: () {
+                        _showLanguageDialog(context);
+                      }
+                    ),
                     const Divider(height: 1, color: AppTheme.dividerColor),
-                    _SettingsTile(title: 'Language', icon: Icons.language_rounded, onTap: () {}),
-                    const Divider(height: 1, color: AppTheme.dividerColor),
-                    _SettingsTile(title: 'Body Measurements', icon: Icons.straighten_rounded, onTap: () {}),
+                    _SettingsTile(
+                      title: 'Body Measurements', 
+                      icon: Icons.straighten_rounded, 
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const BodyMeasurementScreen()),
+                        );
+                      }
+                    ),
                     const Divider(height: 1, color: AppTheme.dividerColor),
                     _SettingsTile(title: 'Subscription', icon: Icons.credit_card_rounded, onTap: () {}),
                   ],
@@ -140,15 +146,7 @@ class MoreScreen extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: AppTheme.dividerColor),
                 ),
-                child: Column(
-                  children: [
-                    _SettingsSwitch(title: 'Haptic Feedback', icon: Icons.vibration_rounded, value: true, onChanged: (v) {}),
-                    const Divider(height: 1, color: AppTheme.dividerColor),
-                    _SettingsAppearance(title: 'Appearance', icon: Icons.brightness_medium_rounded),
-                    const Divider(height: 1, color: AppTheme.dividerColor),
-                    _SettingsServer(title: 'Server', subtitle: 'app.spot.com'),
-                  ],
-                ),
+                child: const _SettingsAppearance(title: 'Appearance', icon: Icons.brightness_medium_rounded),
               ),
 
               const SizedBox(height: 16),
@@ -194,6 +192,35 @@ class MoreScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 100), // padding for bottom nav
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showLanguageDialog(BuildContext context) {
+    final languages = ['Türkçe', 'English', 'Deutsch', 'Français', '日本語', '한국어', '中文'];
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppTheme.cardDark,
+        title: const Text('Select Language', style: TextStyle(color: AppTheme.textPrimary)),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: languages.length,
+            itemBuilder: (context, index) {
+              return ListTile(
+                title: Text(languages[index], style: const TextStyle(color: AppTheme.textSecondary)),
+                onTap: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Language changed to ${languages[index]}')),
+                  );
+                },
+              );
+            },
           ),
         ),
       ),
@@ -255,58 +282,16 @@ class _SettingsTile extends StatelessWidget {
   }
 }
 
-class _SettingsSwitch extends StatelessWidget {
-  final String title;
-  final IconData icon;
-  final bool value;
-  final ValueChanged<bool> onChanged;
-
-  const _SettingsSwitch({
-    required this.title,
-    required this.icon,
-    required this.value,
-    required this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        children: [
-          Icon(icon, size: 20, color: AppTheme.textSecondary),
-          const SizedBox(width: 16),
-          Text(
-            title,
-            style: const TextStyle(
-              color: AppTheme.textPrimary,
-              fontSize: 15,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const Spacer(),
-          Switch(
-            value: value,
-            onChanged: onChanged,
-            activeColor: AppTheme.successColor,
-            activeTrackColor: AppTheme.successColor.withValues(alpha: 0.3),
-            inactiveThumbColor: AppTheme.textMuted,
-            inactiveTrackColor: AppTheme.surfaceDark,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SettingsAppearance extends StatelessWidget {
+class _SettingsAppearance extends ConsumerWidget {
   final String title;
   final IconData icon;
 
   const _SettingsAppearance({required this.title, required this.icon});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentTheme = ref.watch(themeProvider);
+    
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       child: Column(
@@ -329,11 +314,26 @@ class _SettingsAppearance extends StatelessWidget {
           const SizedBox(height: 16),
           Row(
             children: [
-              Expanded(child: _SegmentItem(label: 'System', isSelected: true)),
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => ref.read(themeProvider.notifier).setTheme(ThemeMode.system),
+                  child: _SegmentItem(label: 'System', isSelected: currentTheme == ThemeMode.system),
+                )
+              ),
               const SizedBox(width: 8),
-              Expanded(child: _SegmentItem(label: 'Light', isSelected: false)),
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => ref.read(themeProvider.notifier).setTheme(ThemeMode.light),
+                  child: _SegmentItem(label: 'Light', isSelected: currentTheme == ThemeMode.light),
+                )
+              ),
               const SizedBox(width: 8),
-              Expanded(child: _SegmentItem(label: 'Dark', isSelected: false)),
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => ref.read(themeProvider.notifier).setTheme(ThemeMode.dark),
+                  child: _SegmentItem(label: 'Dark', isSelected: currentTheme == ThemeMode.dark),
+                )
+              ),
             ],
           ),
         ],
@@ -369,62 +369,6 @@ class _SegmentItem extends StatelessWidget {
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _SettingsServer extends StatelessWidget {
-  final String title;
-  final String subtitle;
-
-  const _SettingsServer({required this.title, required this.subtitle});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      child: Row(
-        children: [
-          const Icon(Icons.dns_rounded, size: 20, color: AppTheme.textSecondary),
-          const SizedBox(width: 16),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  color: AppTheme.textPrimary,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              Text(
-                subtitle,
-                style: const TextStyle(
-                  color: AppTheme.textMuted,
-                  fontSize: 12,
-                ),
-              ),
-            ],
-          ),
-          const Spacer(),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: AppTheme.surfaceDark,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Text(
-              'Change',
-              style: TextStyle(
-                color: AppTheme.textSecondary,
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
