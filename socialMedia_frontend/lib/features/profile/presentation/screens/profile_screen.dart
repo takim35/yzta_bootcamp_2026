@@ -11,6 +11,7 @@ import '../../../../features/feed/presentation/widgets/shimmer_loading.dart';
 import '../../../../core/widgets/custom_shimmer.dart';
 import 'follow_list_screen.dart';
 import 'edit_profile_screen.dart';
+import '../../../../features/create_post/presentation/screens/create_post_screen.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   final String? userId;
@@ -96,6 +97,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           backgroundColor: AppTheme.primaryDark,
           elevation: 0,
         ),
+        floatingActionButton: provider.isOwnProfile 
+            ? FloatingActionButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const CreatePostScreen()),
+                  );
+                },
+                backgroundColor: AppTheme.accentViolet,
+                child: const Icon(Icons.add, color: AppTheme.primaryDark),
+              )
+            : null,
         body: RefreshIndicator(
           onRefresh: _loadProfile,
           color: AppTheme.accentViolet,

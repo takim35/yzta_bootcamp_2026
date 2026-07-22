@@ -163,6 +163,22 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
           },
           tooltip: 'Bildirimler',
         ),
+        IconButton(
+          icon: const Icon(
+            Icons.person_outline_rounded,
+            color: AppTheme.textPrimary,
+          ),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => ProfileScreen(userId: currentUserId),
+              ),
+            );
+          },
+          tooltip: 'Sosyal Profil',
+        ),
+        const SizedBox(width: 8),
       ],
     );
   }
