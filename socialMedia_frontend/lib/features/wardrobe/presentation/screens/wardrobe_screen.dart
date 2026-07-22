@@ -38,161 +38,187 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final s = ref.watch(stringsProvider);
-
     return Scaffold(
       backgroundColor: AppTheme.primaryDark,
-      appBar: AppBar(
-        title: Text(
-          s.digitalWardrobe,
-          style: const TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: AppTheme.primaryDark,
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add_rounded, color: AppTheme.accentViolet, size: 28),
-            tooltip: s.isTr ? 'Kıyafet Ekle' : 'Add Clothing',
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const AddItemScreen()),
-              ).then((refreshed) {
-                if (refreshed == true) _loadClothes();
-              });
-            },
-          ),
-        ],
-      ),
-      body: FutureBuilder<List<dynamic>>(
-        future: _clothesFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(color: AppTheme.accentViolet),
-            );
-          }
-          if (snapshot.hasError) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Icon(Icons.error_outline, color: AppTheme.errorColor, size: 48),
-                  const SizedBox(height: 12),
-                  Text(
-                    'Error: ${snapshot.error}',
-                    style: const TextStyle(color: AppTheme.textSecondary),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                  TextButton(
-                    onPressed: _loadClothes,
-                    child: const Text('Retry', style: TextStyle(color: AppTheme.accentViolet)),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          final clothes = snapshot.data ?? [];
-          if (clothes.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.checkroom_rounded,
-                      size: 72, color: AppTheme.accentViolet.withValues(alpha: 0.4)),
-                  const SizedBox(height: 16),
-                  Text(
-                    s.noClothesFound,
-                    style: const TextStyle(color: AppTheme.textSecondary, fontSize: 16),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    s.isTr ? 'Sağ üstteki + butonuyla kıyafet ekleyin' : 'Add clothing using the + button on top right',
-                    style: const TextStyle(color: AppTheme.textMuted, fontSize: 13),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          return GridView.builder(
-            padding: const EdgeInsets.all(12),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 0.78,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-            ),
-            itemCount: clothes.length,
-            itemBuilder: (context, index) {
-              final cloth = clothes[index] as Map<String, dynamic>;
-              final imageUrl = cloth['foto_url']?.toString() ?? cloth['image_url']?.toString() ?? '';
-              final tur = cloth['tur']?.toString() ?? cloth['category']?.toString() ?? 'Clothing';
-              final renk = cloth['renk']?.toString() ?? '';
-
-              return GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => EditItemScreen(initialItem: cloth),
+                  const Text(
+                    'My Wardrobe',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.5,
                     ),
-                  ).then((refreshed) {
-                    if (refreshed == true) _loadClothes();
-                  });
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: AppTheme.cardDark,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppTheme.dividerColor, width: 0.5),
                   ),
-                  clipBehavior: Clip.antiAlias,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Expanded(
-                        child: imageUrl.isNotEmpty
-                            ? Image.network(
-                                imageUrl,
-                                fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) => const _EmptyClothIcon(),
-                              )
-                            : const _EmptyClothIcon(),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(10),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              s.translateWardrobe(tur),
-                              style: const TextStyle(
-                                color: AppTheme.textPrimary,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
-                              ),
-                            ),
-                            if (renk.isNotEmpty)
-                              Text(
-                                s.translateWardrobe(renk),
-                                style: const TextStyle(
-                                  color: AppTheme.textMuted,
-                                  fontSize: 12,
-                                ),
-                              ),
-                          ],
+                  IconButton(
+                    icon: const Icon(Icons.add_circle_outline_rounded, color: Colors.white, size: 28),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const AddItemScreen()),
+                      ).then((refreshed) {
+                        if (refreshed == true) _loadClothes();
+                      });
+                    },
+                  ),
+                ],
+              ),
+            ),
+            
+            // Search Bar
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Container(
+                height: 40,
+                decoration: BoxDecoration(
+                  color: AppTheme.cardDark,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: AppTheme.dividerColor),
+                ),
+                child: Row(
+                  children: [
+                    const SizedBox(width: 12),
+                    const Icon(Icons.search_rounded, color: AppTheme.textMuted, size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: TextField(
+                        style: const TextStyle(color: Colors.white, fontSize: 14),
+                        decoration: InputDecoration(
+                          hintText: 'Search items...',
+                          hintStyle: const TextStyle(color: AppTheme.textMuted),
+                          border: InputBorder.none,
+                          isDense: true,
+                          contentPadding: const EdgeInsets.symmetric(vertical: 10),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              );
-            },
-          );
-        },
+              ),
+            ),
+            const SizedBox(height: 12),
+            
+            // Category Chips
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Row(
+                children: [
+                  _FilterChip(label: 'Favorites'),
+                  _FilterChip(label: 'Shirt'),
+                  _FilterChip(label: 'T-Shirt'),
+                  _FilterChip(label: 'Pants'),
+                  _FilterChip(label: 'Jeans'),
+                  _FilterChip(label: 'Shoes'),
+                  _FilterChip(label: 'Accessories'),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            Expanded(
+              child: FutureBuilder<List<dynamic>>(
+                future: _clothesFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator(color: Colors.white),
+                    );
+                  }
+                  if (snapshot.hasError) {
+                    return Center(
+                      child: Text(
+                        'Error: ${snapshot.error}',
+                        style: const TextStyle(color: AppTheme.errorColor),
+                      ),
+                    );
+                  }
+
+                  final clothes = snapshot.data ?? [];
+                  
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+                        child: Text(
+                          '${clothes.length} items',
+                          style: const TextStyle(
+                            color: AppTheme.textMuted,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                      if (clothes.isEmpty)
+                        const Expanded(
+                          child: Center(
+                            child: Text(
+                              'No clothes found',
+                              style: TextStyle(color: AppTheme.textSecondary),
+                            ),
+                          ),
+                        )
+                      else
+                        Expanded(
+                          child: GridView.builder(
+                            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              childAspectRatio: 0.8,
+                              crossAxisSpacing: 12,
+                              mainAxisSpacing: 12,
+                            ),
+                            itemCount: clothes.length,
+                            itemBuilder: (context, index) {
+                              final cloth = clothes[index] as Map<String, dynamic>;
+                              final imageUrl = cloth['foto_url']?.toString() ?? cloth['image_url']?.toString() ?? '';
+                              
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => EditItemScreen(initialItem: cloth),
+                                    ),
+                                  ).then((refreshed) {
+                                    if (refreshed == true) _loadClothes();
+                                  });
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.cardDark,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(color: AppTheme.dividerColor),
+                                  ),
+                                  clipBehavior: Clip.antiAlias,
+                                  child: imageUrl.isNotEmpty
+                                      ? Image.network(
+                                          imageUrl,
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (_, __, ___) => const _EmptyClothIcon(),
+                                        )
+                                      : const _EmptyClothIcon(),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -207,6 +233,33 @@ class _EmptyClothIcon extends StatelessWidget {
       color: AppTheme.surfaceDark,
       child: const Center(
         child: Icon(Icons.checkroom_rounded, size: 52, color: AppTheme.textMuted),
+      ),
+    );
+  }
+}
+
+class _FilterChip extends StatelessWidget {
+  final String label;
+
+  const _FilterChip({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(right: 8.0),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      decoration: BoxDecoration(
+        color: AppTheme.cardDark,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppTheme.dividerColor),
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 13,
+          fontWeight: FontWeight.w500,
+        ),
       ),
     );
   }

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/theme/app_theme.dart';
 import 'features/onboarding/presentation/screens/onboarding_screen.dart';
-import 'features/home/home_screen.dart';
 import 'features/auth/presentation/providers/auth_provider.dart';
+import 'core/navigation/main_navigation_screen.dart';
 import 'services/notification_service.dart';
 
 void main() async {
@@ -59,7 +59,7 @@ class _AuthGate extends ConsumerWidget {
 
     // Giriş yapılmışsa ana ekrana git
     if (auth.isLoggedIn) {
-      return const HomeScreen();
+      return const MainNavigationScreen();
     }
 
     // Giriş yapılmamışsa onboarding
