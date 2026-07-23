@@ -39,6 +39,11 @@ class KombinOnerIstek(BaseModel):
     hava_durumu: str
     stil_tercihi: Optional[str] = ""
 
+class ManualOutfitCreateRequest(BaseModel):
+    user_id: str
+    item_ids: List[int]
+    aciklama: str
+
 # --- Endpoints ---
 @router.post("/items")
 def kiyafet_ekle(user_id: str, istek: KiyafetEkleIstek, db: sqlite3.Connection = Depends(get_db)):
@@ -143,3 +148,23 @@ def kombin_oner(istek: KombinOnerIstek, db: sqlite3.Connection = Depends(get_db)
         "secilen_kiyafetler": secilen_kiyafetler_detay,
         "aciklama": sonuc["aciklama"],
     }
+
+@router.get("/outfits/{user_id}")
+def outfits_listele(user_id: str, db: sqlite3.Connection = Depends(get_db)):
+    """Kullanıcının daha önce oluşturduğu kombinleri getirir."""
+    repo = ItemRepository(db)
+    return repo.kombin_onerilerini_getir(user_id)
+
+@router.post("/outfits/")
+def manuel_kombin_olustur(istek: ManualOutfitCreateRequest, db: sqlite3.Connection = Depends(get_db)):
+    """Kullanıcının manuel olarak seçtiği kıyafetlerden kombin oluşturur."""
+    repo = ItemRepository(db)
+    baglam_json = json.dumps({"type": "manual"})
+    oneri_id = repo.kombin_onerisi_kaydet(
+        user_id=istek.user_id,
+        baglam_json=baglam_json,
+        kiyafet_idleri=istek.item_ids,
+        aciklama=istek.aciklama,
+    )
+    return {"oneri_id": oneri_id, "mesaj": "Kombin başarıyla kaydedildi."}
+

@@ -41,9 +41,7 @@ class CreatePostProvider extends ChangeNotifier {
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
-  /// Form geçerliliği: en azından görsel seçilmiş olmalı ve en az 1 kıyafet seçilmeli
-  bool get isFormValid =>
-      _selectedImage != null && _selectedOutfitItems.isNotEmpty;
+  // isFormValid is now defined later in the file.
 
   // ─── Mock Outfit Items (UI'da gösterim için) ───────────────
   List<OutfitItem> get mockOutfitItems => [
@@ -186,11 +184,31 @@ class CreatePostProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool _isCollage = false;
+  bool get isCollage => _isCollage;
+
+  void setCollage(bool value) {
+    _isCollage = value;
+    if (value) {
+      _selectedImage = null; // Clear image if collage selected
+    }
+    notifyListeners();
+  }
+
+  void setSelectedOutfitItems(List<OutfitItem> items) {
+    _selectedOutfitItems = List.from(items);
+    notifyListeners();
+  }
+
+  /// Form geçerliliği: Görsel seçili olmalı VEYA kolaj modu aktif olmalı, VE en az 1 parça olmalı
+  bool get isFormValid =>
+      (_selectedImage != null || _isCollage) && _selectedOutfitItems.isNotEmpty;
+
   // ─── Gönderi Paylaş ─────────────────────────────────────────
   Future<String?> submitPost(String userId) async {
     if (!isFormValid) {
-      if (_selectedImage == null) {
-        _errorMessage = 'Lütfen bir görsel seçin.';
+      if (_selectedImage == null && !_isCollage) {
+        _errorMessage = 'Lütfen bir görsel seçin veya kombin kolajı oluşturun.';
       } else if (_selectedOutfitItems.isEmpty) {
         _errorMessage = 'Lütfen en az 1 kombin parçası seçin.';
       }
@@ -203,15 +221,21 @@ class CreatePostProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // 1. Görseli backend'e yükle
-      String? imageUrl = await _uploadImage(selectedImage!);
+      String? imageUrl;
+      
+      if (_isCollage) {
+        imageUrl = 'collage';
+      } else {
+        // 1. Görseli backend'e yükle
+        imageUrl = await _uploadImage(selectedImage!);
 
-      // Upload başarısız olursa hata göster
-      if (imageUrl == null || imageUrl.isEmpty) {
-        _isSubmitting = false;
-        _errorMessage = 'Görsel yüklenemedi. Bağlantınızı kontrol edin.';
-        notifyListeners();
-        return null;
+        // Upload başarısız olursa hata göster
+        if (imageUrl == null || imageUrl.isEmpty) {
+          _isSubmitting = false;
+          _errorMessage = 'Görsel yüklenemedi. Bağlantınızı kontrol edin.';
+          notifyListeners();
+          return null;
+        }
       }
 
       // 2. Post oluştur

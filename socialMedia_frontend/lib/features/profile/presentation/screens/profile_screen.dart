@@ -12,6 +12,7 @@ import '../../../../core/widgets/custom_shimmer.dart';
 import 'follow_list_screen.dart';
 import 'edit_profile_screen.dart';
 import '../../../../features/create_post/presentation/screens/create_post_screen.dart';
+import '../../../../features/feed/presentation/providers/feed_provider.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   final String? userId;
@@ -156,9 +157,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       provider.savedPosts,
                       s,
                       targetUserId,
+                      isSavedTab: true,
                       emptyMessage: s.isTr
-                          ? 'Henüz Podyumda gönderi yok'
-                          : 'No Podium posts yet',
+                          ? 'Henüz kaydedilmiş gönderi yok'
+                          : 'No saved posts yet',
                     ),
                 ],
               ),
@@ -430,7 +432,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   Widget _buildPostGrid(
       List<PostModel> posts, AppStrings s, String targetUserId,
-      {String? emptyMessage, bool isLocked = false}) {
+      {String? emptyMessage, bool isLocked = false, bool isSavedTab = false}) {
     if (isLocked) {
       return Center(
         child: Column(
@@ -508,15 +510,28 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     Flexible(
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(12),
-                        child: post.imageUrl.startsWith('http')
-                            ? Image.network(
-                                post.imageUrl,
-                                fit: BoxFit.contain,
+                        child: post.imageUrl == 'collage'
+                            ? Container(
+                                color: Theme.of(context).colorScheme.surface,
+                                padding: const EdgeInsets.all(24),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.style_rounded, size: 64, color: AppTheme.accentPurple),
+                                    const SizedBox(height: 16),
+                                    const Text('Kombin Kolajı', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                                  ],
+                                ),
                               )
-                            : Image.file(
-                                File(post.imageUrl),
-                                fit: BoxFit.contain,
-                              ),
+                            : post.imageUrl.startsWith('http')
+                                ? Image.network(
+                                    post.imageUrl,
+                                    fit: BoxFit.contain,
+                                  )
+                                : Image.file(
+                                    File(post.imageUrl),
+                                    fit: BoxFit.contain,
+                                  ),
                       ),
                     ),
                     Container(
@@ -559,7 +574,27 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         ],
                       ),
                     ),
-                    if (provider.isOwnProfile) ...[
+                    if (isSavedTab) ...[
+                      const SizedBox(height: 16),
+                      ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 10),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8)),
+                        ),
+                        icon: const Icon(Icons.bookmark_remove,
+                            color: Colors.white, size: 18),
+                        label: Text(s.isTr ? 'Kaydedilenlerden Çıkar' : 'Unsave',
+                            style: const TextStyle(color: Colors.white)),
+                        onPressed: () async {
+                          Navigator.pop(ctx);
+                          await ref.read(feedProvider.notifier).toggleSave(post.id);
+                          ref.read(profileProvider.notifier).loadProfile(targetUserId);
+                        },
+                      ),
+                    ] else if (provider.isOwnProfile) ...[
                       const SizedBox(height: 16),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -597,7 +632,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor:
                                   Theme.of(context).colorScheme.error,
-                              padding: EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                   horizontal: 16, vertical: 10),
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8)),
@@ -631,27 +666,30 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           },
           child: Container(
             color: Theme.of(context).colorScheme.surface,
-            child: post.imageUrl.startsWith('http')
-                ? Image.network(
-                    post.imageUrl,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Center(
-                      child: Icon(Icons.error_outline,
-                          color:
-                              Theme.of(context).textTheme.bodyMedium?.color ??
-                                  Colors.grey),
-                    ),
+            child: post.imageUrl == 'collage'
+                ? Center(
+                    child: Icon(Icons.style_rounded,
+                        size: 40,
+                        color: Theme.of(context).textTheme.bodySmall?.color ??
+                            Colors.grey),
                   )
-                : Image.file(
-                    File(post.imageUrl),
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Center(
-                      child: Icon(Icons.error_outline,
-                          color:
-                              Theme.of(context).textTheme.bodyMedium?.color ??
-                                  Colors.grey),
-                    ),
-                  ),
+                : post.imageUrl.startsWith('http')
+                    ? Image.network(
+                        post.imageUrl,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Center(
+                          child: Icon(Icons.error_outline,
+                              color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+                        ),
+                      )
+                    : Image.file(
+                        File(post.imageUrl),
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Center(
+                          child: Icon(Icons.error_outline,
+                              color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+                        ),
+                      ),
           ),
         );
       },

@@ -628,6 +628,18 @@ class ApiService {
     });
   }
 
+  Future<List<dynamic>> getOutfits(String userId) async {
+    return await _getList('/wardrobe/outfits/$userId');
+  }
+
+  Future<dynamic> createManualOutfit(String userId, List<int> itemIds, String aciklama) async {
+    return await _post('/wardrobe/outfits/', {
+      'user_id': userId,
+      'item_ids': itemIds,
+      'aciklama': aciklama,
+    });
+  }
+
   // ─── 2FA Yardımcı Metodları ────────────────────────────────
   /// 2FA setup/verify için POST isteği — Map döner
   Future<Map<String, dynamic>> post2FA(

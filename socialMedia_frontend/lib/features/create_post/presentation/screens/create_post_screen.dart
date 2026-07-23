@@ -7,6 +7,9 @@ import '../../../../features/create_post/presentation/widgets/outfit_picker.dart
 import '../../../../features/feed/presentation/providers/feed_provider.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/navigation/app_navigator.dart';
+import '../../../../features/profile/presentation/providers/profile_provider.dart';
+import '../../../../services/api_service.dart';
+import '../../../../features/feed/domain/models/outfit_item_model.dart';
 
 class CreatePostScreen extends ConsumerStatefulWidget {
   const CreatePostScreen({super.key});
@@ -146,59 +149,209 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
     if (provider.selectedImage != null) {
       return _buildSelectedImage(provider);
     }
+    if (provider.isCollage && provider.selectedOutfitItems.isNotEmpty) {
+      return _buildCollageGrid(provider);
+    }
     return _buildImagePlaceholder(provider);
   }
 
   Widget _buildImagePlaceholder(CreatePostProvider provider) {
-    return GestureDetector(
-      onTap: () => provider.pickImage(),
-      child: Semantics(
-        label: 'Galeriden görsel seç',
-        child: Container(
-          height: 220,
-          width: double.infinity,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-            color:
-                Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
-          ),
-          child: CustomPaint(
-            painter: _DashedBorderPainter(
-              color:
-                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
-              borderRadius: AppTheme.radiusLarge,
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.add_photo_alternate_rounded,
-                  size: 56,
-                  color: Theme.of(context).colorScheme.primary,
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: () => provider.pickImage(),
+          child: Semantics(
+            label: 'Galeriden görsel seç',
+            child: Container(
+              height: 140,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+                color:
+                    Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
+              ),
+              child: CustomPaint(
+                painter: _DashedBorderPainter(
+                  color:
+                      Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                  borderRadius: AppTheme.radiusLarge,
                 ),
-                SizedBox(height: AppTheme.spacingM),
-                Text(
-                  'Galeriden Seç',
-                  style: TextStyle(
-                    color: AppTheme.accentPurple,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.add_photo_alternate_rounded,
+                      size: 36,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    const SizedBox(height: AppTheme.spacingM),
+                    const Text(
+                      'Galeriden Seç',
+                      style: TextStyle(
+                        color: AppTheme.accentPurple,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox(height: AppTheme.spacingXS),
-                Text(
-                  'Kombinini paylaşmak için bir fotoğraf seç',
-                  style: TextStyle(
-                    color: Theme.of(context).textTheme.bodySmall?.color ??
-                        Colors.grey,
-                    fontSize: 12,
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         ),
+        const SizedBox(height: AppTheme.spacingM),
+        GestureDetector(
+          onTap: () => _showOutfitSelection(provider),
+          child: Semantics(
+            label: 'Kombinlerimden Seç',
+            child: Container(
+              height: 80,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+                color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1),
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.3),
+                )
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.style_rounded,
+                    size: 28,
+                    color: Theme.of(context).colorScheme.secondary,
+                  ),
+                  const SizedBox(width: AppTheme.spacingM),
+                  Text(
+                    'Kombinlerimden Seç',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.secondary,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCollageGrid(CreatePostProvider provider) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppTheme.spacingM),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+        color: Theme.of(context).colorScheme.surface,
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Kombin Kolajı',
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+              TextButton.icon(
+                onPressed: () {
+                  provider.setCollage(false);
+                },
+                icon: const Icon(Icons.close, size: 16, color: Colors.grey),
+                label: const Text('İptal', style: TextStyle(color: Colors.grey)),
+              )
+            ],
+          ),
+          const SizedBox(height: AppTheme.spacingS),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: provider.selectedOutfitItems.map((item) {
+              return Container(
+                width: 80,
+                height: 100,
+                decoration: BoxDecoration(
+                  color: Colors.grey[800],
+                  borderRadius: BorderRadius.circular(8),
+                  image: item.imageUrl.isNotEmpty
+                      ? DecorationImage(
+                          image: NetworkImage(item.imageUrl),
+                          fit: BoxFit.cover,
+                        )
+                      : null,
+                ),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showOutfitSelection(CreatePostProvider provider) async {
+    final userId = ref.read(authProvider).currentUserId ?? '';
+    if (userId.isEmpty) return;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return FutureBuilder<List<dynamic>>(
+          future: ApiService().getOutfits(userId),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (snapshot.hasError) {
+              return Center(
+                child: Text('Hata oluştu', style: TextStyle(color: Theme.of(context).colorScheme.error)),
+              );
+            }
+            final outfits = snapshot.data ?? [];
+            if (outfits.isEmpty) {
+              return const Center(
+                child: Text('Kayıtlı kombininiz bulunmuyor.', style: TextStyle(color: Colors.grey)),
+              );
+            }
+            return ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: outfits.length,
+              itemBuilder: (context, index) {
+                final outfit = outfits[index];
+                final kiyafetler = outfit['kiyafetler'] as List<dynamic>? ?? [];
+                
+                return ListTile(
+                  title: const Text('Kombin Önerisi'),
+                  subtitle: Text(outfit['aciklama']?.toString() ?? '', maxLines: 1, overflow: TextOverflow.ellipsis),
+                  leading: const Icon(Icons.style_rounded, color: AppTheme.accentPurple),
+                  onTap: () {
+                    // Kıyafetleri OutfitItem modeline çevir
+                    final outfitItems = kiyafetler.map((k) {
+                      return OutfitItem(
+                        itemId: k['id'].toString(),
+                        category: k['tur'] ?? 'diğer',
+                        imageUrl: ApiService.fixImageUrl(k['foto_url']?.toString() ?? ''),
+                      );
+                    }).toList();
+                    
+                    provider.setCollage(true);
+                    provider.setSelectedOutfitItems(outfitItems);
+                    Navigator.pop(context);
+                  },
+                );
+              },
+            );
+          },
+        );
+      },
     );
   }
 
@@ -459,10 +612,16 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
         ),
       );
       provider.clearForm();
-      // Feed'i güncelle
+      // Feed'i ve Profil'i güncelle
       ref.read(feedProvider).loadFeed();
-      // Yönlendirmeyi değiştir: Ana sayfa navigasyonundan pop yapmak yerine tab indeksini 0 (Feed) yap
-      ref.read(bottomNavIndexProvider.notifier).state = 0;
+      // Profil Provider'ı da güncelle ki anında podyuma düşsün
+      final currentUserId = ref.read(authProvider).currentUserId;
+      if (currentUserId != null) {
+        ref.read(profileProvider.notifier).loadProfile(currentUserId);
+      }
+      
+      // Ekranı kapat
+      Navigator.of(context).pop(true);
     }
   }
 }

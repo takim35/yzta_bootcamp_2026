@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../../../../features/feed/domain/models/post_model.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../features/auth/presentation/providers/auth_provider.dart';
+import '../../../../services/api_service.dart';
 import '../providers/feed_provider.dart';
 import 'like_button.dart';
 
@@ -302,15 +303,17 @@ class PostCard extends ConsumerWidget {
               children: [
                 InteractiveViewer(
                   clipBehavior: Clip.none,
-                  child: post.imageUrl.startsWith('http')
-                      ? CachedNetworkImage(
-                          imageUrl: post.imageUrl,
-                          fit: BoxFit.contain,
-                          placeholder: (context, url) =>
-                              CircularProgressIndicator(
-                                  color: Theme.of(context).colorScheme.primary),
-                        )
-                      : Image.file(File(post.imageUrl), fit: BoxFit.contain),
+                  child: post.imageUrl == 'collage'
+                      ? _buildCollageGrid(context)
+                      : post.imageUrl.startsWith('http')
+                          ? CachedNetworkImage(
+                              imageUrl: post.imageUrl,
+                              fit: BoxFit.contain,
+                              placeholder: (context, url) =>
+                                  CircularProgressIndicator(
+                                      color: Theme.of(context).colorScheme.primary),
+                            )
+                          : Image.file(File(post.imageUrl), fit: BoxFit.contain),
                 ),
                 Positioned(
                   top: 10,
@@ -328,19 +331,21 @@ class PostCard extends ConsumerWidget {
       },
       child: AspectRatio(
         aspectRatio: 4 / 5,
-        child: post.imageUrl.startsWith('http')
-            ? CachedNetworkImage(
-                imageUrl: post.imageUrl,
-                fit: BoxFit.cover,
-                placeholder: (context, url) => Container(
-                  color: Theme.of(context).colorScheme.surface,
-                  child: Center(
-                    child: CircularProgressIndicator(
-                      color: Theme.of(context).colorScheme.primary,
-                      strokeWidth: 2,
+        child: post.imageUrl == 'collage'
+            ? _buildCollageGrid(context)
+            : post.imageUrl.startsWith('http')
+                ? CachedNetworkImage(
+                    imageUrl: post.imageUrl,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => Container(
+                      color: Theme.of(context).colorScheme.surface,
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          color: Theme.of(context).colorScheme.primary,
+                          strokeWidth: 2,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
                 errorWidget: (context, url, error) => Container(
                   color: Theme.of(context).colorScheme.surface,
                   child: Column(
@@ -444,14 +449,15 @@ class PostCard extends ConsumerWidget {
                 ],
               ),
               IconButton(
-                icon: Opacity(
-                  opacity: post.isSaved ? 1.0 : 0.4,
-                  child: const Text('✨', style: TextStyle(fontSize: 24)),
+                icon: Icon(
+                  post.isSaved ? Icons.bookmark : Icons.bookmark_outline,
+                  color: post.isSaved ? AppTheme.accentPurple : (Theme.of(context).textTheme.bodySmall?.color ?? Colors.white),
+                  size: 26,
                 ),
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
                 onPressed: () => onSave?.call(post.postId),
-                tooltip: post.isSaved ? 'Podyumdan Çıkar' : 'Podyuma Ekle',
+                tooltip: post.isSaved ? 'Kaydedilenlerden Çıkar' : 'Kaydet',
               ),
             ],
           ),
@@ -619,5 +625,38 @@ class PostCard extends ConsumerWidget {
         }
       }
     }
+  }
+
+  Widget _buildCollageGrid(BuildContext context) {
+    if (post.outfitItems.isEmpty) return Container(color: Colors.grey[900]);
+    return Container(
+      color: Theme.of(context).colorScheme.surface,
+      padding: const EdgeInsets.all(8),
+      child: Center(
+        child: Wrap(
+          spacing: 4,
+          runSpacing: 4,
+          alignment: WrapAlignment.center,
+          runAlignment: WrapAlignment.center,
+          children: post.outfitItems.map((item) {
+            final url = ApiService.fixImageUrl(item.imageUrl);
+            return Container(
+              width: 150,
+              height: 200,
+              decoration: BoxDecoration(
+                color: Colors.grey[800],
+                borderRadius: BorderRadius.circular(12),
+                image: url.isNotEmpty
+                    ? DecorationImage(
+                        image: NetworkImage(url),
+                        fit: BoxFit.cover,
+                      )
+                    : null,
+              ),
+            );
+          }).toList(),
+        ),
+      ),
+    );
   }
 }

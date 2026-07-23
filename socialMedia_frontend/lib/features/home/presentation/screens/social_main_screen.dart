@@ -30,17 +30,10 @@ class _SocialMainScreenState extends ConsumerState<SocialMainScreen> {
         index: _currentIndex,
         children: screens,
       ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          border: Border(
-              top: BorderSide(
-                  color: Theme.of(context).dividerColor, width: 0.5)),
-        ),
-        child: BottomNavigationBar(
-          backgroundColor: Theme.of(context).colorScheme.surface,
-          currentIndex: _currentIndex,
-          selectedItemColor: Colors.white,
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        currentIndex: _currentIndex,
+        selectedItemColor: Colors.white,
           unselectedItemColor:
               Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
           showSelectedLabels: true,
@@ -62,7 +55,6 @@ class _SocialMainScreenState extends ConsumerState<SocialMainScreen> {
             ),
           ],
         ),
-      ),
     );
   }
 }

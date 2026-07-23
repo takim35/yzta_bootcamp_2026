@@ -134,3 +134,48 @@ class ItemRepository:
             (int(begenildi), oneri_id),
         )
         self.db.commit()
+
+    def kombin_onerilerini_getir(self, user_id: str) -> list[dict]:
+        rows = self.db.execute(
+            "SELECT * FROM kombin_onerileri WHERE user_id = ? ORDER BY id DESC",
+            (user_id,)
+        ).fetchall()
+        
+        sonuc = []
+        for row in rows:
+            kombin = dict(row)
+            try:
+                import json as _json
+                # kiyafet_idleri'ni çözümle ve kıyafetleri getir
+                kiyafet_idleri = _json.loads(kombin["kiyafet_idleri"])
+                
+                kiyafetler = []
+                for k_id in kiyafet_idleri:
+                    k = self.kiyafet_getir(k_id)
+                    if k:
+                        kiyafetler.append(k)
+                        
+                kombin["kiyafetler"] = kiyafetler
+                sonuc.append(kombin)
+            except:
+                pass
+        return sonuc
+
+    def kombin_onerisini_getir(self, oneri_id: int) -> Optional[dict]:
+        row = self.db.execute("SELECT * FROM kombin_onerileri WHERE id = ?", (oneri_id,)).fetchone()
+        if not row:
+            return None
+            
+        kombin = dict(row)
+        try:
+            import json as _json
+            kiyafet_idleri = _json.loads(kombin["kiyafet_idleri"])
+            kiyafetler = []
+            for k_id in kiyafet_idleri:
+                k = self.kiyafet_getir(k_id)
+                if k:
+                    kiyafetler.append(k)
+            kombin["kiyafetler"] = kiyafetler
+        except:
+            kombin["kiyafetler"] = []
+        return kombin

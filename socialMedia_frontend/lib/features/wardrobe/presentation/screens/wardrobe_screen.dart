@@ -7,6 +7,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/localization/locale_provider.dart';
 import 'add_item_screen.dart';
 import 'edit_item_screen.dart';
+import 'outfits_screen.dart';
 
 class WardrobeScreen extends ConsumerStatefulWidget {
   const WardrobeScreen({super.key});
@@ -60,18 +61,32 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> {
                       letterSpacing: -0.5,
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.add_circle_outline_rounded,
-                        color: Colors.white, size: 28),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => const AddItemScreen()),
-                      ).then((refreshed) {
-                        if (refreshed == true) _loadClothes();
-                      });
-                    },
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.style_rounded, color: Colors.white, size: 28),
+                        tooltip: 'Kombinlerim',
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const OutfitsScreen()),
+                          );
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.add_circle_outline_rounded,
+                            color: Colors.white, size: 28),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const AddItemScreen()),
+                          ).then((refreshed) {
+                            if (refreshed == true) _loadClothes();
+                          });
+                        },
+                      ),
+                    ],
                   ),
                 ],
               ),

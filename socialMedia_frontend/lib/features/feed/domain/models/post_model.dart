@@ -60,7 +60,9 @@ class PostModel {
               .toList() ??
           [],
       createdAt: json['created_at'] != null
-          ? DateTime.parse(json['created_at'] as String)
+          ? DateTime.parse(json['created_at'].toString().endsWith('Z') 
+              ? json['created_at'] as String 
+              : '${json['created_at']}Z')
           : DateTime.now(),
     );
   }

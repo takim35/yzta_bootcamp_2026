@@ -227,7 +227,8 @@ class _EditItemScreenState extends ConsumerState<EditItemScreen> {
   @override
   Widget build(BuildContext context) {
     final s = ref.watch(stringsProvider);
-    final fotoUrl = widget.initialItem['foto_url'] as String?;
+    final rawFotoUrl = widget.initialItem['foto_url']?.toString() ?? widget.initialItem['image_url']?.toString() ?? '';
+    final fotoUrl = rawFotoUrl.isNotEmpty ? ApiService.fixImageUrl(rawFotoUrl) : null;
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
