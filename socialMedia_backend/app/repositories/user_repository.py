@@ -12,7 +12,8 @@ class UserRepository:
         user = self.db.execute(
             """
             SELECT user_id, email, username, display_name, avatar_url, bio,
-                   followers_count, following_count, created_at, profile_visibility
+                   followers_count, following_count, created_at, profile_visibility,
+                   height, weight, chest, waist, hips, location, timezone
             FROM users WHERE user_id = ?
             """,
             (user_id,)
@@ -23,18 +24,39 @@ class UserRepository:
         
         return UserResponse(**dict(user))
 
-    def update_user_profile(self, user_id: str, display_name: Optional[str], bio: Optional[str], avatar_url: Optional[str]) -> None:
+    def update_user_profile(
+        self, user_id: str, 
+        display_name: Optional[str] = None, 
+        bio: Optional[str] = None, 
+        avatar_url: Optional[str] = None,
+        height: Optional[str] = None,
+        weight: Optional[str] = None,
+        chest: Optional[str] = None,
+        waist: Optional[str] = None,
+        hips: Optional[str] = None,
+        location: Optional[str] = None,
+        timezone: Optional[str] = None
+    ) -> None:
         updates = []
         params = []
-        if display_name is not None:
-            updates.append("display_name = ?")
-            params.append(display_name)
-        if bio is not None:
-            updates.append("bio = ?")
-            params.append(bio)
-        if avatar_url is not None:
-            updates.append("avatar_url = ?")
-            params.append(avatar_url)
+        
+        fields = {
+            "display_name": display_name,
+            "bio": bio,
+            "avatar_url": avatar_url,
+            "height": height,
+            "weight": weight,
+            "chest": chest,
+            "waist": waist,
+            "hips": hips,
+            "location": location,
+            "timezone": timezone
+        }
+        
+        for k, v in fields.items():
+            if v is not None:
+                updates.append(f"{k} = ?")
+                params.append(v)
             
         if not updates:
             return

@@ -52,6 +52,13 @@ class ProfileUpdateRequest(BaseModel):
     display_name: Optional[str] = None
     bio: Optional[str] = None
     avatar_url: Optional[str] = None
+    height: Optional[str] = None
+    weight: Optional[str] = None
+    chest: Optional[str] = None
+    waist: Optional[str] = None
+    hips: Optional[str] = None
+    location: Optional[str] = None
+    timezone: Optional[str] = None
 
 
 class PrivacySettingsRequest(BaseModel):
@@ -123,6 +130,13 @@ class UserResponse(BaseModel):
     created_at: str
     is_following: bool = False
     profile_visibility: str = "public"
+    height: Optional[str] = None
+    weight: Optional[str] = None
+    chest: Optional[str] = None
+    waist: Optional[str] = None
+    hips: Optional[str] = None
+    location: Optional[str] = None
+    timezone: Optional[str] = None
 
 
 class OutfitItemResponse(BaseModel):

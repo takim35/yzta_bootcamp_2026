@@ -19,7 +19,8 @@ def _get_user_row(db: sqlite3.Connection, user_id: str):
     row = db.execute(
         """
         SELECT user_id, email, username, display_name, avatar_url, bio,
-               followers_count, following_count, created_at, profile_visibility
+               followers_count, following_count, created_at, profile_visibility,
+               height, weight, chest, waist, hips, location, timezone
         FROM users
         WHERE user_id = ?
         """,
@@ -69,6 +70,13 @@ def get_user(
             created_at=row["created_at"],
             is_following=is_following,
             profile_visibility=row["profile_visibility"],
+            height=row["height"],
+            weight=row["weight"],
+            chest=row["chest"],
+            waist=row["waist"],
+            hips=row["hips"],
+            location=row["location"],
+            timezone=row["timezone"],
         )
 
     except HTTPException:
@@ -127,6 +135,27 @@ def update_profile(
         if body.avatar_url is not None:
             updates.append("avatar_url = ?")
             values.append(body.avatar_url)
+        if body.height is not None:
+            updates.append("height = ?")
+            values.append(body.height)
+        if body.weight is not None:
+            updates.append("weight = ?")
+            values.append(body.weight)
+        if body.chest is not None:
+            updates.append("chest = ?")
+            values.append(body.chest)
+        if body.waist is not None:
+            updates.append("waist = ?")
+            values.append(body.waist)
+        if body.hips is not None:
+            updates.append("hips = ?")
+            values.append(body.hips)
+        if body.location is not None:
+            updates.append("location = ?")
+            values.append(body.location)
+        if body.timezone is not None:
+            updates.append("timezone = ?")
+            values.append(body.timezone)
 
         if not updates:
             return MessageResponse(success=True, message="Güncellenecek alan yok.")

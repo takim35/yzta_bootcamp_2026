@@ -89,6 +89,20 @@ def init_db() -> None:
         if "two_fa_enabled" not in existing_cols:
             migrations.append("ALTER TABLE users ADD COLUMN two_fa_enabled INTEGER NOT NULL DEFAULT 0")
 
+        new_columns = {
+            "height": "TEXT DEFAULT NULL",
+            "weight": "TEXT DEFAULT NULL",
+            "chest": "TEXT DEFAULT NULL",
+            "waist": "TEXT DEFAULT NULL",
+            "hips": "TEXT DEFAULT NULL",
+            "location": "TEXT DEFAULT NULL",
+            "timezone": "TEXT DEFAULT NULL"
+        }
+
+        for col, col_def in new_columns.items():
+            if col not in existing_cols:
+                migrations.append(f"ALTER TABLE users ADD COLUMN {col} {col_def}")
+
         for migration in migrations:
             conn.execute(migration)
         if migrations:
