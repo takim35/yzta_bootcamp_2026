@@ -76,7 +76,7 @@ class MoreScreen extends ConsumerWidget {
                             ),
                             SizedBox(height: 4),
                             Text(
-                              'Manage your account',
+                              strings.manageAccount,
                               style: TextStyle(
                                 color: Theme.of(context)
                                         .textTheme
@@ -118,12 +118,12 @@ class MoreScreen extends ConsumerWidget {
                 child: Column(
                   children: [
                     _SettingsTile(
-                        title: 'Style Preferences',
+                        title: strings.stylePreferences,
                         icon: Icons.palette_rounded,
                         onTap: () {}),
                     Divider(height: 1, color: Theme.of(context).dividerColor),
                     _SettingsTile(
-                        title: 'Location & Timezone',
+                        title: strings.locationTimezone,
                         icon: Icons.location_on_rounded,
                         onTap: () {
                           Navigator.push(
@@ -134,7 +134,7 @@ class MoreScreen extends ConsumerWidget {
                         }),
                     Divider(height: 1, color: Theme.of(context).dividerColor),
                     _SettingsTile(
-                        title: 'Outfit Schedule',
+                        title: strings.outfitSchedule,
                         icon: Icons.calendar_today_rounded,
                         onTap: () {}),
                     Divider(height: 1, color: Theme.of(context).dividerColor),
@@ -157,7 +157,7 @@ class MoreScreen extends ConsumerWidget {
                         }),
                     Divider(height: 1, color: Theme.of(context).dividerColor),
                     _SettingsTile(
-                        title: 'Subscription',
+                        title: strings.subscription,
                         icon: Icons.credit_card_rounded,
                         onTap: () {}),
                   ],
@@ -203,19 +203,19 @@ class MoreScreen extends ConsumerWidget {
                 child: Column(
                   children: [
                     _SettingsTile(
-                        title: 'Terms of Use',
+                        title: strings.termsOfUse,
                         icon: Icons.description_rounded,
                         hasExternalIcon: true,
                         onTap: () {}),
                     Divider(height: 1, color: Theme.of(context).dividerColor),
                     _SettingsTile(
-                        title: 'Privacy Policy',
+                        title: strings.privacyPolicy,
                         icon: Icons.security_rounded,
                         hasExternalIcon: true,
                         onTap: () {}),
                     Divider(height: 1, color: Theme.of(context).dividerColor),
                     _SettingsTile(
-                      title: 'Delete Account',
+                      title: strings.deleteAccount,
                       icon: Icons.delete_outline_rounded,
                       isDestructive: true,
                       onTap: () {},
@@ -422,7 +422,7 @@ class _SegmentItem extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
-        color: isSelected ? Theme.of(context).dividerColor : Colors.transparent,
+        color: isSelected ? Theme.of(context).colorScheme.primary : Colors.transparent,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Center(
@@ -431,7 +431,7 @@ class _SegmentItem extends StatelessWidget {
           style: TextStyle(
             color: isSelected
                 ? Colors.white
-                : Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
+                : Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
             fontSize: 13,
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
           ),

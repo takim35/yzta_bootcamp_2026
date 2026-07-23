@@ -349,6 +349,23 @@ class AppStrings {
       'Körpermaße', 'Mensurations', '身体測定', '신체 치수', '身体测量');
   String get settings => _t(
       'Settings', 'Ayarlar', 'Einstellungen', 'Paramètres', '設定', '설정', '设置');
+  
+  // ── More Screen ──────────────────────────────────────────────
+  String get manageAccount => _t('Manage your account', 'Hesabını yönet', 'Konto verwalten', 'Gérer votre compte', 'アカウントの管理', '계정 관리', '管理您的帐户');
+  String get stylePreferences => _t('Style Preferences', 'Stil Tercihleri', 'Stilpräferenzen', 'Préférences de style', 'スタイルの好み', '스타일 기본 설정', '风格偏好');
+  String get locationTimezone => _t('Location & Timezone', 'Konum ve Saat Dilimi', 'Standort & Zeitzone', 'Lieu et fuseau horaire', '場所とタイムゾーン', '위치 및 시간대', '位置和时区');
+  String get outfitSchedule => _t('Outfit Schedule', 'Kıyafet Planı', 'Outfit-Zeitplan', 'Calendrier des tenues', '衣装のスケジュール', '의상 일정', '服装时间表');
+  String get subscription => _t('Subscription', 'Abonelik', 'Abonnement', 'Abonnement', 'サブスクリプション', '구독', '订阅');
+  String get termsOfUse => _t('Terms of Use', 'Kullanım Koşulları', 'Nutzungsbedingungen', "Conditions d'utilisation", '利用規約', '이용 약款', '使用条款');
+  String get privacyPolicy => _t('Privacy Policy', 'Gizlilik Politikası', 'Datenschutzrichtlinie', 'Politique de confidentialité', 'プライバシーポリシー', '개인정보 처리방침', '隐私政策');
+  String get deleteAccount => _t('Delete Account', 'Hesabı Sil', 'Konto löschen', 'Supprimer le compte', 'アカウントを削除', '계정 삭제', '删除帐户');
+
+  // ── Dashboard Greeting ───────────────────────────────────────
+  String get goodMorning => _t('Good morning', 'Günaydın', 'Guten Morgen', 'Bonjour', 'おはようございます', '좋은 아침입니다', '早上好');
+  String get goodAfternoon => _t('Good afternoon', 'Tünaydın', 'Guten Tag', 'Bon après-midi', 'こんにちは', '좋은 오후입니다', '下午好');
+  String get goodEvening => _t('Good evening', 'İyi akşamlar', 'Guten Abend', 'Bonsoir', 'こんばんは', '좋은 저녁입니다', '晚上好');
+  String get goodNight => _t('Good night', 'İyi geceler', 'Gute Nacht', 'Bonne nuit', 'おやすみなさい', '안녕히 주무세요', '晚安');
+  String get whatToWear => _t('What should we wear today? 🤔', 'Bugün ne giysek? 🤔', 'Was sollen wir heute tragen? 🤔', 'Que devrions-nous porter aujourd\'hui? 🤔', '今日は何を着ようか？ 🤔', '오늘은 무엇을 입을까? 🤔', '今天穿什么？ 🤔');
 
   // ── Navigation ───────────────────────────────────────────────
   String get navFeed => _t('Feed', 'Akış', 'Feed', 'Flux', 'フィード', '피드', '动态');

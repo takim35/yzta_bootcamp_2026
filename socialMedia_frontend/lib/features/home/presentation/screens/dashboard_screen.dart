@@ -1,15 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../profile/presentation/providers/profile_provider.dart';
 import '../../../feed/presentation/screens/feed_screen.dart';
 import '../../../wardrobe/presentation/screens/ai_stylist_screen.dart';
 import '../../../wardrobe/presentation/screens/add_item_screen.dart';
+import '../../../../core/localization/app_strings.dart';
+import '../../../../core/localization/locale_provider.dart';
 
 class DashboardScreen extends ConsumerWidget {
   DashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final strings = ref.watch(stringsProvider);
+    final user = ref.watch(profileProvider).user;
+    final name = user?.displayName.isNotEmpty == true ? user!.displayName : 'Demo';
+    
+    final hour = DateTime.now().hour;
+    String greeting;
+    if (hour >= 5 && hour < 12) {
+      greeting = strings.goodMorning;
+    } else if (hour >= 12 && hour < 17) {
+      greeting = strings.goodAfternoon;
+    } else if (hour >= 17 && hour < 21) {
+      greeting = strings.goodEvening;
+    } else {
+      greeting = strings.goodNight;
+    }
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
@@ -20,7 +39,7 @@ class DashboardScreen extends ConsumerWidget {
             children: [
               // Greeting
               Text(
-                'Good morning, Demo',
+                '$greeting, $name',
                 style: TextStyle(
                   color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                   fontSize: 26,
@@ -30,7 +49,7 @@ class DashboardScreen extends ConsumerWidget {
               ),
               SizedBox(height: 4),
               Text(
-                "Here's your outfit summary",
+                strings.whatToWear,
                 style: TextStyle(
                   color: Theme.of(context).textTheme.bodySmall?.color ??
                       Colors.grey,
