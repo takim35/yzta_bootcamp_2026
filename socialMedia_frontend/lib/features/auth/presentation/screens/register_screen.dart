@@ -18,7 +18,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  
+
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
   bool _isLoading = false;
@@ -118,7 +118,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded, color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
+          icon: Icon(Icons.arrow_back_ios_new_rounded,
+              color:
+                  Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -137,7 +139,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+                      color: Theme.of(context).textTheme.bodyLarge?.color ??
+                          Colors.white,
                     ),
                   ),
                   SizedBox(height: AppTheme.spacingS),
@@ -147,23 +150,28 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         : 'Join us and digitize your wardrobe',
                     style: TextStyle(
                       fontSize: 16,
-                      color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
+                      color: Theme.of(context).textTheme.bodyMedium?.color ??
+                          Colors.grey,
                     ),
                   ),
                   SizedBox(height: AppTheme.spacingXXL),
-                  
+
                   if (_errorMessage != null)
                     Container(
                       padding: EdgeInsets.all(AppTheme.spacingM),
                       margin: EdgeInsets.only(bottom: AppTheme.spacingM),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
-                        border: Border.all(color: Theme.of(context).colorScheme.error.withValues(alpha: 0.5)),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .error
+                            .withValues(alpha: 0.1),
+                        borderRadius:
+                            BorderRadius.circular(AppTheme.radiusSmall),
                       ),
                       child: Text(
                         _errorMessage!,
-                        style: TextStyle(color: Theme.of(context).colorScheme.error),
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.error),
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -184,7 +192,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     },
                   ),
                   SizedBox(height: AppTheme.spacingL),
-                  
+
                   _buildTextField(
                     controller: _passwordController,
                     hintText: s.password,
@@ -208,22 +216,24 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       return null;
                     },
                   ),
-                  
+
                   // Şifre kuralları bilgilendirme metni
                   Padding(
-                    padding: EdgeInsets.only(top: AppTheme.spacingS, bottom: AppTheme.spacingL),
+                    padding: EdgeInsets.only(
+                        top: AppTheme.spacingS, bottom: AppTheme.spacingL),
                     child: Text(
                       s.isTr
                           ? 'Şifreniz en az 8 karakter uzunluğunda olmalı; en az bir büyük harf, bir rakam ve bir sembol (!@#\$%^&*) içermelidir.'
                           : 'Password must be at least 8 characters long, containing at least one uppercase letter, one digit, and one symbol (!@#\$%^&*).',
                       style: TextStyle(
                         fontSize: 12,
-                        color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey.withValues(alpha: 0.6),
+                        color: Theme.of(context).textTheme.bodyMedium?.color ??
+                            Colors.grey.withValues(alpha: 0.6),
                         height: 1.4,
                       ),
                     ),
                   ),
-                  
+
                   _buildTextField(
                     controller: _confirmPasswordController,
                     hintText: s.isTr ? 'Şifre Tekrar' : 'Confirm Password',
@@ -237,10 +247,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     },
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return s.isTr ? 'Lütfen şifrenizi tekrar girin' : 'Please confirm your password';
+                        return s.isTr
+                            ? 'Lütfen şifrenizi tekrar girin'
+                            : 'Please confirm your password';
                       }
                       if (value != _passwordController.text) {
-                        return s.isTr ? 'Şifreler birbiriyle uyuşmuyor' : 'Passwords do not match';
+                        return s.isTr
+                            ? 'Şifreler birbiriyle uyuşmuyor'
+                            : 'Passwords do not match';
                       }
                       return null;
                     },
@@ -254,13 +268,18 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       padding: EdgeInsets.symmetric(vertical: 16),
                       decoration: BoxDecoration(
                         gradient: _isLoading ? null : AppTheme.primaryGradient,
-                        color: _isLoading ? Theme.of(context).colorScheme.surface : null,
+                        color: _isLoading
+                            ? Theme.of(context).colorScheme.surface
+                            : null,
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: _isLoading
                             ? []
                             : [
                                 BoxShadow(
-                                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .primary
+                                      .withValues(alpha: 0.3),
                                   blurRadius: 12,
                                   offset: Offset(0, 4),
                                 ),
@@ -299,10 +318,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       decoration: BoxDecoration(
                         color: Theme.of(context).colorScheme.surface,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: Theme.of(context).dividerColor,
-                          width: 1.5,
-                        ),
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -327,9 +342,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           ),
                           SizedBox(width: 12),
                           Text(
-                            s.isTr ? 'Google ile Devam Et' : 'Continue with Google',
+                            s.isTr
+                                ? 'Google ile Devam Et'
+                                : 'Continue with Google',
                             style: TextStyle(
-                              color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+                              color: Theme.of(context)
+                                      .textTheme
+                                      .bodyLarge
+                                      ?.color ??
+                                  Colors.white,
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
                             ),
@@ -361,17 +382,25 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       controller: controller,
       obscureText: isPassword && !isPasswordVisible,
       keyboardType: keyboardType,
-      style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
+      style: TextStyle(
+          color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
       validator: validator,
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
-        prefixIcon: Icon(icon, color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+        hintStyle: TextStyle(
+            color:
+                Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+        prefixIcon: Icon(icon,
+            color:
+                Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
         suffixIcon: isPassword
             ? IconButton(
                 icon: Icon(
-                  isPasswordVisible ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                  color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
+                  isPasswordVisible
+                      ? Icons.visibility_off_outlined
+                      : Icons.visibility_outlined,
+                  color: Theme.of(context).textTheme.bodyMedium?.color ??
+                      Colors.grey,
                 ),
                 onPressed: onVisibilityToggle,
               )

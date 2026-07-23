@@ -74,7 +74,8 @@ class _AiStylistScreenState extends ConsumerState<AiStylistScreen> {
     _scrollToBottom();
 
     try {
-      final response = await _apiService.chat(userId, text, weather: _weatherContext);
+      final response =
+          await _apiService.chat(userId, text, weather: _weatherContext);
       final aiText = response['asistan_mesaji']?.toString() ??
           response['reply']?.toString() ??
           'Yanıt üretilemedi.';
@@ -119,10 +120,14 @@ class _AiStylistScreenState extends ConsumerState<AiStylistScreen> {
                 gradient: AppTheme.primaryGradient,
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(Icons.auto_awesome, color: Colors.white, size: 18),
+              child:
+                  const Icon(Icons.auto_awesome, color: Colors.white, size: 18),
             ),
             const SizedBox(width: 10),
-            Text(s.aiStylist, style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white)),
+            Text(s.aiStylist,
+                style: TextStyle(
+                    color: Theme.of(context).textTheme.bodyLarge?.color ??
+                        Colors.white)),
           ],
         ),
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -133,12 +138,15 @@ class _AiStylistScreenState extends ConsumerState<AiStylistScreen> {
           // ── Mesaj Listesi ───────────────────────────────────
           Expanded(
             child: !_historyLoaded
-                ? Center(child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary))
+                ? Center(
+                    child: CircularProgressIndicator(
+                        color: Theme.of(context).colorScheme.primary))
                 : _messages.isEmpty
                     ? _buildEmptyState(s)
                     : ListView.builder(
                         controller: _scrollController,
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 12),
                         itemCount: _messages.length,
                         itemBuilder: (context, index) {
                           final msg = _messages[index];
@@ -171,7 +179,10 @@ class _AiStylistScreenState extends ConsumerState<AiStylistScreen> {
                   ),
                   const SizedBox(width: 8),
                   Text('Stilistiniz düşünüyor...',
-                      style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey, fontSize: 12)),
+                      style: TextStyle(
+                          color: Theme.of(context).textTheme.bodySmall?.color ??
+                              Colors.grey,
+                          fontSize: 12)),
                 ],
               ),
             ),
@@ -181,24 +192,29 @@ class _AiStylistScreenState extends ConsumerState<AiStylistScreen> {
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surface,
-              border: Border(top: BorderSide(color: Theme.of(context).dividerColor)),
+              border: Border(
+                  top: BorderSide(color: Theme.of(context).dividerColor)),
             ),
             child: Row(
               children: [
                 Expanded(
                   child: TextField(
                     controller: _messageController,
-                    style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
+                    style: TextStyle(
+                        color: Theme.of(context).textTheme.bodyLarge?.color ??
+                            Colors.white),
                     maxLines: null,
                     textInputAction: TextInputAction.send,
                     onSubmitted: (_) => _sendMessage(),
                     decoration: InputDecoration(
                       hintText: s.askForSuggestions,
-                      hintStyle: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey),
+                      hintStyle: TextStyle(
+                          color: Theme.of(context).textTheme.bodySmall?.color ??
+                              Colors.grey),
                       filled: true,
                       fillColor: Theme.of(context).cardColor,
-                      contentPadding:
-                          const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(24),
                         borderSide: BorderSide.none,
@@ -216,7 +232,8 @@ class _AiStylistScreenState extends ConsumerState<AiStylistScreen> {
                       gradient: AppTheme.primaryGradient,
                       borderRadius: BorderRadius.circular(23),
                     ),
-                    child: const Icon(Icons.send_rounded, color: Colors.white, size: 20),
+                    child: const Icon(Icons.send_rounded,
+                        color: Colors.white, size: 20),
                   ),
                 ),
               ],
@@ -232,7 +249,8 @@ class _AiStylistScreenState extends ConsumerState<AiStylistScreen> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
-        mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment:
+            isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           if (!isUser) ...[
@@ -243,7 +261,8 @@ class _AiStylistScreenState extends ConsumerState<AiStylistScreen> {
                 gradient: AppTheme.primaryGradient,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.auto_awesome, color: Colors.white, size: 14),
+              child:
+                  const Icon(Icons.auto_awesome, color: Colors.white, size: 14),
             ),
             const SizedBox(width: 8),
           ],
@@ -263,7 +282,10 @@ class _AiStylistScreenState extends ConsumerState<AiStylistScreen> {
               child: Text(
                 msg['text'] ?? '',
                 style: TextStyle(
-                  color: isUser ? Colors.white : Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+                  color: isUser
+                      ? Colors.white
+                      : Theme.of(context).textTheme.bodyLarge?.color ??
+                          Colors.white,
                   fontSize: 14,
                   height: 1.4,
                 ),
@@ -288,13 +310,15 @@ class _AiStylistScreenState extends ConsumerState<AiStylistScreen> {
               gradient: AppTheme.primaryGradient,
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.auto_awesome, color: Colors.white, size: 36),
+            child:
+                const Icon(Icons.auto_awesome, color: Colors.white, size: 36),
           ),
           const SizedBox(height: 20),
           Text(
             s.aiStylist,
             style: TextStyle(
-              color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+              color:
+                  Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
@@ -304,7 +328,10 @@ class _AiStylistScreenState extends ConsumerState<AiStylistScreen> {
             padding: EdgeInsets.symmetric(horizontal: 40),
             child: Text(
               'Merhaba! Bugün ne giyeceğinizi birlikte seçelim. Nereye gidiyorsunuz?',
-              style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey, fontSize: 14),
+              style: TextStyle(
+                  color: Theme.of(context).textTheme.bodySmall?.color ??
+                      Colors.grey,
+                  fontSize: 14),
               textAlign: TextAlign.center,
             ),
           ),

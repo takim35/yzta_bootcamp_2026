@@ -36,8 +36,11 @@ class SearchProvider extends ChangeNotifier {
 
     try {
       final currentUserId = _ref.read(authProvider).currentUserId;
-      final results = await _apiService.searchUsers(query, viewerId: currentUserId);
-      _searchResults = results.map((e) => UserModel.fromJson(e as Map<String, dynamic>)).toList();
+      final results =
+          await _apiService.searchUsers(query, viewerId: currentUserId);
+      _searchResults = results
+          .map((e) => UserModel.fromJson(e as Map<String, dynamic>))
+          .toList();
     } catch (e) {
       _errorMessage = e.toString();
       _searchResults = [];
@@ -53,7 +56,8 @@ class SearchProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> toggleFollow(String targetUserId, bool isCurrentlyFollowing) async {
+  Future<void> toggleFollow(
+      String targetUserId, bool isCurrentlyFollowing) async {
     final currentUserId = _ref.read(authProvider).currentUserId;
     if (currentUserId == null) return;
 
@@ -70,9 +74,11 @@ class SearchProvider extends ChangeNotifier {
 
     try {
       if (isCurrentlyFollowing) {
-        await _apiService.unfollow(followerId: currentUserId, followingId: targetUserId);
+        await _apiService.unfollow(
+            followerId: currentUserId, followingId: targetUserId);
       } else {
-        await _apiService.follow(followerId: currentUserId, followingId: targetUserId);
+        await _apiService.follow(
+            followerId: currentUserId, followingId: targetUserId);
       }
     } catch (e) {
       // Revert optimistic update

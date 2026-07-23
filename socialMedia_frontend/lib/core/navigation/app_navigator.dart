@@ -28,16 +28,24 @@ class AppNavigator extends ConsumerWidget {
       body: screens[currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: currentIndex,
-        onTap: (index) => ref.read(bottomNavIndexProvider.notifier).state = index,
+        onTap: (index) =>
+            ref.read(bottomNavIndexProvider.notifier).state = index,
         type: BottomNavigationBarType.fixed,
         backgroundColor: Theme.of(context).colorScheme.surface,
         selectedItemColor: Theme.of(context).colorScheme.primary,
-        unselectedItemColor: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
+        unselectedItemColor:
+            Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
         items: [
-          BottomNavigationBarItem(icon: const Icon(Icons.home_rounded), label: s.navFeed),
-          BottomNavigationBarItem(icon: const Icon(Icons.search_rounded), label: s.isTr ? 'Ara' : 'Search'),
-          BottomNavigationBarItem(icon: const Icon(Icons.add_box_rounded), label: s.isTr ? 'Gönderi' : 'Post'),
-          BottomNavigationBarItem(icon: const Icon(Icons.person_rounded), label: s.navProfile),
+          BottomNavigationBarItem(
+              icon: const Icon(Icons.home_rounded), label: s.navFeed),
+          BottomNavigationBarItem(
+              icon: const Icon(Icons.search_rounded),
+              label: s.isTr ? 'Ara' : 'Search'),
+          BottomNavigationBarItem(
+              icon: const Icon(Icons.add_box_rounded),
+              label: s.isTr ? 'Gönderi' : 'Post'),
+          BottomNavigationBarItem(
+              icon: const Icon(Icons.person_rounded), label: s.navProfile),
         ],
       ),
     );

@@ -14,20 +14,24 @@ class FollowListBottomSheet extends ConsumerStatefulWidget {
     this.initialTabIndex = 0,
   });
 
-  static void show(BuildContext context, {required String userId, int initialTabIndex = 0}) {
+  static void show(BuildContext context,
+      {required String userId, int initialTabIndex = 0}) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      builder: (context) => FollowListBottomSheet(userId: userId, initialTabIndex: initialTabIndex),
+      builder: (context) => FollowListBottomSheet(
+          userId: userId, initialTabIndex: initialTabIndex),
     );
   }
 
   @override
-  ConsumerState<FollowListBottomSheet> createState() => _FollowListBottomSheetState();
+  ConsumerState<FollowListBottomSheet> createState() =>
+      _FollowListBottomSheetState();
 }
 
-class _FollowListBottomSheetState extends ConsumerState<FollowListBottomSheet> with SingleTickerProviderStateMixin {
+class _FollowListBottomSheetState extends ConsumerState<FollowListBottomSheet>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final ApiService _api = ApiService();
   bool _isLoading = true;
@@ -37,7 +41,8 @@ class _FollowListBottomSheetState extends ConsumerState<FollowListBottomSheet> w
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this, initialIndex: widget.initialTabIndex);
+    _tabController = TabController(
+        length: 2, vsync: this, initialIndex: widget.initialTabIndex);
     _loadData();
   }
 
@@ -45,7 +50,7 @@ class _FollowListBottomSheetState extends ConsumerState<FollowListBottomSheet> w
     try {
       final followers = await _api.getFollowers(widget.userId);
       final following = await _api.getFollowing(widget.userId);
-      
+
       setState(() {
         _followers = followers;
         _following = following;
@@ -98,8 +103,10 @@ class _FollowListBottomSheetState extends ConsumerState<FollowListBottomSheet> w
           TabBar(
             controller: _tabController,
             indicatorColor: Theme.of(context).colorScheme.primary,
-            labelColor: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
-            unselectedLabelColor: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
+            labelColor:
+                Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+            unselectedLabelColor:
+                Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
             tabs: const [
               Tab(text: 'Takipçiler'),
               Tab(text: 'Takip Edilenler'),
@@ -108,7 +115,9 @@ class _FollowListBottomSheetState extends ConsumerState<FollowListBottomSheet> w
           Divider(color: Theme.of(context).dividerColor, height: 1),
           Expanded(
             child: _isLoading
-                ? Center(child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary))
+                ? Center(
+                    child: CircularProgressIndicator(
+                        color: Theme.of(context).colorScheme.primary))
                 : TabBarView(
                     controller: _tabController,
                     children: [
@@ -127,7 +136,9 @@ class _FollowListBottomSheetState extends ConsumerState<FollowListBottomSheet> w
       return Center(
         child: Text(
           'Kullanıcı bulunamadı.',
-          style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey),
+          style: TextStyle(
+              color:
+                  Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey),
         ),
       );
     }
@@ -138,7 +149,7 @@ class _FollowListBottomSheetState extends ConsumerState<FollowListBottomSheet> w
       itemBuilder: (context, index) {
         final user = users[index];
         final avatarUrl = user['avatar_url'];
-        
+
         return ListTile(
           leading: CircleAvatar(
             backgroundColor: Theme.of(context).cardColor,
@@ -146,16 +157,23 @@ class _FollowListBottomSheetState extends ConsumerState<FollowListBottomSheet> w
                 ? NetworkImage(avatarUrl)
                 : null,
             child: avatarUrl == null || avatarUrl.isEmpty
-                ? Icon(Icons.person, color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey)
+                ? Icon(Icons.person,
+                    color: Theme.of(context).textTheme.bodyMedium?.color ??
+                        Colors.grey)
                 : null,
           ),
           title: Text(
             user['username'] ?? '',
-            style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white, fontWeight: FontWeight.bold),
+            style: TextStyle(
+                color: Theme.of(context).textTheme.bodyLarge?.color ??
+                    Colors.white,
+                fontWeight: FontWeight.bold),
           ),
           subtitle: Text(
             user['display_name'] ?? '',
-            style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+            style: TextStyle(
+                color: Theme.of(context).textTheme.bodyMedium?.color ??
+                    Colors.grey),
           ),
           onTap: () => _navigateToProfile(user['user_id'] ?? user['id']),
         );

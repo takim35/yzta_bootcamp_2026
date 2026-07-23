@@ -32,12 +32,16 @@ class EmptyState extends ConsumerWidget {
               height: 100,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                color: Theme.of(context)
+                    .colorScheme
+                    .primary
+                    .withValues(alpha: 0.1),
               ),
               child: Icon(
                 icon,
                 size: 48,
-                color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
+                color:
+                    Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
                 semanticLabel: title,
               ),
             ),
@@ -46,7 +50,8 @@ class EmptyState extends ConsumerWidget {
             Text(
               title,
               style: TextStyle(
-                color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+                color: Theme.of(context).textTheme.bodyLarge?.color ??
+                    Colors.white,
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
               ),
@@ -57,7 +62,8 @@ class EmptyState extends ConsumerWidget {
             Text(
               subtitle,
               style: TextStyle(
-                color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
+                color: Theme.of(context).textTheme.bodyMedium?.color ??
+                    Colors.grey,
                 fontSize: 14,
               ),
               textAlign: TextAlign.center,
@@ -71,8 +77,7 @@ class EmptyState extends ConsumerWidget {
                   color: Colors.transparent,
                   child: InkWell(
                     onTap: onAction,
-                    borderRadius:
-                        BorderRadius.circular(AppTheme.radiusRound),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusRound),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppTheme.spacingXL,

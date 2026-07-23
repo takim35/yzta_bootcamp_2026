@@ -19,8 +19,8 @@ class MainNavigationScreen extends ConsumerWidget {
     final screens = [
       DashboardScreen(),
       WardrobeScreen(),
-      TryOnComingSoonScreen(), 
-      MoreScreen(), 
+      TryOnComingSoonScreen(),
+      MoreScreen(),
     ];
 
     return Scaffold(
@@ -62,14 +62,16 @@ class MainNavigationScreen extends ConsumerWidget {
                   icon: Icons.home_rounded,
                   label: 'Home',
                   isSelected: currentIndex == 0,
-                  onTap: () => ref.read(mainNavIndexProvider.notifier).state = 0,
+                  onTap: () =>
+                      ref.read(mainNavIndexProvider.notifier).state = 0,
                 ),
                 SizedBox(width: 24),
                 _NavBarItem(
                   icon: Icons.checkroom_rounded,
                   label: 'Wardrobe',
                   isSelected: currentIndex == 1,
-                  onTap: () => ref.read(mainNavIndexProvider.notifier).state = 1,
+                  onTap: () =>
+                      ref.read(mainNavIndexProvider.notifier).state = 1,
                 ),
               ],
             ),
@@ -80,14 +82,16 @@ class MainNavigationScreen extends ConsumerWidget {
                   icon: Icons.auto_awesome_rounded,
                   label: 'Try-On',
                   isSelected: currentIndex == 2,
-                  onTap: () => ref.read(mainNavIndexProvider.notifier).state = 2,
+                  onTap: () =>
+                      ref.read(mainNavIndexProvider.notifier).state = 2,
                 ),
                 SizedBox(width: 24),
                 _NavBarItem(
                   icon: Icons.grid_view_rounded,
                   label: 'More',
                   isSelected: currentIndex == 3,
-                  onTap: () => ref.read(mainNavIndexProvider.notifier).state = 3,
+                  onTap: () =>
+                      ref.read(mainNavIndexProvider.notifier).state = 3,
                 ),
               ],
             ),
@@ -113,8 +117,10 @@ class _NavBarItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isSelected ? Colors.white : Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey;
-    
+    final color = isSelected
+        ? Colors.white
+        : Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey;
+
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,

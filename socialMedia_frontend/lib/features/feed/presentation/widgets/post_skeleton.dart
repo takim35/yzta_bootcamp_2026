@@ -33,12 +33,13 @@ class PostSkeleton extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppTheme.spacingM),
-          
+
           // Image placeholder
-          const CustomShimmer(width: double.infinity, height: 300, borderRadius: 16),
-          
+          const CustomShimmer(
+              width: double.infinity, height: 300, borderRadius: 16),
+
           const SizedBox(height: AppTheme.spacingM),
-          
+
           // Action buttons placeholder
           Row(
             children: const [
@@ -49,9 +50,9 @@ class PostSkeleton extends StatelessWidget {
               CustomShimmer(width: 32, height: 32, isCircle: true),
             ],
           ),
-          
+
           const SizedBox(height: AppTheme.spacingM),
-          
+
           // Caption placeholder
           const CustomShimmer(width: double.infinity, height: 14),
           const SizedBox(height: 6),

@@ -2,23 +2,24 @@ import 'package:flutter/material.dart';
 
 class AppTheme {
   // Pastel Disco Vibe Colors (Soft & Harmonized)
-  static const Color primaryDark = Color(0xFF1E1A29); // Yumuşak koyu pastel mor/gri
+  static const Color primaryDark =
+      Color(0xFF1E1A29); // Yumuşak koyu pastel mor/gri
   static const Color surfaceDark = Color(0xFF2A233A); // Daha açık yüzey
   static const Color cardDark = Color(0xFF332B47); // Kart arka planı
-  
+
   // Accents (Keeping for compatibility, but maybe less saturated)
-  static const Color accentViolet = Color(0xFFDDB8F7); 
-  static const Color accentPurple = Color(0xFFCBA1EB); 
-  static const Color accentPink = Color(0xFFFFB3D9); 
-  static const Color accentCyan = Color(0xFFA3FFF0); 
-  static const Color accentGold = Color(0xFFFFEBB3); 
-  
+  static const Color accentViolet = Color(0xFFDDB8F7);
+  static const Color accentPurple = Color(0xFFCBA1EB);
+  static const Color accentPink = Color(0xFFFFB3D9);
+  static const Color accentCyan = Color(0xFFA3FFF0);
+  static const Color accentGold = Color(0xFFFFEBB3);
+
   static const Color textPrimary = Color(0xFFEBEBF5); // iOS tarzı yumuşak beyaz
   static const Color textSecondary = Color(0xFF9E99A8); // Soft gray purple
   static const Color textMuted = Color(0xFF736E7D); // Darker gray purple
   static const Color dividerColor = Color(0xFF3E3654); // Subtle border color
-  static const Color errorColor = Color(0xFFFF6B6B); 
-  static const Color successColor = Color(0xFF51CF66); 
+  static const Color errorColor = Color(0xFFFF6B6B);
+  static const Color successColor = Color(0xFF51CF66);
 
   // Spacing
   static const double spacingXS = 4.0;
@@ -74,6 +75,12 @@ class AppTheme {
         surface: surfaceDark,
         error: errorColor,
       ),
+      cardTheme: CardThemeData(
+        color: cardDark,
+        elevation: 8,
+        shadowColor: Colors.black.withValues(alpha: 0.3),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      ),
       useMaterial3: true,
     );
   }
@@ -89,13 +96,22 @@ class AppTheme {
         elevation: 0,
         centerTitle: false,
         iconTheme: IconThemeData(color: Color(0xFF1E1A29)),
-        titleTextStyle: TextStyle(color: Color(0xFF1E1A29), fontSize: 18, fontWeight: FontWeight.w600),
+        titleTextStyle: TextStyle(
+            color: Color(0xFF1E1A29),
+            fontSize: 18,
+            fontWeight: FontWeight.w600),
       ),
       colorScheme: const ColorScheme.light(
         primary: accentPurple,
         secondary: accentPink,
         surface: Colors.white,
         error: errorColor,
+      ),
+      cardTheme: CardThemeData(
+        color: Colors.white,
+        elevation: 4,
+        shadowColor: const Color(0xFF1E1A29).withValues(alpha: 0.05),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
       useMaterial3: true,
     );

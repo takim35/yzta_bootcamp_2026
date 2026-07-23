@@ -7,7 +7,8 @@ class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});
 
   @override
-  ConsumerState<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+  ConsumerState<ForgotPasswordScreen> createState() =>
+      _ForgotPasswordScreenState();
 }
 
 class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
@@ -40,7 +41,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.25),
       end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _entryController, curve: Curves.easeOutCubic));
+    ).animate(
+        CurvedAnimation(parent: _entryController, curve: Curves.easeOutCubic));
 
     _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(parent: _entryController, curve: Curves.easeOut),
@@ -59,7 +61,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
 
   Future<void> _onRequestCode() async {
     setState(() => _errorMessage = null);
-    if (_emailController.text.trim().isEmpty || !_emailController.text.contains('@')) {
+    if (_emailController.text.trim().isEmpty ||
+        !_emailController.text.contains('@')) {
       setState(() => _errorMessage = 'Geçerli bir e-posta adresi girin.');
       return;
     }
@@ -85,7 +88,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
     }
     setState(() => _isLoading = true);
     try {
-      await ApiService().verifyResetCode(_emailController.text.trim(), _codeController.text.trim());
+      await ApiService().verifyResetCode(
+          _emailController.text.trim(), _codeController.text.trim());
       if (mounted) setState(() => _currentStep = 3);
     } catch (e) {
       final msg = e.toString().contains('ApiException')
@@ -127,10 +131,15 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
       appBar: AppBar(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
-        iconTheme: IconThemeData(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
+        iconTheme: IconThemeData(
+            color:
+                Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
         title: Text(
           'Şifremi Sıfırla',
-          style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white, fontWeight: FontWeight.w700),
+          style: TextStyle(
+              color:
+                  Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+              fontWeight: FontWeight.w700),
         ),
       ),
       body: SafeArea(
@@ -158,7 +167,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
+            color:
+                Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
           ),
           child: Icon(
             Icons.check_circle_rounded,
@@ -169,13 +179,20 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
         const SizedBox(height: 32),
         Text(
           'Başarılı!',
-          style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
+          style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.w800,
+              color:
+                  Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
         ),
         const SizedBox(height: 12),
         Text(
           'Şifreniz başarıyla güncellendi.',
           textAlign: TextAlign.center,
-          style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey, fontSize: 16),
+          style: TextStyle(
+              color:
+                  Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
+              fontSize: 16),
         ),
         const SizedBox(height: 48),
         GestureDetector(
@@ -189,7 +206,10 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
             child: const Center(
               child: Text(
                 'Giriş Yap',
-                style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700),
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700),
               ),
             ),
           ),
@@ -208,7 +228,6 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: Theme.of(context).colorScheme.surface,
-              border: Border.all(color: Theme.of(context).dividerColor, width: 1.5),
             ),
             child: Icon(
               Icons.lock_reset_rounded,
@@ -217,48 +236,55 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
             ),
           ),
           const SizedBox(height: 24),
-
           Text(
             'Şifrenizi Sıfırlayın',
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
+            style: TextStyle(
+                fontSize: 26,
+                fontWeight: FontWeight.w800,
+                color: Theme.of(context).textTheme.bodyLarge?.color ??
+                    Colors.white),
           ),
           const SizedBox(height: 8),
           Text(
-            _currentStep == 1 
+            _currentStep == 1
                 ? 'E-posta adresinize bir sıfırlama kodu göndereceğiz.'
                 : _currentStep == 2
                     ? 'E-postanıza gelen 6 haneli kodu girin.'
                     : 'Yeni şifrenizi belirleyin.',
             textAlign: TextAlign.center,
-            style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey, fontSize: 14),
+            style: TextStyle(
+                color: Theme.of(context).textTheme.bodyMedium?.color ??
+                    Colors.grey,
+                fontSize: 14),
           ),
           const SizedBox(height: 36),
-
           if (_errorMessage != null) ...[
             Container(
               padding: const EdgeInsets.all(14),
               margin: const EdgeInsets.only(bottom: 16),
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
+                color:
+                    Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Theme.of(context).colorScheme.error.withValues(alpha: 0.4)),
               ),
               child: Row(
                 children: [
-                  Icon(Icons.error_outline_rounded, color: Theme.of(context).colorScheme.error, size: 18),
+                  Icon(Icons.error_outline_rounded,
+                      color: Theme.of(context).colorScheme.error, size: 18),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
                       _errorMessage!,
-                      style: TextStyle(color: Theme.of(context).colorScheme.error, fontSize: 13),
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                          fontSize: 13),
                     ),
                   ),
                 ],
               ),
             ),
           ],
-
           if (_currentStep == 1) ...[
             _buildTextField(
               controller: _emailController,
@@ -266,8 +292,10 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
               icon: Icons.email_outlined,
               keyboardType: TextInputType.emailAddress,
               validator: (v) {
-                if (v == null || v.isEmpty) return 'Lütfen e-posta adresinizi girin.';
-                if (!v.contains('@')) return 'Geçerli bir e-posta adresi girin.';
+                if (v == null || v.isEmpty)
+                  return 'Lütfen e-posta adresinizi girin.';
+                if (!v.contains('@'))
+                  return 'Geçerli bir e-posta adresi girin.';
                 return null;
               },
             ),
@@ -289,7 +317,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
               icon: Icons.lock_outline_rounded,
               isPassword: true,
               isVisible: _isNewPasswordVisible,
-              onToggleVisibility: () => setState(() => _isNewPasswordVisible = !_isNewPasswordVisible),
+              onToggleVisibility: () => setState(
+                  () => _isNewPasswordVisible = !_isNewPasswordVisible),
               validator: (v) {
                 if (v == null || v.isEmpty) return 'Yeni şifrenizi girin.';
                 if (v.length < 6) return 'Şifre en az 6 karakter olmalıdır.';
@@ -303,10 +332,12 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
               icon: Icons.lock_outline_rounded,
               isPassword: true,
               isVisible: _isConfirmPasswordVisible,
-              onToggleVisibility: () => setState(() => _isConfirmPasswordVisible = !_isConfirmPasswordVisible),
+              onToggleVisibility: () => setState(
+                  () => _isConfirmPasswordVisible = !_isConfirmPasswordVisible),
               validator: (v) {
                 if (v == null || v.isEmpty) return 'Şifrenizi tekrar girin.';
-                if (v != _newPasswordController.text) return 'Şifreler eşleşmiyor.';
+                if (v != _newPasswordController.text)
+                  return 'Şifreler eşleşmiyor.';
                 return null;
               },
             ),
@@ -333,7 +364,10 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
               ? []
               : [
                   BoxShadow(
-                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.4),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .primary
+                        .withValues(alpha: 0.4),
                     blurRadius: 16,
                     offset: const Offset(0, 6),
                   ),
@@ -377,17 +411,26 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
       controller: controller,
       obscureText: isPassword && !isVisible,
       keyboardType: keyboardType,
-      style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white, fontSize: 15),
+      style: TextStyle(
+          color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+          fontSize: 15),
       validator: validator,
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey, fontSize: 15),
-        prefixIcon: Icon(icon, color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey, size: 20),
+        hintStyle: TextStyle(
+            color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
+            fontSize: 15),
+        prefixIcon: Icon(icon,
+            color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
+            size: 20),
         suffixIcon: isPassword
             ? IconButton(
                 icon: Icon(
-                  isVisible ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                  color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
+                  isVisible
+                      ? Icons.visibility_off_outlined
+                      : Icons.visibility_outlined,
+                  color: Theme.of(context).textTheme.bodySmall?.color ??
+                      Colors.grey,
                   size: 20,
                 ),
                 onPressed: onToggleVisibility,
@@ -395,7 +438,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
             : null,
         filled: true,
         fillColor: Theme.of(context).colorScheme.surface,
-        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+        contentPadding:
+            const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide(color: Theme.of(context).dividerColor),
@@ -406,7 +450,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.5),
+          borderSide: BorderSide(
+              color: Theme.of(context).colorScheme.primary, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
@@ -414,7 +459,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.error, width: 1.5),
+          borderSide: BorderSide(
+              color: Theme.of(context).colorScheme.error, width: 1.5),
         ),
       ),
     );

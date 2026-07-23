@@ -72,7 +72,8 @@ class _LikersBottomSheetState extends State<LikersBottomSheet> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white.withValues(alpha: 0.24),
+                color: Theme.of(context).textTheme.bodyLarge?.color ??
+                    Colors.white.withValues(alpha: 0.24),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -80,21 +81,34 @@ class _LikersBottomSheetState extends State<LikersBottomSheet> {
           const Text(
             'Beğenenler',
             style: TextStyle(
-              color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+              color:
+                  Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 16),
           Divider(color: Theme.of(context).dividerColor, height: 1),
-          
+
           Expanded(
             child: _isLoading
-                ? Center(child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary))
+                ? Center(
+                    child: CircularProgressIndicator(
+                        color: Theme.of(context).colorScheme.primary))
                 : _error.isNotEmpty
-                    ? Center(child: Text(_error, style: TextStyle(color: Theme.of(context).colorScheme.error)))
+                    ? Center(
+                        child: Text(_error,
+                            style: TextStyle(
+                                color: Theme.of(context).colorScheme.error)))
                     : _likers.isEmpty
-                        ? Center(child: Text('Henüz beğenen yok.', style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey)))
+                        ? Center(
+                            child: Text('Henüz beğenen yok.',
+                                style: TextStyle(
+                                    color: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall
+                                            ?.color ??
+                                        Colors.grey)))
                         : ListView.builder(
                             padding: const EdgeInsets.symmetric(vertical: 8),
                             itemCount: _likers.length,
@@ -102,31 +116,48 @@ class _LikersBottomSheetState extends State<LikersBottomSheet> {
                               final liker = _likers[index];
                               return ListTile(
                                 leading: CircleAvatar(
-                                  backgroundColor: Theme.of(context).colorScheme.primary,
+                                  backgroundColor:
+                                      Theme.of(context).colorScheme.primary,
                                   backgroundImage: liker['avatar_url'] != null
-                                      ? CachedNetworkImageProvider(liker['avatar_url'])
+                                      ? CachedNetworkImageProvider(
+                                          liker['avatar_url'])
                                       : null,
                                   child: liker['avatar_url'] == null
-                                      ? Icon(Icons.person, color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white)
+                                      ? Icon(Icons.person,
+                                          color: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyLarge
+                                                  ?.color ??
+                                              Colors.white)
                                       : null,
                                 ),
                                 title: Text(
                                   liker['username'] ?? '',
                                   style: const TextStyle(
-                                    color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+                                    color: Theme.of(context)
+                                            .textTheme
+                                            .bodyLarge
+                                            ?.color ??
+                                        Colors.white,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
                                 subtitle: Text(
                                   liker['display_name'] ?? '',
-                                  style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey),
+                                  style: TextStyle(
+                                      color: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall
+                                              ?.color ??
+                                          Colors.grey),
                                 ),
                                 onTap: () {
                                   Navigator.pop(context);
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (_) => ProfileScreen(userId: liker['user_id']),
+                                      builder: (_) => ProfileScreen(
+                                          userId: liker['user_id']),
                                     ),
                                   );
                                 },

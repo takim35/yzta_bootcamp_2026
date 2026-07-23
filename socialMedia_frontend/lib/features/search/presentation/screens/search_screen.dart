@@ -41,15 +41,23 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           controller: _searchController,
           focusNode: _focusNode,
           onChanged: _onSearchChanged,
-          style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
+          style: TextStyle(
+              color:
+                  Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
           decoration: InputDecoration(
             hintText: s.isTr ? 'Kullanıcı Ara...' : 'Search Users...',
-            hintStyle: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey),
+            hintStyle: TextStyle(
+                color: Theme.of(context).textTheme.bodySmall?.color ??
+                    Colors.grey),
             border: InputBorder.none,
-            prefixIcon: Icon(Icons.search, color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey),
+            prefixIcon: Icon(Icons.search,
+                color: Theme.of(context).textTheme.bodySmall?.color ??
+                    Colors.grey),
             suffixIcon: _searchController.text.isNotEmpty
                 ? IconButton(
-                    icon: Icon(Icons.clear, color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey),
+                    icon: Icon(Icons.clear,
+                        color: Theme.of(context).textTheme.bodySmall?.color ??
+                            Colors.grey),
                     onPressed: () {
                       _searchController.clear();
                       ref.read(searchProvider).clearSearch();
@@ -66,7 +74,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
   Widget _buildBody(SearchProvider searchState, bool isTr) {
     if (searchState.isLoading) {
-      return Center(child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary));
+      return Center(
+          child: CircularProgressIndicator(
+              color: Theme.of(context).colorScheme.primary));
     }
 
     if (searchState.errorMessage.isNotEmpty) {
@@ -83,11 +93,18 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.search_rounded, size: 64, color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey.withValues(alpha: 0.3)),
+            Icon(Icons.search_rounded,
+                size: 64,
+                color: Theme.of(context).textTheme.bodySmall?.color ??
+                    Colors.grey.withValues(alpha: 0.3)),
             const SizedBox(height: 16),
             Text(
-              isTr ? 'Kişileri bulmak için arama yapın' : 'Search to find people',
-              style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey),
+              isTr
+                  ? 'Kişileri bulmak için arama yapın'
+                  : 'Search to find people',
+              style: TextStyle(
+                  color: Theme.of(context).textTheme.bodySmall?.color ??
+                      Colors.grey),
             ),
           ],
         ),
@@ -98,7 +115,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       return Center(
         child: Text(
           isTr ? 'Sonuç bulunamadı' : 'No results found',
-          style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey),
+          style: TextStyle(
+              color:
+                  Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey),
         ),
       );
     }
@@ -106,7 +125,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     return ListView.separated(
       padding: const EdgeInsets.all(AppTheme.spacingM),
       itemCount: searchState.searchResults.length,
-      separatorBuilder: (context, index) => Divider(color: Theme.of(context).dividerColor),
+      separatorBuilder: (context, index) =>
+          Divider(color: Theme.of(context).dividerColor),
       itemBuilder: (context, index) {
         final user = searchState.searchResults[index];
         return ListTile(
@@ -120,31 +140,47 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           },
           leading: CircleAvatar(
             backgroundColor: Theme.of(context).colorScheme.surface,
-            backgroundImage: user.avatarUrl.isNotEmpty ? NetworkImage(user.avatarUrl) : null,
-            child: user.avatarUrl.isEmpty ? Icon(Icons.person, color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey) : null,
+            backgroundImage:
+                user.avatarUrl.isNotEmpty ? NetworkImage(user.avatarUrl) : null,
+            child: user.avatarUrl.isEmpty
+                ? Icon(Icons.person,
+                    color: Theme.of(context).textTheme.bodyMedium?.color ??
+                        Colors.grey)
+                : null,
           ),
           title: Text(
             user.username,
-            style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white, fontWeight: FontWeight.bold),
+            style: TextStyle(
+                color: Theme.of(context).textTheme.bodyLarge?.color ??
+                    Colors.white,
+                fontWeight: FontWeight.bold),
           ),
           subtitle: Text(
             user.displayName,
-            style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+            style: TextStyle(
+                color: Theme.of(context).textTheme.bodyMedium?.color ??
+                    Colors.grey),
           ),
           trailing: ElevatedButton(
-            onPressed: () => searchState.toggleFollow(user.userId, user.isFollowing),
+            onPressed: () =>
+                searchState.toggleFollow(user.userId, user.isFollowing),
             style: ElevatedButton.styleFrom(
-              backgroundColor: user.isFollowing ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.primary,
-              foregroundColor: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+              backgroundColor: user.isFollowing
+                  ? Theme.of(context).colorScheme.surface
+                  : Theme.of(context).colorScheme.primary,
+              foregroundColor:
+                  Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
               elevation: 0,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
-                side: user.isFollowing ? BorderSide(color: Theme.of(context).dividerColor) : BorderSide.none,
+                side: user.isFollowing
+                    ? BorderSide(color: Theme.of(context).dividerColor)
+                    : BorderSide.none,
               ),
             ),
             child: Text(
-              user.isFollowing 
-                  ? (isTr ? 'Takibi Bırak' : 'Unfollow') 
+              user.isFollowing
+                  ? (isTr ? 'Takibi Bırak' : 'Unfollow')
                   : (isTr ? 'Takip Et' : 'Follow'),
               style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
             ),

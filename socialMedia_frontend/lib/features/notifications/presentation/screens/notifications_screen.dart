@@ -11,7 +11,8 @@ class NotificationsScreen extends ConsumerStatefulWidget {
   const NotificationsScreen({super.key});
 
   @override
-  ConsumerState<NotificationsScreen> createState() => _NotificationsScreenState();
+  ConsumerState<NotificationsScreen> createState() =>
+      _NotificationsScreenState();
 }
 
 class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
@@ -103,34 +104,51 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       appBar: AppBar(
         title: Text(
           s.isTr ? 'Bildirimler' : 'Notifications',
-          style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              color:
+                  Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+              fontWeight: FontWeight.bold),
         ),
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
-        iconTheme: IconThemeData(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
+        iconTheme: IconThemeData(
+            color:
+                Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
         actions: [
           if (hasUnread)
             TextButton(
               onPressed: _markAllRead,
               child: Text(
                 s.isTr ? 'Tümünü Oku' : 'Read All',
-                style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 13),
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.primary, fontSize: 13),
               ),
             ),
         ],
       ),
       body: _isLoading
-          ? Center(child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary))
+          ? Center(
+              child: CircularProgressIndicator(
+                  color: Theme.of(context).colorScheme.primary))
           : _notifications.isEmpty
               ? Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.notifications_off_rounded, size: 64, color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey),
+                      Icon(Icons.notifications_off_rounded,
+                          size: 64,
+                          color: Theme.of(context).textTheme.bodySmall?.color ??
+                              Colors.grey),
                       const SizedBox(height: 16),
                       Text(
-                        s.isTr ? 'Henüz bildiriminiz yok' : 'No notifications yet',
-                        style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey, fontSize: 16),
+                        s.isTr
+                            ? 'Henüz bildiriminiz yok'
+                            : 'No notifications yet',
+                        style: TextStyle(
+                            color:
+                                Theme.of(context).textTheme.bodySmall?.color ??
+                                    Colors.grey,
+                            fontSize: 16),
                       ),
                     ],
                   ),
@@ -149,20 +167,33 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                       final postImageUrl = notif['post_image_url'] as String?;
 
                       return Container(
-                        color: isRead ? Colors.transparent : Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
+                        color: isRead
+                            ? Colors.transparent
+                            : Theme.of(context)
+                                .colorScheme
+                                .primary
+                                .withValues(alpha: 0.05),
                         child: ListTile(
                           leading: Stack(
                             clipBehavior: Clip.none,
                             children: [
                               CircleAvatar(
                                 radius: 22,
-                                backgroundColor: Theme.of(context).colorScheme.surface,
-                                backgroundImage: actorAvatar != null && actorAvatar.isNotEmpty
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.surface,
+                                backgroundImage: actorAvatar != null &&
+                                        actorAvatar.isNotEmpty
                                     ? NetworkImage(actorAvatar)
                                     : null,
-                                child: actorAvatar == null || actorAvatar.isEmpty
-                                    ? Icon(Icons.person, color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey)
-                                    : null,
+                                child:
+                                    actorAvatar == null || actorAvatar.isEmpty
+                                        ? Icon(Icons.person,
+                                            color: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyMedium
+                                                    ?.color ??
+                                                Colors.grey)
+                                        : null,
                               ),
                               Positioned(
                                 bottom: -2,
@@ -170,7 +201,8 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                                 child: Container(
                                   padding: const EdgeInsets.all(2),
                                   decoration: const BoxDecoration(
-                                    color: Theme.of(context).scaffoldBackgroundColor,
+                                    color: Theme.of(context)
+                                        .scaffoldBackgroundColor,
                                     shape: BoxShape.circle,
                                   ),
                                   child: Icon(
@@ -185,51 +217,68 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                           title: Text(
                             message,
                             style: TextStyle(
-                              color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+                              color: Theme.of(context)
+                                      .textTheme
+                                      .bodyLarge
+                                      ?.color ??
+                                  Colors.white,
                               fontSize: 14,
-                              fontWeight: isRead ? FontWeight.normal : FontWeight.w600,
+                              fontWeight:
+                                  isRead ? FontWeight.normal : FontWeight.w600,
                             ),
                           ),
                           subtitle: Text(
                             _timeAgo(notif['created_at'] as String?),
-                            style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey, fontSize: 12),
+                            style: TextStyle(
+                                color: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall
+                                        ?.color ??
+                                    Colors.grey,
+                                fontSize: 12),
                           ),
-                          trailing: postImageUrl != null && postImageUrl.isNotEmpty
-                              ? ClipRRect(
-                                  borderRadius: BorderRadius.circular(8),
-                                  child: Image.network(
-                                    postImageUrl,
-                                    width: 44,
-                                    height: 44,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-                                  ),
-                                )
-                              : null,
+                          trailing:
+                              postImageUrl != null && postImageUrl.isNotEmpty
+                                  ? ClipRRect(
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: Image.network(
+                                        postImageUrl,
+                                        width: 44,
+                                        height: 44,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (_, __, ___) =>
+                                            const SizedBox.shrink(),
+                                      ),
+                                    )
+                                  : null,
                           onTap: () async {
                             if (!isRead) {
                               try {
-                                await ApiService().markNotificationRead(notif['notification_id'] as String);
+                                await ApiService().markNotificationRead(
+                                    notif['notification_id'] as String);
                                 await _loadNotifications();
                               } catch (_) {}
                             }
-                            
+
                             if (type == 'follow') {
                               if (!context.mounted) return;
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => ProfileScreen(userId: notif['actor_id'] as String),
+                                  builder: (_) => ProfileScreen(
+                                      userId: notif['actor_id'] as String),
                                 ),
                               );
                             } else if (type == 'like' || type == 'comment') {
-                              final currentUserId = ref.read(authProvider).currentUserId;
+                              final currentUserId =
+                                  ref.read(authProvider).currentUserId;
                               if (currentUserId != null) {
                                 if (!context.mounted) return;
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) => ProfileScreen(userId: currentUserId),
+                                    builder: (_) =>
+                                        ProfileScreen(userId: currentUserId),
                                   ),
                                 );
                               }

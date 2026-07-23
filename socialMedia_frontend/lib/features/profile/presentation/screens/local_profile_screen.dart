@@ -18,7 +18,8 @@ class LocalProfileScreen extends ConsumerWidget {
         elevation: 0,
         title: const Text(
           'Account Info',
-          style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
+          style: TextStyle(
+              color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
@@ -35,30 +36,30 @@ class LocalProfileScreen extends ConsumerWidget {
                   decoration: BoxDecoration(
                     color: Theme.of(context).cardColor,
                     shape: BoxShape.circle,
-                    border: Border.all(color: Theme.of(context).dividerColor, width: 2),
                   ),
                   child: Center(
-                    child: Icon(Icons.person_rounded, size: 50, color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+                    child: Icon(Icons.person_rounded,
+                        size: 50,
+                        color: Theme.of(context).textTheme.bodyMedium?.color ??
+                            Colors.grey),
                   ),
                 ),
               ),
               const SizedBox(height: 32),
-              
               Text(
                 'Personal Information',
                 style: TextStyle(
-                  color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
+                  color: Theme.of(context).textTheme.bodyMedium?.color ??
+                      Colors.grey,
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                 ),
               ),
               const SizedBox(height: 16),
-              
               Container(
                 decoration: BoxDecoration(
                   color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Theme.of(context).dividerColor),
                 ),
                 child: Column(
                   children: [
@@ -94,7 +95,8 @@ class _InfoRow extends StatelessWidget {
           Text(
             label,
             style: TextStyle(
-              color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+              color:
+                  Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
               fontSize: 15,
               fontWeight: FontWeight.w500,
             ),
@@ -102,7 +104,8 @@ class _InfoRow extends StatelessWidget {
           Text(
             value,
             style: TextStyle(
-              color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
+              color:
+                  Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
               fontSize: 15,
             ),
           ),

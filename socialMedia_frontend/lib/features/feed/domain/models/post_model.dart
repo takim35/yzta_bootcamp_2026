@@ -42,7 +42,6 @@ class PostModel {
     return timeago.format(createdAt, locale: 'tr');
   }
 
-
   factory PostModel.fromJson(Map<String, dynamic> json) {
     return PostModel(
       postId: json['post_id'] as String? ?? '',

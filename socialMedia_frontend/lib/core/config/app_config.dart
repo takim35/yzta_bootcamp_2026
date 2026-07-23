@@ -46,7 +46,8 @@ class AppConfig {
 
   /// Tam backend URL'si
   static String get baseUrl {
-    if (_definedHost.startsWith('http://') || _definedHost.startsWith('https://')) {
+    if (_definedHost.startsWith('http://') ||
+        _definedHost.startsWith('https://')) {
       return _definedHost;
     }
     return 'http://$apiHost:$apiPort';

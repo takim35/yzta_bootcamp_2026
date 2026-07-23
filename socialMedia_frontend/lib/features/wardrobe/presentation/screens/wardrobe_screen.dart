@@ -46,7 +46,8 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> {
           children: [
             // Header
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -60,11 +61,13 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> {
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.add_circle_outline_rounded, color: Colors.white, size: 28),
+                    icon: const Icon(Icons.add_circle_outline_rounded,
+                        color: Colors.white, size: 28),
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => const AddItemScreen()),
+                        MaterialPageRoute(
+                            builder: (_) => const AddItemScreen()),
                       ).then((refreshed) {
                         if (refreshed == true) _loadClothes();
                       });
@@ -73,7 +76,7 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> {
                 ],
               ),
             ),
-            
+
             // Search Bar
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -82,22 +85,31 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> {
                 decoration: BoxDecoration(
                   color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Theme.of(context).dividerColor),
                 ),
                 child: Row(
                   children: [
                     const SizedBox(width: 12),
-                    Icon(Icons.search_rounded, color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey, size: 20),
+                    Icon(Icons.search_rounded,
+                        color: Theme.of(context).textTheme.bodySmall?.color ??
+                            Colors.grey,
+                        size: 20),
                     const SizedBox(width: 8),
                     Expanded(
                       child: TextField(
-                        style: const TextStyle(color: Colors.white, fontSize: 14),
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 14),
                         decoration: InputDecoration(
                           hintText: 'Search items...',
-                          hintStyle: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey),
+                          hintStyle: TextStyle(
+                              color: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.color ??
+                                  Colors.grey),
                           border: InputBorder.none,
                           isDense: true,
-                          contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                          contentPadding:
+                              const EdgeInsets.symmetric(vertical: 10),
                         ),
                       ),
                     ),
@@ -106,7 +118,7 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> {
               ),
             ),
             const SizedBox(height: 12),
-            
+
             // Category Chips
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -138,22 +150,26 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> {
                     return Center(
                       child: Text(
                         'Error: ${snapshot.error}',
-                        style: TextStyle(color: Theme.of(context).colorScheme.error),
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.error),
                       ),
                     );
                   }
 
                   final clothes = snapshot.data ?? [];
-                  
+
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16.0, vertical: 4.0),
                         child: Text(
                           '${clothes.length} items',
                           style: TextStyle(
-                            color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
+                            color:
+                                Theme.of(context).textTheme.bodySmall?.color ??
+                                    Colors.grey,
                             fontSize: 12,
                           ),
                         ),
@@ -163,15 +179,22 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> {
                           child: Center(
                             child: Text(
                               'No clothes found',
-                              style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+                              style: TextStyle(
+                                  color: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium
+                                          ?.color ??
+                                      Colors.grey),
                             ),
                           ),
                         )
                       else
                         Expanded(
                           child: GridView.builder(
-                            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16.0, vertical: 8.0),
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 2,
                               childAspectRatio: 0.8,
                               crossAxisSpacing: 12,
@@ -179,14 +202,25 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> {
                             ),
                             itemCount: clothes.length,
                             itemBuilder: (context, index) {
-                              final cloth = clothes[index] as Map<String, dynamic>;
-                              final rawImageUrl = cloth['foto_url']?.toString() ?? cloth['image_url']?.toString() ?? '';
-                              final imageUrl = ApiService.fixImageUrl(rawImageUrl);
-                              
+                              final cloth =
+                                  clothes[index] as Map<String, dynamic>;
+                              final rawImageUrl =
+                                  cloth['foto_url']?.toString() ??
+                                      cloth['image_url']?.toString() ??
+                                      '';
+                              final imageUrl =
+                                  ApiService.fixImageUrl(rawImageUrl);
+
                               final parts = <String>[];
-                              if (cloth['renk'] != null && cloth['renk'].toString().isNotEmpty) parts.add(cloth['renk'].toString());
-                              if (cloth['tur'] != null && cloth['tur'].toString().isNotEmpty) parts.add(cloth['tur'].toString());
-                              if (cloth['beden'] != null && cloth['beden'].toString().isNotEmpty) parts.add(cloth['beden'].toString());
+                              if (cloth['renk'] != null &&
+                                  cloth['renk'].toString().isNotEmpty)
+                                parts.add(cloth['renk'].toString());
+                              if (cloth['tur'] != null &&
+                                  cloth['tur'].toString().isNotEmpty)
+                                parts.add(cloth['tur'].toString());
+                              if (cloth['beden'] != null &&
+                                  cloth['beden'].toString().isNotEmpty)
+                                parts.add(cloth['beden'].toString());
                               final label = parts.join(', ');
 
                               return GestureDetector(
@@ -194,7 +228,8 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (_) => EditItemScreen(initialItem: cloth),
+                                      builder: (_) =>
+                                          EditItemScreen(initialItem: cloth),
                                     ),
                                   ).then((refreshed) {
                                     if (refreshed == true) _loadClothes();
@@ -204,7 +239,6 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> {
                                   decoration: BoxDecoration(
                                     color: Theme.of(context).cardColor,
                                     borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(color: Theme.of(context).dividerColor),
                                   ),
                                   clipBehavior: Clip.antiAlias,
                                   child: Stack(
@@ -214,7 +248,8 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> {
                                           ? Image.network(
                                               imageUrl,
                                               fit: BoxFit.cover,
-                                              errorBuilder: (_, __, ___) => const _EmptyClothIcon(),
+                                              errorBuilder: (_, __, ___) =>
+                                                  const _EmptyClothIcon(),
                                             )
                                           : const _EmptyClothIcon(),
                                       if (label.isNotEmpty)
@@ -223,7 +258,8 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> {
                                           left: 0,
                                           right: 0,
                                           child: Container(
-                                            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 8, horizontal: 8),
                                             decoration: BoxDecoration(
                                               gradient: LinearGradient(
                                                 begin: Alignment.bottomCenter,
@@ -240,7 +276,11 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> {
                                                 color: Colors.white,
                                                 fontSize: 12,
                                                 fontWeight: FontWeight.w600,
-                                                shadows: [Shadow(color: Colors.black54, blurRadius: 2)],
+                                                shadows: [
+                                                  Shadow(
+                                                      color: Colors.black54,
+                                                      blurRadius: 2)
+                                                ],
                                               ),
                                               maxLines: 2,
                                               overflow: TextOverflow.ellipsis,
@@ -274,7 +314,9 @@ class _EmptyClothIcon extends StatelessWidget {
     return Container(
       color: Theme.of(context).colorScheme.surface,
       child: Center(
-        child: Icon(Icons.checkroom_rounded, size: 52, color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey),
+        child: Icon(Icons.checkroom_rounded,
+            size: 52,
+            color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey),
       ),
     );
   }
@@ -293,7 +335,6 @@ class _FilterChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Text(
         label,

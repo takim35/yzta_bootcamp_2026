@@ -7,7 +7,8 @@ import 'dart:convert';
 import '../../../../features/feed/domain/models/outfit_item_model.dart';
 import '../../../../services/api_service.dart';
 
-final createPostProvider = ChangeNotifierProvider((ref) => CreatePostProvider());
+final createPostProvider =
+    ChangeNotifierProvider((ref) => CreatePostProvider());
 
 class CreatePostProvider extends ChangeNotifier {
   final ApiService _api = ApiService();
@@ -41,7 +42,8 @@ class CreatePostProvider extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
 
   /// Form geçerliliği: en azından görsel seçilmiş olmalı ve en az 1 kıyafet seçilmeli
-  bool get isFormValid => _selectedImage != null && _selectedOutfitItems.isNotEmpty;
+  bool get isFormValid =>
+      _selectedImage != null && _selectedOutfitItems.isNotEmpty;
 
   // ─── Mock Outfit Items (UI'da gösterim için) ───────────────
   List<OutfitItem> get mockOutfitItems => [
@@ -53,22 +55,26 @@ class CreatePostProvider extends ChangeNotifier {
         OutfitItem(
           itemId: 'item-002',
           category: 'alt giyim',
-          imageUrl: '${ApiService.baseUrl}/static/categories/miyazaki_bottom.png',
+          imageUrl:
+              '${ApiService.baseUrl}/static/categories/miyazaki_bottom.png',
         ),
         OutfitItem(
           itemId: 'item-003',
           category: 'ayakkabı',
-          imageUrl: '${ApiService.baseUrl}/static/categories/miyazaki_shoes.png',
+          imageUrl:
+              '${ApiService.baseUrl}/static/categories/miyazaki_shoes.png',
         ),
         OutfitItem(
           itemId: 'item-004',
           category: 'aksesuar',
-          imageUrl: '${ApiService.baseUrl}/static/categories/miyazaki_accessory.png',
+          imageUrl:
+              '${ApiService.baseUrl}/static/categories/miyazaki_accessory.png',
         ),
         OutfitItem(
           itemId: 'item-005',
           category: 'dış giyim',
-          imageUrl: '${ApiService.baseUrl}/static/categories/miyazaki_jacket.png',
+          imageUrl:
+              '${ApiService.baseUrl}/static/categories/miyazaki_jacket.png',
         ),
         OutfitItem(
           itemId: 'item-006',

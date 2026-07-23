@@ -144,16 +144,26 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: Theme.of(context).colorScheme.surface,
-        title: Text('Yorumu Sil', style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white)),
-        content: Text('Bu yorumu silmek istediğinize emin misiniz?', style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey)),
+        title: Text('Yorumu Sil',
+            style: TextStyle(
+                color: Theme.of(context).textTheme.bodyLarge?.color ??
+                    Colors.white)),
+        content: Text('Bu yorumu silmek istediğinize emin misiniz?',
+            style: TextStyle(
+                color: Theme.of(context).textTheme.bodyMedium?.color ??
+                    Colors.grey)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text('İptal', style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey)),
+            child: Text('İptal',
+                style: TextStyle(
+                    color: Theme.of(context).textTheme.bodySmall?.color ??
+                        Colors.grey)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text('Sil', style: TextStyle(color: Theme.of(context).colorScheme.error)),
+            child: Text('Sil',
+                style: TextStyle(color: Theme.of(context).colorScheme.error)),
           ),
         ],
       ),
@@ -162,7 +172,8 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
     if (confirm != true) return;
 
     try {
-      await _api.deleteComment(commentId: commentId, userId: widget.currentUserId);
+      await _api.deleteComment(
+          commentId: commentId, userId: widget.currentUserId);
       await _loadComments();
       widget.onCommentsCountChanged?.call(_comments.length);
     } catch (_) {
@@ -194,7 +205,8 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
               child: Text(
                 'Yorumlar (${_comments.isNotEmpty ? _comments.length : widget.initialCommentsCount})',
                 style: TextStyle(
-                  color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+                  color: Theme.of(context).textTheme.bodyLarge?.color ??
+                      Colors.white,
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                 ),
@@ -206,13 +218,18 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
             if (_replyingToUsername != null) ...[
               Container(
                 color: Theme.of(context).cardColor.withOpacity(0.5),
-                padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingM, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: AppTheme.spacingM, vertical: 8),
                 child: Row(
                   children: [
                     Expanded(
                       child: Text(
                         '@$_replyingToUsername kullanıcısına yanıt veriliyor...',
-                        style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey, fontSize: 13),
+                        style: TextStyle(
+                            color:
+                                Theme.of(context).textTheme.bodySmall?.color ??
+                                    Colors.grey,
+                            fontSize: 13),
                       ),
                     ),
                     GestureDetector(
@@ -222,7 +239,10 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                           _replyingToUsername = null;
                         });
                       },
-                      child: Icon(Icons.close_rounded, color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey, size: 18),
+                      child: Icon(Icons.close_rounded,
+                          color: Theme.of(context).textTheme.bodySmall?.color ??
+                              Colors.grey,
+                          size: 18),
                     ),
                   ],
                 ),
@@ -239,7 +259,8 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
   Widget _buildBody() {
     if (_isLoading) {
       return Center(
-        child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary),
+        child: CircularProgressIndicator(
+            color: Theme.of(context).colorScheme.primary),
       );
     }
 
@@ -256,14 +277,18 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
       return Center(
         child: Text(
           'Henüz yorum yok. İlk yorumu sen yap!',
-          style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+          style: TextStyle(
+              color:
+                  Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
         ),
       );
     }
 
     // parentId'si null olanlar veya bizim listemizde parentId'si bulunmayanlar ana yorumdur
     final commentIds = _comments.map((c) => c.commentId).toSet();
-    final parents = _comments.where((c) => c.parentId == null || !commentIds.contains(c.parentId)).toList();
+    final parents = _comments
+        .where((c) => c.parentId == null || !commentIds.contains(c.parentId))
+        .toList();
 
     return ListView.separated(
       padding: const EdgeInsets.all(AppTheme.spacingM),
@@ -271,7 +296,8 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
       separatorBuilder: (_, __) => const SizedBox(height: AppTheme.spacingM),
       itemBuilder: (context, index) {
         final parent = parents[index];
-        final replies = _comments.where((c) => c.parentId == parent.commentId).toList();
+        final replies =
+            _comments.where((c) => c.parentId == parent.commentId).toList();
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -299,14 +325,18 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
         CircleAvatar(
           radius: isReply ? 12 : 16,
           backgroundColor: Theme.of(context).cardColor,
-          backgroundImage: comment.avatarUrl != null && comment.avatarUrl!.isNotEmpty
-              ? CachedNetworkImageProvider(comment.avatarUrl!)
-              : null,
+          backgroundImage:
+              comment.avatarUrl != null && comment.avatarUrl!.isNotEmpty
+                  ? CachedNetworkImageProvider(comment.avatarUrl!)
+                  : null,
           child: comment.avatarUrl == null || comment.avatarUrl!.isEmpty
               ? Text(
-                  comment.username.isNotEmpty ? comment.username[0].toUpperCase() : '?',
+                  comment.username.isNotEmpty
+                      ? comment.username[0].toUpperCase()
+                      : '?',
                   style: TextStyle(
-                    color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+                    color: Theme.of(context).textTheme.bodyLarge?.color ??
+                        Colors.white,
                     fontSize: isReply ? 10 : 12,
                   ),
                 )
@@ -323,7 +353,8 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                     TextSpan(
                       text: '${comment.username} ',
                       style: TextStyle(
-                        color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+                        color: Theme.of(context).textTheme.bodyLarge?.color ??
+                            Colors.white,
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
                       ),
@@ -331,7 +362,8 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                     TextSpan(
                       text: comment.content,
                       style: TextStyle(
-                        color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
+                        color: Theme.of(context).textTheme.bodyMedium?.color ??
+                            Colors.grey,
                         fontSize: 14,
                       ),
                     ),
@@ -344,7 +376,8 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                   Text(
                     comment.timeAgo,
                     style: TextStyle(
-                      color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
+                      color: Theme.of(context).textTheme.bodySmall?.color ??
+                          Colors.grey,
                       fontSize: 12,
                     ),
                   ),
@@ -361,7 +394,8 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                       child: Text(
                         'Yanıtla',
                         style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
+                          color: Theme.of(context).textTheme.bodySmall?.color ??
+                              Colors.grey,
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                         ),
@@ -379,7 +413,8 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
             onTap: () => _deleteComment(comment.commentId),
             child: Icon(
               Icons.delete_outline_rounded,
-              color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
+              color:
+                  Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
               size: 18,
             ),
           ),
@@ -397,10 +432,16 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
             child: TextField(
               controller: _controller,
               focusNode: _focusNode,
-              style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
+              style: TextStyle(
+                  color: Theme.of(context).textTheme.bodyLarge?.color ??
+                      Colors.white),
               decoration: InputDecoration(
-                hintText: _replyingToUsername != null ? 'Yanıt ekle...' : 'Yorum ekle...',
-                hintStyle: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey),
+                hintText: _replyingToUsername != null
+                    ? 'Yanıt ekle...'
+                    : 'Yorum ekle...',
+                hintStyle: TextStyle(
+                    color: Theme.of(context).textTheme.bodySmall?.color ??
+                        Colors.grey),
                 filled: true,
                 fillColor: Theme.of(context).cardColor,
                 border: OutlineInputBorder(
@@ -425,7 +466,8 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                     height: 20,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                : Icon(Icons.send_rounded, color: Theme.of(context).colorScheme.primary),
+                : Icon(Icons.send_rounded,
+                    color: Theme.of(context).colorScheme.primary),
           ),
         ],
       ),

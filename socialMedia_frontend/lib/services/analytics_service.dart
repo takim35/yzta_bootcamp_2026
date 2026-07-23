@@ -18,7 +18,7 @@ class AnalyticsService {
   void logOnboardingCompleted() {
     logEvent('onboarding_completed');
   }
-  
+
   void logOnboardingSkipped(int atStep) {
     logEvent('onboarding_skipped', parameters: {
       'step_index': atStep,

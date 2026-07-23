@@ -66,18 +66,21 @@ class _BodyMeasurementScreenState extends State<BodyMeasurementScreen> {
       backgroundColor: bgColor,
       appBar: AppBar(
         backgroundColor: bgColor,
-        title: const Text('Body Measurements', style: TextStyle(color: Colors.white)),
+        title: const Text('Body Measurements',
+            style: TextStyle(color: Colors.white)),
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
           if (_hasSavedData && !_isEditing)
             IconButton(
-              icon: const Icon(Icons.edit_rounded, color: AppTheme.accentViolet),
+              icon:
+                  const Icon(Icons.edit_rounded, color: AppTheme.accentViolet),
               onPressed: () => setState(() => _isEditing = true),
               tooltip: 'Edit',
             ),
           if (_hasSavedData)
             IconButton(
-              icon: const Icon(Icons.delete_outline_rounded, color: AppTheme.errorColor),
+              icon: const Icon(Icons.delete_outline_rounded,
+                  color: AppTheme.errorColor),
               onPressed: _delete,
               tooltip: 'Delete',
             ),
@@ -93,12 +96,16 @@ class _BodyMeasurementScreenState extends State<BodyMeasurementScreen> {
               style: TextStyle(color: Colors.grey, fontSize: 14),
             ),
             const SizedBox(height: 24),
-            _buildField('Height (cm)', _heightCtrl, Icons.height_rounded, surfaceColor),
-            _buildField('Weight (kg)', _weightCtrl, Icons.monitor_weight_rounded, surfaceColor),
-            _buildField('Bust (cm)', _bustCtrl, Icons.straighten_rounded, surfaceColor),
-            _buildField('Waist (cm)', _waistCtrl, Icons.straighten_rounded, surfaceColor),
-            _buildField('Hips (cm)', _hipsCtrl, Icons.straighten_rounded, surfaceColor),
-            
+            _buildField(
+                'Height (cm)', _heightCtrl, Icons.height_rounded, surfaceColor),
+            _buildField('Weight (kg)', _weightCtrl,
+                Icons.monitor_weight_rounded, surfaceColor),
+            _buildField(
+                'Bust (cm)', _bustCtrl, Icons.straighten_rounded, surfaceColor),
+            _buildField('Waist (cm)', _waistCtrl, Icons.straighten_rounded,
+                surfaceColor),
+            _buildField(
+                'Hips (cm)', _hipsCtrl, Icons.straighten_rounded, surfaceColor),
             const SizedBox(height: 32),
             if (_isEditing)
               SizedBox(
@@ -107,10 +114,15 @@ class _BodyMeasurementScreenState extends State<BodyMeasurementScreen> {
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.accentViolet,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
                   ),
                   onPressed: _save,
-                  child: const Text('Save Measurements', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                  child: const Text('Save Measurements',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16)),
                 ),
               ),
           ],
@@ -119,7 +131,8 @@ class _BodyMeasurementScreenState extends State<BodyMeasurementScreen> {
     );
   }
 
-  Widget _buildField(String label, TextEditingController controller, IconData icon, Color surfaceColor) {
+  Widget _buildField(String label, TextEditingController controller,
+      IconData icon, Color surfaceColor) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
       child: TextField(
@@ -143,7 +156,8 @@ class _BodyMeasurementScreenState extends State<BodyMeasurementScreen> {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: AppTheme.accentViolet, width: 2),
+            borderSide:
+                const BorderSide(color: AppTheme.accentViolet, width: 2),
           ),
         ),
       ),

@@ -47,7 +47,8 @@ class GoogleAuthService {
         final googleAuth = await googleUser.authentication;
         idToken = googleAuth.idToken;
         if (idToken == null) {
-          debugPrint('[GoogleAuth] ID token alınamadı — REVERSED_CLIENT_ID eksik olabilir.');
+          debugPrint(
+              '[GoogleAuth] ID token alınamadı — REVERSED_CLIENT_ID eksik olabilir.');
           debugPrint('[GoogleAuth] Email + displayName ile devam ediliyor...');
         }
       } catch (e) {
@@ -58,7 +59,8 @@ class GoogleAuthService {
       final userId = await ApiService().loginWithGoogle(
         idToken: idToken ?? 'NO_TOKEN_${DateTime.now().millisecondsSinceEpoch}',
         email: googleUser.email,
-        displayName: googleUser.displayName ?? googleUser.email.split('@').first,
+        displayName:
+            googleUser.displayName ?? googleUser.email.split('@').first,
         avatarUrl: googleUser.photoUrl,
       );
 

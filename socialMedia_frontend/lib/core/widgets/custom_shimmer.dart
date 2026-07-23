@@ -53,7 +53,9 @@ class _CustomShimmerState extends State<CustomShimmer>
           height: widget.height,
           decoration: BoxDecoration(
             shape: widget.isCircle ? BoxShape.circle : BoxShape.rectangle,
-            borderRadius: widget.isCircle ? null : BorderRadius.circular(widget.borderRadius),
+            borderRadius: widget.isCircle
+                ? null
+                : BorderRadius.circular(widget.borderRadius),
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,

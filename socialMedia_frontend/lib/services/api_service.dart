@@ -22,15 +22,16 @@ class ApiService {
   static String fixImageUrl(String? url) {
     if (url == null || url.isEmpty) return '';
     // Bilinen tüm local adres varyantlarını AppConfig.baseUrl ile değiştir
-    return url
-        .replaceAllMapped(
-          RegExp(r'https?://(localhost|127\.0\.0\.1|10\.0\.2\.2|10\.5\.5\.\d+):8000'),
-          (_) => AppConfig.baseUrl,
-        );
+    return url.replaceAllMapped(
+      RegExp(
+          r'https?://(localhost|127\.0\.0\.1|10\.0\.2\.2|10\.5\.5\.\d+):8000'),
+      (_) => AppConfig.baseUrl,
+    );
   }
 
   final http.Client _client = http.Client();
-  static const Duration _timeout = Duration(seconds: 30); // Ollama AI çağrıları için daha uzun
+  static const Duration _timeout =
+      Duration(seconds: 30); // Ollama AI çağrıları için daha uzun
 
   // ─── Headers ────────────────────────────────────────────────
   Map<String, String> get _headers => {
@@ -52,8 +53,8 @@ class ApiService {
   Future<dynamic> _getDecoded(String endpoint,
       {Map<String, String>? queryParams}) async {
     try {
-      final uri = Uri.parse('$baseUrl$endpoint')
-          .replace(queryParameters: queryParams);
+      final uri =
+          Uri.parse('$baseUrl$endpoint').replace(queryParameters: queryParams);
       final response =
           await _client.get(uri, headers: _headers).timeout(_timeout);
 
@@ -63,7 +64,8 @@ class ApiService {
         _throwError(response);
       }
     } on SocketException {
-      throw ApiException('Bağlantı hatası. İnternet bağlantınızı kontrol edin.');
+      throw ApiException(
+          'Bağlantı hatası. İnternet bağlantınızı kontrol edin.');
     } on TimeoutException {
       throw ApiException('İstek zaman aşımına uğradı. Lütfen tekrar deneyin.');
     } catch (e) {
@@ -95,7 +97,8 @@ class ApiService {
         _throwError(response);
       }
     } on SocketException {
-      throw ApiException('Bağlantı hatası. İnternet bağlantınızı kontrol edin.');
+      throw ApiException(
+          'Bağlantı hatası. İnternet bağlantınızı kontrol edin.');
     } on TimeoutException {
       throw ApiException('İstek zaman aşımına uğradı. Lütfen tekrar deneyin.');
     } catch (e) {
@@ -104,8 +107,7 @@ class ApiService {
     }
   }
 
-  Future<Map<String, dynamic>> _put(
-      String endpoint, Map<String, dynamic> body,
+  Future<Map<String, dynamic>> _put(String endpoint, Map<String, dynamic> body,
       {Map<String, String>? headers}) async {
     try {
       final uri = Uri.parse('$baseUrl$endpoint');
@@ -117,7 +119,9 @@ class ApiService {
           .put(uri, headers: reqHeaders, body: jsonEncode(body))
           .timeout(_timeout);
 
-      if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 204) {
+      if (response.statusCode == 200 ||
+          response.statusCode == 201 ||
+          response.statusCode == 204) {
         if (response.body.isNotEmpty) {
           return jsonDecode(response.body) as Map<String, dynamic>;
         }
@@ -126,7 +130,8 @@ class ApiService {
         _throwError(response);
       }
     } on SocketException {
-      throw ApiException('Bağlantı hatası. İnternet bağlantınızı kontrol edin.');
+      throw ApiException(
+          'Bağlantı hatası. İnternet bağlantınızı kontrol edin.');
     } on TimeoutException {
       throw ApiException('İstek zaman aşımına uğradı. Lütfen tekrar deneyin.');
     } catch (e) {
@@ -151,7 +156,9 @@ class ApiService {
       final streamed = await _client.send(request).timeout(_timeout);
       final response = await http.Response.fromStream(streamed);
 
-      if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 204) {
+      if (response.statusCode == 200 ||
+          response.statusCode == 201 ||
+          response.statusCode == 204) {
         if (response.body.isNotEmpty) {
           return jsonDecode(response.body) as Map<String, dynamic>;
         }
@@ -160,7 +167,8 @@ class ApiService {
         _throwError(response);
       }
     } on SocketException {
-      throw ApiException('Bağlantı hatası. İnternet bağlantınızı kontrol edin.');
+      throw ApiException(
+          'Bağlantı hatası. İnternet bağlantınızı kontrol edin.');
     } on TimeoutException {
       throw ApiException('İstek zaman aşımına uğradı. Lütfen tekrar deneyin.');
     } catch (e) {
@@ -177,7 +185,9 @@ class ApiService {
           .patch(uri, headers: _headers, body: jsonEncode(body))
           .timeout(_timeout);
 
-      if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 204) {
+      if (response.statusCode == 200 ||
+          response.statusCode == 201 ||
+          response.statusCode == 204) {
         if (response.body.isNotEmpty) {
           return jsonDecode(response.body) as Map<String, dynamic>;
         }
@@ -186,7 +196,8 @@ class ApiService {
         _throwError(response);
       }
     } on SocketException {
-      throw ApiException('Bağlantı hatası. İnternet bağlantınızı kontrol edin.');
+      throw ApiException(
+          'Bağlantı hatası. İnternet bağlantınızı kontrol edin.');
     } on TimeoutException {
       throw ApiException('İstek zaman aşımına uğradı. Lütfen tekrar deneyin.');
     } catch (e) {
@@ -194,7 +205,6 @@ class ApiService {
       throw ApiException('Beklenmeyen bir hata oluştu: $e');
     }
   }
-
 
   // ─── Error Handler ──────────────────────────────────────────
   Never _throwError(http.Response response) {
@@ -323,8 +333,8 @@ class ApiService {
     final queryParams = <String, String>{};
     if (viewerId != null) queryParams['viewer_id'] = viewerId;
 
-    final data = await _getList('/posts/users/$userId/posts',
-        queryParams: queryParams);
+    final data =
+        await _getList('/posts/users/$userId/posts', queryParams: queryParams);
     return data
         .map((p) => PostModel.fromJson(p as Map<String, dynamic>))
         .toList();
@@ -337,11 +347,15 @@ class ApiService {
         .toList();
   }
 
-  Future<void> deletePost({required String postId, required String userId}) async {
+  Future<void> deletePost(
+      {required String postId, required String userId}) async {
     await _delete('/posts/$postId?user_id=$userId', null);
   }
 
-  Future<void> updatePost({required String postId, required String userId, required String caption}) async {
+  Future<void> updatePost(
+      {required String postId,
+      required String userId,
+      required String caption}) async {
     await _patch('/posts/$postId?user_id=$userId', {
       'caption': caption,
     });
@@ -377,11 +391,13 @@ class ApiService {
     final body = {
       'profile_visibility': isPrivate ? 'private' : 'public',
     };
-    await _put('/users/me/privacy', body, headers: {'Authorization': 'Bearer $userId'});
+    await _put('/users/me/privacy', body,
+        headers: {'Authorization': 'Bearer $userId'});
   }
 
   Future<void> deleteAccount(String userId) async {
-    await _delete('/users/me', null, headers: {'Authorization': 'Bearer $userId'});
+    await _delete('/users/me', null,
+        headers: {'Authorization': 'Bearer $userId'});
   }
 
   // ─── Follow ─────────────────────────────────────────────────
@@ -428,7 +444,8 @@ class ApiService {
     final uri = Uri.parse('$baseUrl/posts/$postId/save').replace(
       queryParameters: {'user_id': userId},
     );
-    final response = await _client.post(uri, headers: _headers).timeout(_timeout);
+    final response =
+        await _client.post(uri, headers: _headers).timeout(_timeout);
     if (response.statusCode != 200 && response.statusCode != 201) {
       _throwError(response);
     }
@@ -486,25 +503,22 @@ class ApiService {
   Future<String> suggestCaption({
     required List<OutfitItem> outfitItems,
     String? styleHint,
-    String? imageUrl,  // Yüklenen görselin URL'si (Gemini Vision için)
+    String? imageUrl, // Yüklenen görselin URL'si (Gemini Vision için)
   }) async {
     final body = <String, dynamic>{
-      'outfit_items':
-          outfitItems.map((item) => item.toJson()).toList(),
+      'outfit_items': outfitItems.map((item) => item.toJson()).toList(),
     };
     if (styleHint != null && styleHint.isNotEmpty) {
       body['style_hint'] = styleHint;
     }
     if (imageUrl != null && imageUrl.isNotEmpty) {
-      body['image_url'] = imageUrl;  // Görsel URL'sini backend'e gönder
+      body['image_url'] = imageUrl; // Görsel URL'sini backend'e gönder
     }
     final data = await _post('/captions/suggest', body);
     // Backend MessageResponse: {success, message, data: {caption: "..."}}
     final nested = data['data'] as Map<String, dynamic>?;
     return nested?['caption'] as String? ?? '';
   }
-
-
 
   // --- Epic 3: Wardrobe & AI Stylist ---
   Future<List<dynamic>> getClothes(String userId) async {
@@ -547,7 +561,8 @@ class ApiService {
     }
   }
 
-  Future<dynamic> getOutfit(String userId, String event, String weather, String style) async {
+  Future<dynamic> getOutfit(
+      String userId, String event, String weather, String style) async {
     return await _post('/wardrobe/outfit/suggest', {
       'user_id': userId,
       'etkinlik': event,
@@ -558,7 +573,8 @@ class ApiService {
 
   // ─── 2FA Yardımcı Metodları ────────────────────────────────
   /// 2FA setup/verify için POST isteği — Map döner
-  Future<Map<String, dynamic>> post2FA(String endpoint, Map<String, dynamic> body) async {
+  Future<Map<String, dynamic>> post2FA(
+      String endpoint, Map<String, dynamic> body) async {
     return await _post(endpoint, body);
   }
 
@@ -573,7 +589,8 @@ class ApiService {
         _throwError(response);
       }
     } on SocketException {
-      throw ApiException('Bağlantı hatası. İnternet bağlantınızı kontrol edin.');
+      throw ApiException(
+          'Bağlantı hatası. İnternet bağlantınızı kontrol edin.');
     } on TimeoutException {
       throw ApiException('İstek zaman aşımına uğradı.');
     } catch (e) {
@@ -592,8 +609,10 @@ class ApiService {
     return await _post('/auth/2fa/setup', {'user_id': userId});
   }
 
-  Future<Map<String, dynamic>> verify2FASetup(String userId, String code) async {
-    return await _post('/auth/2fa/verify-setup', {'user_id': userId, 'code': code});
+  Future<Map<String, dynamic>> verify2FASetup(
+      String userId, String code) async {
+    return await _post(
+        '/auth/2fa/verify-setup', {'user_id': userId, 'code': code});
   }
 
   Future<Map<String, dynamic>> login2FA(String userId, String code) async {
@@ -634,7 +653,8 @@ class ApiService {
     return await _put('/notifications/read-all?user_id=$userId', {});
   }
 
-  Future<Map<String, dynamic>> markNotificationRead(String notificationId) async {
+  Future<Map<String, dynamic>> markNotificationRead(
+      String notificationId) async {
     return await _put('/notifications/$notificationId/read', {});
   }
 

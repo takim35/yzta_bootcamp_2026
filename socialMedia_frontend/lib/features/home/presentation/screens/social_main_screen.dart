@@ -33,13 +33,16 @@ class _SocialMainScreenState extends ConsumerState<SocialMainScreen> {
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
-          border: Border(top: BorderSide(color: Theme.of(context).dividerColor, width: 0.5)),
+          border: Border(
+              top: BorderSide(
+                  color: Theme.of(context).dividerColor, width: 0.5)),
         ),
         child: BottomNavigationBar(
           backgroundColor: Theme.of(context).colorScheme.surface,
           currentIndex: _currentIndex,
           selectedItemColor: Colors.white,
-          unselectedItemColor: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
+          unselectedItemColor:
+              Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
           showSelectedLabels: true,
           showUnselectedLabels: true,
           type: BottomNavigationBarType.fixed,

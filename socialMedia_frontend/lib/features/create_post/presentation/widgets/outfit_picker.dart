@@ -70,17 +70,13 @@ class _OutfitCard extends ConsumerWidget {
                 height: 80,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-                  border: Border.all(
-                    color: isSelected
-                        ? Theme.of(context).colorScheme.primary
-                        : Theme.of(context).dividerColor,
-                    width: isSelected ? 2.5 : 1,
-                  ),
                   boxShadow: isSelected
                       ? [
                           BoxShadow(
-                            color:
-                                Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .primary
+                                .withValues(alpha: 0.3),
                             blurRadius: 12,
                             offset: const Offset(0, 4),
                           ),
@@ -113,7 +109,9 @@ class _OutfitCard extends ConsumerWidget {
                           color: Theme.of(context).colorScheme.surface,
                           child: Icon(
                             Icons.checkroom_rounded,
-                            color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
+                            color:
+                                Theme.of(context).textTheme.bodySmall?.color ??
+                                    Colors.grey,
                             size: 28,
                           ),
                         ),
@@ -122,7 +120,10 @@ class _OutfitCard extends ConsumerWidget {
                       if (isSelected)
                         Container(
                           decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .primary
+                                .withValues(alpha: 0.3),
                           ),
                           child: const Center(
                             child: Icon(
@@ -143,10 +144,10 @@ class _OutfitCard extends ConsumerWidget {
                 style: TextStyle(
                   color: isSelected
                       ? AppTheme.accentPurple
-                      : Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
+                      : Theme.of(context).textTheme.bodyMedium?.color ??
+                          Colors.grey,
                   fontSize: 11,
-                  fontWeight:
-                      isSelected ? FontWeight.w600 : FontWeight.w400,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                 ),
                 textAlign: TextAlign.center,
                 maxLines: 1,

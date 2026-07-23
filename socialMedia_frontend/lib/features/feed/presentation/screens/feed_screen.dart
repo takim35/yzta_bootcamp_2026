@@ -92,8 +92,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                 top: AppTheme.spacingS,
                 bottom: AppTheme.spacingXXL * 3,
               ),
-              itemCount:
-                  provider.posts.length + (provider.hasMore ? 1 : 0),
+              itemCount: provider.posts.length + (provider.hasMore ? 1 : 0),
               itemBuilder: (context, index) {
                 // Son eleman: loading göstergesi
                 if (index == provider.posts.length) {
@@ -159,7 +158,8 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
             color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
           ),
           onPressed: () {
-            NotificationsBottomSheet.show(context, currentUserId: currentUserId);
+            NotificationsBottomSheet.show(context,
+                currentUserId: currentUserId);
           },
           tooltip: 'Bildirimler',
         ),

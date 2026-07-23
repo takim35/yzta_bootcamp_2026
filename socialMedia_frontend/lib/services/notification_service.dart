@@ -30,7 +30,8 @@ class NotificationService {
       // Timezone bulunamazsa sistem saatini kullan
     }
 
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
     const iosSettings = DarwinInitializationSettings(
       requestAlertPermission: true,
       requestBadgePermission: true,
@@ -58,18 +59,16 @@ class NotificationService {
   // ─── İzin Kontrolü ──────────────────────────────────────────
   Future<bool> requestPermission() async {
     // Android 13+ için bildirim izni
-    final androidImpl = _notifications
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>();
+    final androidImpl = _notifications.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
     if (androidImpl != null) {
       final granted = await androidImpl.requestNotificationsPermission();
       return granted ?? false;
     }
 
     // iOS için
-    final iosImpl = _notifications
-        .resolvePlatformSpecificImplementation<
-            IOSFlutterLocalNotificationsPlugin>();
+    final iosImpl = _notifications.resolvePlatformSpecificImplementation<
+        IOSFlutterLocalNotificationsPlugin>();
     if (iosImpl != null) {
       final granted = await iosImpl.requestPermissions(
         alert: true,
@@ -83,7 +82,8 @@ class NotificationService {
 
   // ─── Günlük Sabah Hatırlatıcısı ─────────────────────────────
   /// Her sabah 08:00'de kıyafet hatırlatma bildirimi gönderir
-  Future<void> scheduleDailyClothesReminder({int hour = 8, int minute = 0}) async {
+  Future<void> scheduleDailyClothesReminder(
+      {int hour = 8, int minute = 0}) async {
     if (!_initialized) await init();
 
     await _notifications.cancel(_dailyReminderId);
@@ -131,7 +131,8 @@ class NotificationService {
       payload: 'daily_reminder',
     );
 
-    debugPrint('Günlük hatırlatıcı ayarlandı: $hour:${minute.toString().padLeft(2, '0')}');
+    debugPrint(
+        'Günlük hatırlatıcı ayarlandı: $hour:${minute.toString().padLeft(2, '0')}');
   }
 
   /// Günlük hatırlatıcıyı iptal eder
@@ -142,7 +143,8 @@ class NotificationService {
 
   // ─── Düşük Stok Uyarısı ─────────────────────────────────────
   /// Temiz kıyafet sayısı eşiğin altına düştüğünde bildirim gönderir
-  Future<void> checkLowClothesCount(List<dynamic> clothes, {int threshold = 3}) async {
+  Future<void> checkLowClothesCount(List<dynamic> clothes,
+      {int threshold = 3}) async {
     if (!_initialized) await init();
 
     // Temiz kıyafetleri say

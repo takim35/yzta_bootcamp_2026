@@ -88,10 +88,10 @@ class _LikeButtonState extends ConsumerState<LikeButton>
                     key: ValueKey(widget.isLiked),
                     color: widget.isLiked
                         ? Theme.of(context).colorScheme.secondary
-                        : Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
+                        : Theme.of(context).textTheme.bodySmall?.color ??
+                            Colors.grey,
                     size: 24,
-                    semanticLabel:
-                        widget.isLiked ? 'Beğenildi' : 'Beğenilmedi',
+                    semanticLabel: widget.isLiked ? 'Beğenildi' : 'Beğenilmedi',
                   ),
                 ),
               ),
@@ -104,7 +104,8 @@ class _LikeButtonState extends ConsumerState<LikeButton>
                   style: TextStyle(
                     color: widget.isLiked
                         ? Theme.of(context).colorScheme.secondary
-                        : Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
+                        : Theme.of(context).textTheme.bodyMedium?.color ??
+                            Colors.grey,
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                   ),

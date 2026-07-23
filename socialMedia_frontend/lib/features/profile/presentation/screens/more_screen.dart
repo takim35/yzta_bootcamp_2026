@@ -32,7 +32,7 @@ class MoreScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 24),
-              
+
               // Profile Card
               GestureDetector(
                 onTap: () {
@@ -46,7 +46,6 @@ class MoreScreen extends ConsumerWidget {
                   decoration: BoxDecoration(
                     color: Theme.of(context).cardColor,
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Theme.of(context).dividerColor),
                   ),
                   child: Row(
                     children: [
@@ -56,9 +55,10 @@ class MoreScreen extends ConsumerWidget {
                         decoration: BoxDecoration(
                           color: Theme.of(context).colorScheme.surface,
                           shape: BoxShape.circle,
-                          border: Border.all(color: Theme.of(context).colorScheme.primary, width: 2),
                         ),
-                        child: Icon(Icons.person_rounded, color: Theme.of(context).colorScheme.primary, size: 32),
+                        child: Icon(Icons.person_rounded,
+                            color: Theme.of(context).colorScheme.primary,
+                            size: 32),
                       ),
                       SizedBox(width: 16),
                       Expanded(
@@ -77,65 +77,82 @@ class MoreScreen extends ConsumerWidget {
                             Text(
                               'Manage your account',
                               style: TextStyle(
-                                color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
+                                color: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall
+                                        ?.color ??
+                                    Colors.grey,
                                 fontSize: 13,
                               ),
                             ),
                           ],
                         ),
                       ),
-                      Icon(Icons.chevron_right_rounded, color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey),
+                      Icon(Icons.chevron_right_rounded,
+                          color: Theme.of(context).textTheme.bodySmall?.color ??
+                              Colors.grey),
                     ],
                   ),
                 ),
               ),
-              
+
               const SizedBox(height: 32),
-              
+
               Text(
                 strings.settings,
                 style: TextStyle(
-                  color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+                  color: Theme.of(context).textTheme.bodyLarge?.color ??
+                      Colors.white,
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
               ),
               const SizedBox(height: 16),
-              
+
               Container(
                 decoration: BoxDecoration(
                   color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Theme.of(context).dividerColor),
                 ),
                 child: Column(
                   children: [
-                    _SettingsTile(title: 'Style Preferences', icon: Icons.palette_rounded, onTap: () {}),
-                    Divider(height: 1, color: Theme.of(context).dividerColor),
-                    _SettingsTile(title: 'Location & Timezone', icon: Icons.location_on_rounded, onTap: () {}),
-                    Divider(height: 1, color: Theme.of(context).dividerColor),
-                    _SettingsTile(title: 'Outfit Schedule', icon: Icons.calendar_today_rounded, onTap: () {}),
+                    _SettingsTile(
+                        title: 'Style Preferences',
+                        icon: Icons.palette_rounded,
+                        onTap: () {}),
                     Divider(height: 1, color: Theme.of(context).dividerColor),
                     _SettingsTile(
-                      title: strings.language, 
-                      icon: Icons.language_rounded, 
-                      onTap: () {
-                        _showLanguageDialog(context, ref);
-                      }
-                    ),
+                        title: 'Location & Timezone',
+                        icon: Icons.location_on_rounded,
+                        onTap: () {}),
                     Divider(height: 1, color: Theme.of(context).dividerColor),
                     _SettingsTile(
-                      title: strings.bodyMeasurements, 
-                      icon: Icons.straighten_rounded, 
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const BodyMeasurementScreen()),
-                        );
-                      }
-                    ),
+                        title: 'Outfit Schedule',
+                        icon: Icons.calendar_today_rounded,
+                        onTap: () {}),
                     Divider(height: 1, color: Theme.of(context).dividerColor),
-                    _SettingsTile(title: 'Subscription', icon: Icons.credit_card_rounded, onTap: () {}),
+                    _SettingsTile(
+                        title: strings.language,
+                        icon: Icons.language_rounded,
+                        onTap: () {
+                          _showLanguageDialog(context, ref);
+                        }),
+                    Divider(height: 1, color: Theme.of(context).dividerColor),
+                    _SettingsTile(
+                        title: strings.bodyMeasurements,
+                        icon: Icons.straighten_rounded,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const BodyMeasurementScreen()),
+                          );
+                        }),
+                    Divider(height: 1, color: Theme.of(context).dividerColor),
+                    _SettingsTile(
+                        title: 'Subscription',
+                        icon: Icons.credit_card_rounded,
+                        onTap: () {}),
                   ],
                 ),
               ),
@@ -146,9 +163,10 @@ class MoreScreen extends ConsumerWidget {
                 decoration: BoxDecoration(
                   color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Theme.of(context).dividerColor),
                 ),
-                child: _SettingsAppearance(title: strings.theme, icon: Icons.brightness_medium_rounded),
+                child: _SettingsAppearance(
+                    title: strings.theme,
+                    icon: Icons.brightness_medium_rounded),
               ),
 
               const SizedBox(height: 16),
@@ -157,7 +175,6 @@ class MoreScreen extends ConsumerWidget {
                 decoration: BoxDecoration(
                   color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Theme.of(context).dividerColor),
                 ),
                 child: _SettingsTile(
                   title: strings.logout,
@@ -175,13 +192,20 @@ class MoreScreen extends ConsumerWidget {
                 decoration: BoxDecoration(
                   color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Theme.of(context).dividerColor),
                 ),
                 child: Column(
                   children: [
-                    _SettingsTile(title: 'Terms of Use', icon: Icons.description_rounded, hasExternalIcon: true, onTap: () {}),
+                    _SettingsTile(
+                        title: 'Terms of Use',
+                        icon: Icons.description_rounded,
+                        hasExternalIcon: true,
+                        onTap: () {}),
                     Divider(height: 1, color: Theme.of(context).dividerColor),
-                    _SettingsTile(title: 'Privacy Policy', icon: Icons.security_rounded, hasExternalIcon: true, onTap: () {}),
+                    _SettingsTile(
+                        title: 'Privacy Policy',
+                        icon: Icons.security_rounded,
+                        hasExternalIcon: true,
+                        onTap: () {}),
                     Divider(height: 1, color: Theme.of(context).dividerColor),
                     _SettingsTile(
                       title: 'Delete Account',
@@ -214,7 +238,10 @@ class MoreScreen extends ConsumerWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: Theme.of(context).cardColor,
-        title: Text(ref.watch(stringsProvider).languageTitle, style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white)),
+        title: Text(ref.watch(stringsProvider).languageTitle,
+            style: TextStyle(
+                color: Theme.of(context).textTheme.bodyLarge?.color ??
+                    Colors.white)),
         content: SizedBox(
           width: double.maxFinite,
           child: ListView.builder(
@@ -223,9 +250,14 @@ class MoreScreen extends ConsumerWidget {
             itemBuilder: (context, index) {
               final lang = languages[index];
               return ListTile(
-                title: Text(lang['name'] as String, style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey)),
+                title: Text(lang['name'] as String,
+                    style: TextStyle(
+                        color: Theme.of(context).textTheme.bodyMedium?.color ??
+                            Colors.grey)),
                 onTap: () {
-                  ref.read(localeProvider.notifier).setLocale(lang['locale'] as AppLocale);
+                  ref
+                      .read(localeProvider.notifier)
+                      .setLocale(lang['locale'] as AppLocale);
                   Navigator.pop(context);
                 },
               );
@@ -261,18 +293,25 @@ class _SettingsTile extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         child: Row(
-          mainAxisAlignment: isCenter ? MainAxisAlignment.center : MainAxisAlignment.start,
+          mainAxisAlignment:
+              isCenter ? MainAxisAlignment.center : MainAxisAlignment.start,
           children: [
             Icon(
               icon,
               size: 20,
-              color: isDestructive ? Theme.of(context).colorScheme.error : Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
+              color: isDestructive
+                  ? Theme.of(context).colorScheme.error
+                  : Theme.of(context).textTheme.bodyMedium?.color ??
+                      Colors.grey,
             ),
             const SizedBox(width: 16),
             Text(
               title,
               style: TextStyle(
-                color: isDestructive ? Theme.of(context).colorScheme.error : Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+                color: isDestructive
+                    ? Theme.of(context).colorScheme.error
+                    : Theme.of(context).textTheme.bodyLarge?.color ??
+                        Colors.white,
                 fontSize: 15,
                 fontWeight: FontWeight.w500,
               ),
@@ -280,8 +319,11 @@ class _SettingsTile extends StatelessWidget {
             if (!isCenter) const Spacer(),
             if (!isCenter)
               Icon(
-                hasExternalIcon ? Icons.open_in_new_rounded : Icons.chevron_right_rounded,
-                color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
+                hasExternalIcon
+                    ? Icons.open_in_new_rounded
+                    : Icons.chevron_right_rounded,
+                color:
+                    Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
                 size: 18,
               ),
           ],
@@ -301,7 +343,7 @@ class _SettingsAppearance extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final strings = ref.watch(stringsProvider);
     final currentTheme = ref.watch(themeProvider);
-    
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       child: Column(
@@ -309,12 +351,16 @@ class _SettingsAppearance extends ConsumerWidget {
         children: [
           Row(
             children: [
-              Icon(icon, size: 20, color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+              Icon(icon,
+                  size: 20,
+                  color: Theme.of(context).textTheme.bodyMedium?.color ??
+                      Colors.grey),
               SizedBox(width: 16),
               Text(
                 title,
                 style: TextStyle(
-                  color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+                  color: Theme.of(context).textTheme.bodyLarge?.color ??
+                      Colors.white,
                   fontSize: 15,
                   fontWeight: FontWeight.w500,
                 ),
@@ -325,25 +371,31 @@ class _SettingsAppearance extends ConsumerWidget {
           Row(
             children: [
               Expanded(
-                child: GestureDetector(
-                  onTap: () => ref.read(themeProvider.notifier).setTheme(ThemeMode.system),
-                  child: _SegmentItem(label: strings.systemTheme, isSelected: currentTheme == ThemeMode.system),
-                )
-              ),
+                  child: GestureDetector(
+                onTap: () =>
+                    ref.read(themeProvider.notifier).setTheme(ThemeMode.system),
+                child: _SegmentItem(
+                    label: strings.systemTheme,
+                    isSelected: currentTheme == ThemeMode.system),
+              )),
               const SizedBox(width: 8),
               Expanded(
-                child: GestureDetector(
-                  onTap: () => ref.read(themeProvider.notifier).setTheme(ThemeMode.light),
-                  child: _SegmentItem(label: strings.lightTheme, isSelected: currentTheme == ThemeMode.light),
-                )
-              ),
+                  child: GestureDetector(
+                onTap: () =>
+                    ref.read(themeProvider.notifier).setTheme(ThemeMode.light),
+                child: _SegmentItem(
+                    label: strings.lightTheme,
+                    isSelected: currentTheme == ThemeMode.light),
+              )),
               const SizedBox(width: 8),
               Expanded(
-                child: GestureDetector(
-                  onTap: () => ref.read(themeProvider.notifier).setTheme(ThemeMode.dark),
-                  child: _SegmentItem(label: strings.darkTheme, isSelected: currentTheme == ThemeMode.dark),
-                )
-              ),
+                  child: GestureDetector(
+                onTap: () =>
+                    ref.read(themeProvider.notifier).setTheme(ThemeMode.dark),
+                child: _SegmentItem(
+                    label: strings.darkTheme,
+                    isSelected: currentTheme == ThemeMode.dark),
+              )),
             ],
           ),
         ],
@@ -365,16 +417,14 @@ class _SegmentItem extends StatelessWidget {
       decoration: BoxDecoration(
         color: isSelected ? Theme.of(context).dividerColor : Colors.transparent,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: isSelected ? Colors.white : Theme.of(context).dividerColor,
-          width: 0.5,
-        ),
       ),
       child: Center(
         child: Text(
           label,
           style: TextStyle(
-            color: isSelected ? Colors.white : Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
+            color: isSelected
+                ? Colors.white
+                : Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
             fontSize: 13,
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
           ),

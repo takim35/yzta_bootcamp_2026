@@ -28,35 +28,35 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
   late Animation<double> _fadeAnimation;
 
   List<Map<String, dynamic>> _getPages(AppStrings s) => [
-    {
-      'title': s.onbWardrobeTitle,
-      'subtitle': s.onbWardrobeSub,
-      'icon': Icons.checkroom_rounded,
-      'color': Color(0xFF7C3AED),
-      'bgIcon': Icons.style_rounded,
-    },
-    {
-      'title': s.onbARTitle,
-      'subtitle': s.onbARSub,
-      'icon': Icons.camera_enhance_rounded,
-      'color': Color(0xFFDB2777),
-      'bgIcon': Icons.view_in_ar_rounded,
-    },
-    {
-      'title': s.onbAITitle,
-      'subtitle': s.onbAISub,
-      'icon': Icons.auto_awesome_rounded,
-      'color': Color(0xFF0EA5E9),
-      'bgIcon': Icons.psychology_rounded,
-    },
-    {
-      'title': s.onbSocialTitle,
-      'subtitle': s.onbSocialSub,
-      'icon': Icons.diversity_3_rounded,
-      'color': Color(0xFF10B981),
-      'bgIcon': Icons.group_rounded,
-    },
-  ];
+        {
+          'title': s.onbWardrobeTitle,
+          'subtitle': s.onbWardrobeSub,
+          'icon': Icons.checkroom_rounded,
+          'color': Color(0xFF7C3AED),
+          'bgIcon': Icons.style_rounded,
+        },
+        {
+          'title': s.onbARTitle,
+          'subtitle': s.onbARSub,
+          'icon': Icons.camera_enhance_rounded,
+          'color': Color(0xFFDB2777),
+          'bgIcon': Icons.view_in_ar_rounded,
+        },
+        {
+          'title': s.onbAITitle,
+          'subtitle': s.onbAISub,
+          'icon': Icons.auto_awesome_rounded,
+          'color': Color(0xFF0EA5E9),
+          'bgIcon': Icons.psychology_rounded,
+        },
+        {
+          'title': s.onbSocialTitle,
+          'subtitle': s.onbSocialSub,
+          'icon': Icons.diversity_3_rounded,
+          'color': Color(0xFF10B981),
+          'bgIcon': Icons.group_rounded,
+        },
+      ];
 
   @override
   void initState() {
@@ -117,13 +117,19 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
           s.isTr ? 'İzinler Gerekli' : 'Permissions Required',
-          style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              color:
+                  Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+              fontWeight: FontWeight.bold),
         ),
         content: Text(
-          s.isTr 
-              ? 'Dijital Gardrop deneyimini tam anlamıyla yaşayabilmen için kamerana ve fotoğraf galerine erişim iznine ihtiyacımız var. (Kıyafetlerini yükleyebilmen için)' 
+          s.isTr
+              ? 'Dijital Gardrop deneyimini tam anlamıyla yaşayabilmen için kamerana ve fotoğraf galerine erişim iznine ihtiyacımız var. (Kıyafetlerini yükleyebilmen için)'
               : 'To fully experience Digital Wardrobe, we need access to your camera and photo gallery. (So you can upload your clothes)',
-          style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey, height: 1.4),
+          style: TextStyle(
+              color:
+                  Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
+              height: 1.4),
         ),
         actions: [
           TextButton(
@@ -132,12 +138,16 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
               AnalyticsService().logEvent('permission_prompt_skipped');
               _finishOnboarding();
             },
-            child: Text(s.isTr ? 'Atla' : 'Skip', style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey)),
+            child: Text(s.isTr ? 'Atla' : 'Skip',
+                style: TextStyle(
+                    color: Theme.of(context).textTheme.bodySmall?.color ??
+                        Colors.grey)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.primary,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
             ),
             onPressed: () async {
               Navigator.pop(ctx);
@@ -151,7 +161,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
               ].request();
               _finishOnboarding();
             },
-            child: Text(s.isTr ? 'İzin Ver' : 'Allow', style: TextStyle(color: Colors.white)),
+            child: Text(s.isTr ? 'İzin Ver' : 'Allow',
+                style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -273,7 +284,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                         child: Text(
                           s.skip,
                           style: TextStyle(
-                            color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
+                            color:
+                                Theme.of(context).textTheme.bodyMedium?.color ??
+                                    Colors.grey,
                             fontSize: 15,
                             fontWeight: FontWeight.w500,
                           ),
@@ -361,32 +374,40 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                         return FadeTransition(
                           opacity: _fadeAnimation,
                           child: SingleChildScrollView(
-                              child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
-                                p['title'] as String,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.w800,
-                                  color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
-                                  height: 1.15,
-                                  letterSpacing: -0.5,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  p['title'] as String,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 28,
+                                    fontWeight: FontWeight.w800,
+                                    color: Theme.of(context)
+                                            .textTheme
+                                            .bodyLarge
+                                            ?.color ??
+                                        Colors.white,
+                                    height: 1.15,
+                                    letterSpacing: -0.5,
+                                  ),
                                 ),
-                              ),
-                              SizedBox(height: 16),
-                              Text(
-                                p['subtitle'] as String,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
-                                  height: 1.6,
+                                SizedBox(height: 16),
+                                Text(
+                                  p['subtitle'] as String,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Theme.of(context)
+                                            .textTheme
+                                            .bodyMedium
+                                            ?.color ??
+                                        Colors.grey,
+                                    height: 1.6,
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
+                              ],
+                            ),
                           ),
                         );
                       },

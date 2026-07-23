@@ -32,17 +32,42 @@ class _EditItemScreenState extends ConsumerState<EditItemScreen> {
   final _markaCtrl = TextEditingController();
   final _bedenCtrl = TextEditingController();
 
-  final List<String> _turler = ['Üst Giyim', 'Alt Giyim', 'Dış Giyim', 'Elbise', 'Ayakkabı', 'Aksesuar', 'Çanta'];
-  final List<String> _renkler = ['Siyah', 'Beyaz', 'Kırmızı', 'Mavi', 'Yeşil', 'Sarı', 'Gri', 'Kahverengi', 'Çok Renkli'];
-  final List<String> _mevsimler = ['İlkbahar', 'Yaz', 'Sonbahar', 'Kış', 'Tüm Sezon'];
+  final List<String> _turler = [
+    'Üst Giyim',
+    'Alt Giyim',
+    'Dış Giyim',
+    'Elbise',
+    'Ayakkabı',
+    'Aksesuar',
+    'Çanta'
+  ];
+  final List<String> _renkler = [
+    'Siyah',
+    'Beyaz',
+    'Kırmızı',
+    'Mavi',
+    'Yeşil',
+    'Sarı',
+    'Gri',
+    'Kahverengi',
+    'Çok Renkli'
+  ];
+  final List<String> _mevsimler = [
+    'İlkbahar',
+    'Yaz',
+    'Sonbahar',
+    'Kış',
+    'Tüm Sezon'
+  ];
 
   @override
   void initState() {
     super.initState();
     _tur = _ensureValidDropdownValue(widget.initialItem['tur'], _turler);
     _renk = _ensureValidDropdownValue(widget.initialItem['renk'], _renkler);
-    _mevsim = _ensureValidDropdownValue(widget.initialItem['mevsim'], _mevsimler);
-    
+    _mevsim =
+        _ensureValidDropdownValue(widget.initialItem['mevsim'], _mevsimler);
+
     _markaCtrl.text = widget.initialItem['marka'] ?? '';
     _bedenCtrl.text = widget.initialItem['beden'] ?? '';
   }
@@ -115,16 +140,25 @@ class _EditItemScreenState extends ConsumerState<EditItemScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: Theme.of(context).cardColor,
-        title: Text('Delete Clothing', style: TextStyle(color: Theme.of(context).colorScheme.error)),
-        content: Text('Are you sure you want to delete this clothing from your wardrobe?', style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white)),
+        title: Text('Delete Clothing',
+            style: TextStyle(color: Theme.of(context).colorScheme.error)),
+        content: Text(
+            'Are you sure you want to delete this clothing from your wardrobe?',
+            style: TextStyle(
+                color: Theme.of(context).textTheme.bodyLarge?.color ??
+                    Colors.white)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: Text('Cancel', style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey)),
+            child: Text('Cancel',
+                style: TextStyle(
+                    color: Theme.of(context).textTheme.bodySmall?.color ??
+                        Colors.grey)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text('Delete', style: TextStyle(color: Theme.of(context).colorScheme.error)),
+            child: Text('Delete',
+                style: TextStyle(color: Theme.of(context).colorScheme.error)),
           ),
         ],
       ),
@@ -161,16 +195,24 @@ class _EditItemScreenState extends ConsumerState<EditItemScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: Icon(Icons.camera_alt_rounded, color: Theme.of(context).colorScheme.primary),
-              title: Text('Camera', style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white)),
+              leading: Icon(Icons.camera_alt_rounded,
+                  color: Theme.of(context).colorScheme.primary),
+              title: Text('Camera',
+                  style: TextStyle(
+                      color: Theme.of(context).textTheme.bodyLarge?.color ??
+                          Colors.white)),
               onTap: () {
                 Navigator.pop(context);
                 _pickImage(ImageSource.camera);
               },
             ),
             ListTile(
-              leading: Icon(Icons.photo_library_rounded, color: Theme.of(context).colorScheme.secondary),
-              title: Text('Photo Library', style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white)),
+              leading: Icon(Icons.photo_library_rounded,
+                  color: Theme.of(context).colorScheme.secondary),
+              title: Text('Photo Library',
+                  style: TextStyle(
+                      color: Theme.of(context).textTheme.bodyLarge?.color ??
+                          Colors.white)),
               onTap: () {
                 Navigator.pop(context);
                 _pickImage(ImageSource.gallery);
@@ -189,28 +231,47 @@ class _EditItemScreenState extends ConsumerState<EditItemScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text(s.isTr ? 'Kıyafeti Düzenle' : 'Edit Clothing', style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white)),
+        title: Text(s.isTr ? 'Kıyafeti Düzenle' : 'Edit Clothing',
+            style: TextStyle(
+                color: Theme.of(context).textTheme.bodyLarge?.color ??
+                    Colors.white)),
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
-        iconTheme: IconThemeData(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
+        iconTheme: IconThemeData(
+            color:
+                Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
         actions: [
-          _isDeleting 
-            ? Padding(padding: EdgeInsets.all(16), child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Theme.of(context).colorScheme.error, strokeWidth: 2)))
-            : IconButton(
-                icon: Icon(Icons.delete_outline, color: Theme.of(context).colorScheme.error),
-                onPressed: _deleteItem,
-              ),
+          _isDeleting
+              ? Padding(
+                  padding: EdgeInsets.all(16),
+                  child: SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                          color: Theme.of(context).colorScheme.error,
+                          strokeWidth: 2)))
+              : IconButton(
+                  icon: Icon(Icons.delete_outline,
+                      color: Theme.of(context).colorScheme.error),
+                  onPressed: _deleteItem,
+                ),
           _isLoading
               ? Padding(
                   padding: EdgeInsets.all(16),
                   child: SizedBox(
-                    width: 20, height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: Theme.of(context).colorScheme.primary),
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Theme.of(context).colorScheme.primary),
                   ),
                 )
               : TextButton(
                   onPressed: _submit,
-                  child: Text(s.isTr ? 'Kaydet' : 'Save', style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold)),
+                  child: Text(s.isTr ? 'Kaydet' : 'Save',
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontWeight: FontWeight.bold)),
                 ),
         ],
       ),
@@ -227,43 +288,75 @@ class _EditItemScreenState extends ConsumerState<EditItemScreen> {
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Theme.of(context).dividerColor, width: 2),
                 ),
                 child: _selectedImage != null
-                    ? ClipRRect(borderRadius: BorderRadius.circular(14), child: Image.file(_selectedImage!, fit: BoxFit.cover))
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(14),
+                        child: Image.file(_selectedImage!, fit: BoxFit.cover))
                     : (fotoUrl != null && fotoUrl.isNotEmpty)
-                        ? ClipRRect(borderRadius: BorderRadius.circular(14), child: Image.network(fotoUrl, fit: BoxFit.cover))
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(14),
+                            child: Image.network(fotoUrl, fit: BoxFit.cover))
                         : Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.add_photo_alternate_rounded, size: 52, color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.7)),
+                              Icon(Icons.add_photo_alternate_rounded,
+                                  size: 52,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .primary
+                                      .withValues(alpha: 0.7)),
                               const SizedBox(height: 12),
-                              Text(s.isTr ? 'Fotoğraf değiştir' : 'Change photo', style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey, fontSize: 15)),
+                              Text(
+                                  s.isTr ? 'Fotoğraf değiştir' : 'Change photo',
+                                  style: TextStyle(
+                                      color: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall
+                                              ?.color ??
+                                          Colors.grey,
+                                      fontSize: 15)),
                             ],
                           ),
               ),
             ),
             const SizedBox(height: 24),
             const _SectionLabel(text: 'Type *'),
-            _ChipsField(value: _tur, items: _turler, onChanged: (v) => setState(() => _tur = v), displayTranslator: (val) => s.translateWardrobe(val)),
+            _ChipsField(
+                value: _tur,
+                items: _turler,
+                onChanged: (v) => setState(() => _tur = v),
+                displayTranslator: (val) => s.translateWardrobe(val)),
             const SizedBox(height: 16),
             const _SectionLabel(text: 'Color *'),
-            _ChipsField(value: _renk, items: _renkler, onChanged: (v) => setState(() => _renk = v), displayTranslator: (val) => s.translateWardrobe(val)),
+            _ChipsField(
+                value: _renk,
+                items: _renkler,
+                onChanged: (v) => setState(() => _renk = v),
+                displayTranslator: (val) => s.translateWardrobe(val)),
             const SizedBox(height: 16),
             const _SectionLabel(text: 'Season'),
-            _ChipsField(value: _mevsim, items: _mevsimler, onChanged: (v) => setState(() => _mevsim = v), displayTranslator: (val) => s.translateWardrobe(val)),
+            _ChipsField(
+                value: _mevsim,
+                items: _mevsimler,
+                onChanged: (v) => setState(() => _mevsim = v),
+                displayTranslator: (val) => s.translateWardrobe(val)),
             const SizedBox(height: 16),
             const _SectionLabel(text: 'Brand'),
             TextField(
               controller: _markaCtrl,
-              style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
+              style: TextStyle(
+                  color: Theme.of(context).textTheme.bodyLarge?.color ??
+                      Colors.white),
               decoration: _inputDeco('Enter brand'),
             ),
             const SizedBox(height: 16),
             const _SectionLabel(text: 'Size'),
             TextField(
               controller: _bedenCtrl,
-              style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
+              style: TextStyle(
+                  color: Theme.of(context).textTheme.bodyLarge?.color ??
+                      Colors.white),
               decoration: _inputDeco('Size (e.g. M, 38)'),
             ),
             const SizedBox(height: 40),
@@ -276,7 +369,8 @@ class _EditItemScreenState extends ConsumerState<EditItemScreen> {
   InputDecoration _inputDeco(String hint) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey),
+      hintStyle: TextStyle(
+          color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey),
       filled: true,
       fillColor: Theme.of(context).colorScheme.surface,
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -295,7 +389,11 @@ class _SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8, left: 4),
-      child: Text(text, style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white, fontWeight: FontWeight.bold)),
+      child: Text(text,
+          style: TextStyle(
+              color:
+                  Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+              fontWeight: FontWeight.bold)),
     );
   }
 }
@@ -325,16 +423,19 @@ class _ChipsField extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.surface,
+              color: isSelected
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).dividerColor,
-              ),
             ),
             child: Text(
               displayTranslator != null ? displayTranslator!(item) : item,
               style: TextStyle(
-                color: isSelected ? Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white : Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+                color: isSelected
+                    ? Theme.of(context).textTheme.bodyLarge?.color ??
+                        Colors.white
+                    : Theme.of(context).textTheme.bodyLarge?.color ??
+                        Colors.white,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 fontSize: 13,
               ),

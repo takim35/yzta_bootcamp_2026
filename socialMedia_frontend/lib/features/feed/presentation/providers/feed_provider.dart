@@ -181,7 +181,8 @@ class FeedProvider extends ChangeNotifier {
   }
 
   Future<void> updatePost(String postId, String caption) async {
-    await _api.updatePost(postId: postId, userId: currentUserId, caption: caption);
+    await _api.updatePost(
+        postId: postId, userId: currentUserId, caption: caption);
     final index = _posts.indexWhere((p) => p.postId == postId);
     if (index != -1) {
       _posts[index] = _posts[index].copyWith(caption: caption);

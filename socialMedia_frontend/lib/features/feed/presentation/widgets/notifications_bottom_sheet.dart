@@ -29,7 +29,8 @@ class NotificationsBottomSheet extends StatefulWidget {
   }
 
   @override
-  State<NotificationsBottomSheet> createState() => _NotificationsBottomSheetState();
+  State<NotificationsBottomSheet> createState() =>
+      _NotificationsBottomSheetState();
 }
 
 class _NotificationsBottomSheetState extends State<NotificationsBottomSheet> {
@@ -88,7 +89,8 @@ class _NotificationsBottomSheetState extends State<NotificationsBottomSheet> {
     try {
       await _api.markNotificationRead(notificationId);
       setState(() {
-        final index = _notifications.indexWhere((n) => n['notification_id'] == notificationId);
+        final index = _notifications
+            .indexWhere((n) => n['notification_id'] == notificationId);
         if (index != -1) {
           _notifications[index]['is_read'] = 1;
         }
@@ -123,7 +125,8 @@ class _NotificationsBottomSheetState extends State<NotificationsBottomSheet> {
                   Text(
                     'Bildirimler 🔔',
                     style: TextStyle(
-                      color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+                      color: Theme.of(context).textTheme.bodyLarge?.color ??
+                          Colors.white,
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
                     ),
@@ -154,7 +157,8 @@ class _NotificationsBottomSheetState extends State<NotificationsBottomSheet> {
   Widget _buildBody() {
     if (_isLoading) {
       return Center(
-        child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary),
+        child: CircularProgressIndicator(
+            color: Theme.of(context).colorScheme.primary),
       );
     }
 
@@ -172,11 +176,17 @@ class _NotificationsBottomSheetState extends State<NotificationsBottomSheet> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.notifications_off_outlined, size: 48, color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey),
+            Icon(Icons.notifications_off_outlined,
+                size: 48,
+                color: Theme.of(context).textTheme.bodySmall?.color ??
+                    Colors.grey),
             SizedBox(height: 12),
             Text(
               'Henüz bildirimin yok ✨',
-              style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey, fontSize: 15),
+              style: TextStyle(
+                  color: Theme.of(context).textTheme.bodyMedium?.color ??
+                      Colors.grey,
+                  fontSize: 15),
             ),
           ],
         ),
@@ -192,21 +202,28 @@ class _NotificationsBottomSheetState extends State<NotificationsBottomSheet> {
         final isRead = (notif['is_read'] as int? ?? 0) == 1;
         final type = notif['type'] as String? ?? 'like';
         final message = notif['message'] as String? ?? '';
-        final avatarUrl = ApiService.fixImageUrl(notif['actor_avatar_url'] as String?);
-        final actorName = notif['actor_display_name'] ?? notif['actor_username'] ?? '?';
+        final avatarUrl =
+            ApiService.fixImageUrl(notif['actor_avatar_url'] as String?);
+        final actorName =
+            notif['actor_display_name'] ?? notif['actor_username'] ?? '?';
 
         Widget iconBadge;
         if (type == 'like') {
-          iconBadge = const Icon(Icons.favorite_rounded, color: Colors.pinkAccent, size: 14);
+          iconBadge = const Icon(Icons.favorite_rounded,
+              color: Colors.pinkAccent, size: 14);
         } else if (type == 'comment') {
-          iconBadge = Icon(Icons.chat_bubble_rounded, color: Theme.of(context).colorScheme.primary, size: 14);
+          iconBadge = Icon(Icons.chat_bubble_rounded,
+              color: Theme.of(context).colorScheme.primary, size: 14);
         } else {
-          iconBadge = const Icon(Icons.person_add_rounded, color: Colors.blueAccent, size: 14);
+          iconBadge = const Icon(Icons.person_add_rounded,
+              color: Colors.blueAccent, size: 14);
         }
 
         return Container(
           decoration: BoxDecoration(
-            color: isRead ? Colors.transparent : Theme.of(context).cardColor.withOpacity(0.6),
+            color: isRead
+                ? Colors.transparent
+                : Theme.of(context).cardColor.withOpacity(0.6),
             borderRadius: BorderRadius.circular(12),
           ),
           child: ListTile(
@@ -220,11 +237,21 @@ class _NotificationsBottomSheetState extends State<NotificationsBottomSheet> {
                 CircleAvatar(
                   radius: 20,
                   backgroundColor: Theme.of(context).cardColor,
-                  backgroundImage: avatarUrl.isNotEmpty ? CachedNetworkImageProvider(avatarUrl) : null,
+                  backgroundImage: avatarUrl.isNotEmpty
+                      ? CachedNetworkImageProvider(avatarUrl)
+                      : null,
                   child: avatarUrl.isEmpty
                       ? Text(
-                          actorName.isNotEmpty ? actorName[0].toUpperCase() : '?',
-                          style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white, fontWeight: FontWeight.bold),
+                          actorName.isNotEmpty
+                              ? actorName[0].toUpperCase()
+                              : '?',
+                          style: TextStyle(
+                              color: Theme.of(context)
+                                      .textTheme
+                                      .bodyLarge
+                                      ?.color ??
+                                  Colors.white,
+                              fontWeight: FontWeight.bold),
                         )
                       : null,
                 ),
@@ -245,7 +272,8 @@ class _NotificationsBottomSheetState extends State<NotificationsBottomSheet> {
             title: Text(
               message,
               style: TextStyle(
-                color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+                color: Theme.of(context).textTheme.bodyLarge?.color ??
+                    Colors.white,
                 fontSize: 14,
                 fontWeight: isRead ? FontWeight.normal : FontWeight.w600,
               ),

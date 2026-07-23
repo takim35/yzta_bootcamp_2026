@@ -24,10 +24,10 @@ class WeatherService {
         return null; // Permissions are denied
       }
     }
-    
+
     if (permission == LocationPermission.deniedForever) {
       return null; // Permissions are permanently denied
-    } 
+    }
 
     return await Geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.low,

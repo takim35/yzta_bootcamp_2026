@@ -19,9 +19,9 @@ class TryOnComingSoonScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.surface,
                   shape: BoxShape.circle,
-                  border: Border.all(color: Theme.of(context).colorScheme.secondary, width: 2),
                 ),
-                child: Icon(Icons.auto_awesome_rounded, color: Theme.of(context).colorScheme.secondary, size: 48),
+                child: Icon(Icons.auto_awesome_rounded,
+                    color: Theme.of(context).colorScheme.secondary, size: 48),
               ),
               const SizedBox(height: 32),
               const Text(
@@ -37,23 +37,25 @@ class TryOnComingSoonScreen extends StatelessWidget {
                 'See how clothes fit on you virtually!\nThis feature is coming very soon.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
+                  color: Theme.of(context).textTheme.bodySmall?.color ??
+                      Colors.grey,
                   fontSize: 16,
                   height: 1.5,
                 ),
               ),
               const SizedBox(height: 48),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 decoration: BoxDecoration(
                   color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: Theme.of(context).dividerColor),
                 ),
                 child: Text(
                   'Stay Tuned 👀',
                   style: TextStyle(
-                    color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
+                    color: Theme.of(context).textTheme.bodyMedium?.color ??
+                        Colors.grey,
                     fontWeight: FontWeight.w600,
                   ),
                 ),

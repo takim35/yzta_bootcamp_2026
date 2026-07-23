@@ -73,14 +73,18 @@ class PostCard extends ConsumerWidget {
                           child: CachedNetworkImage(
                             imageUrl: post.avatarUrl,
                             fit: BoxFit.contain,
-                            placeholder: (context, url) => CircularProgressIndicator(color: Theme.of(context).colorScheme.primary),
+                            placeholder: (context, url) =>
+                                CircularProgressIndicator(
+                                    color:
+                                        Theme.of(context).colorScheme.primary),
                           ),
                         ),
                         Positioned(
                           top: 10,
                           right: 10,
                           child: IconButton(
-                            icon: const Icon(Icons.close, color: Colors.white, size: 30),
+                            icon: const Icon(Icons.close,
+                                color: Colors.white, size: 30),
                             onPressed: () => Navigator.pop(context),
                           ),
                         ),
@@ -96,7 +100,10 @@ class PostCard extends ConsumerWidget {
                 gradient: AppTheme.primaryGradient,
                 boxShadow: [
                   BoxShadow(
-                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .primary
+                        .withValues(alpha: 0.3),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -117,7 +124,9 @@ class PostCard extends ConsumerWidget {
                               ? post.username[0].toUpperCase()
                               : '?',
                           style: TextStyle(
-                            color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+                            color:
+                                Theme.of(context).textTheme.bodyLarge?.color ??
+                                    Colors.white,
                             fontWeight: FontWeight.w600,
                           ),
                         )
@@ -138,7 +147,8 @@ class PostCard extends ConsumerWidget {
                   Text(
                     post.username,
                     style: TextStyle(
-                      color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+                      color: Theme.of(context).textTheme.bodyLarge?.color ??
+                          Colors.white,
                       fontWeight: FontWeight.w600,
                       fontSize: 14,
                     ),
@@ -148,7 +158,8 @@ class PostCard extends ConsumerWidget {
                   Text(
                     post.timeAgo,
                     style: TextStyle(
-                      color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
+                      color: Theme.of(context).textTheme.bodySmall?.color ??
+                          Colors.grey,
                       fontSize: 12,
                     ),
                     semanticsLabel: 'Paylaşım zamanı: ${post.timeAgo}',
@@ -157,89 +168,124 @@ class PostCard extends ConsumerWidget {
               ),
             ),
           ),
-            // More options
-            IconButton(
-              icon: Icon(
-                Icons.more_horiz_rounded,
-                color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
-                size: 20,
-              ),
-              onPressed: () {
-                showModalBottomSheet(
-                  context: context,
-                  backgroundColor: Theme.of(context).colorScheme.surface,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                  ),
-                  builder: (context) => SafeArea(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const SizedBox(height: 8),
-                        Container(
-                          width: 40,
-                          height: 4,
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).dividerColor,
-                            borderRadius: BorderRadius.circular(2),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        if (isMine) ...[
-                          ListTile(
-                            leading: Icon(Icons.edit_rounded, color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
-                            title: Text('Düzenle', style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white)),
-                            onTap: () {
-                              Navigator.pop(context);
-                              _showEditDialog(context, ref);
-                            },
-                          ),
-                          ListTile(
-                            leading: Icon(Icons.delete_outline_rounded, color: Theme.of(context).colorScheme.error),
-                            title: Text('Sil', style: TextStyle(color: Theme.of(context).colorScheme.error)),
-                            onTap: () {
-                              Navigator.pop(context);
-                              _showDeleteConfirm(context, ref);
-                            },
-                          ),
-                        ] else ...[
-                          ListTile(
-                            leading: const Icon(Icons.favorite, color: Colors.pinkAccent),
-                            title: Text('İlgileniyorum', style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white)),
-                            onTap: () {
-                              Navigator.pop(context);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('İlgi alanlarınıza eklendi! ✨'),
-                                  backgroundColor: Colors.pinkAccent,
-                                ),
-                              );
-                            },
-                          ),
-                          ListTile(
-                            leading: Icon(Icons.visibility_off_outlined, color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey),
-                            title: Text('İlgilenmiyorum', style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white)),
-                            onTap: () {
-                              Navigator.pop(context);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Bu tarz gönderiler daha az gösterilecek.'),
-                                  backgroundColor: Theme.of(context).colorScheme.surface,
-                                ),
-                              );
-                            },
-                          ),
-                        ],
-                        const SizedBox(height: 16),
-                      ],
-                    ),
-                  ),
-                );
-              },
-              tooltip: 'Daha fazla',
+          // More options
+          IconButton(
+            icon: Icon(
+              Icons.more_horiz_rounded,
+              color:
+                  Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
+              size: 20,
             ),
-          ],
-        ),
+            onPressed: () {
+              showModalBottomSheet(
+                context: context,
+                backgroundColor: Theme.of(context).colorScheme.surface,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                ),
+                builder: (context) => SafeArea(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const SizedBox(height: 8),
+                      Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).dividerColor,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      if (isMine) ...[
+                        ListTile(
+                          leading: Icon(Icons.edit_rounded,
+                              color: Theme.of(context)
+                                      .textTheme
+                                      .bodyLarge
+                                      ?.color ??
+                                  Colors.white),
+                          title: Text('Düzenle',
+                              style: TextStyle(
+                                  color: Theme.of(context)
+                                          .textTheme
+                                          .bodyLarge
+                                          ?.color ??
+                                      Colors.white)),
+                          onTap: () {
+                            Navigator.pop(context);
+                            _showEditDialog(context, ref);
+                          },
+                        ),
+                        ListTile(
+                          leading: Icon(Icons.delete_outline_rounded,
+                              color: Theme.of(context).colorScheme.error),
+                          title: Text('Sil',
+                              style: TextStyle(
+                                  color: Theme.of(context).colorScheme.error)),
+                          onTap: () {
+                            Navigator.pop(context);
+                            _showDeleteConfirm(context, ref);
+                          },
+                        ),
+                      ] else ...[
+                        ListTile(
+                          leading: const Icon(Icons.favorite,
+                              color: Colors.pinkAccent),
+                          title: Text('İlgileniyorum',
+                              style: TextStyle(
+                                  color: Theme.of(context)
+                                          .textTheme
+                                          .bodyLarge
+                                          ?.color ??
+                                      Colors.white)),
+                          onTap: () {
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('İlgi alanlarınıza eklendi! ✨'),
+                                backgroundColor: Colors.pinkAccent,
+                              ),
+                            );
+                          },
+                        ),
+                        ListTile(
+                          leading: Icon(Icons.visibility_off_outlined,
+                              color: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.color ??
+                                  Colors.grey),
+                          title: Text('İlgilenmiyorum',
+                              style: TextStyle(
+                                  color: Theme.of(context)
+                                          .textTheme
+                                          .bodyLarge
+                                          ?.color ??
+                                      Colors.white)),
+                          onTap: () {
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                    'Bu tarz gönderiler daha az gösterilecek.'),
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.surface,
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                      const SizedBox(height: 16),
+                    ],
+                  ),
+                ),
+              );
+            },
+            tooltip: 'Daha fazla',
+          ),
+        ],
+      ),
     );
   }
 
@@ -260,7 +306,9 @@ class PostCard extends ConsumerWidget {
                       ? CachedNetworkImage(
                           imageUrl: post.imageUrl,
                           fit: BoxFit.contain,
-                          placeholder: (context, url) => CircularProgressIndicator(color: Theme.of(context).colorScheme.primary),
+                          placeholder: (context, url) =>
+                              CircularProgressIndicator(
+                                  color: Theme.of(context).colorScheme.primary),
                         )
                       : Image.file(File(post.imageUrl), fit: BoxFit.contain),
                 ),
@@ -268,7 +316,8 @@ class PostCard extends ConsumerWidget {
                   top: 10,
                   right: 10,
                   child: IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white, size: 30),
+                    icon:
+                        const Icon(Icons.close, color: Colors.white, size: 30),
                     onPressed: () => Navigator.pop(context),
                   ),
                 ),
@@ -281,64 +330,68 @@ class PostCard extends ConsumerWidget {
         aspectRatio: 4 / 5,
         child: post.imageUrl.startsWith('http')
             ? CachedNetworkImage(
-              imageUrl: post.imageUrl,
-              fit: BoxFit.cover,
-              placeholder: (context, url) => Container(
-                color: Theme.of(context).colorScheme.surface,
-                child: Center(
-                  child: CircularProgressIndicator(
-                    color: Theme.of(context).colorScheme.primary,
-                    strokeWidth: 2,
+                imageUrl: post.imageUrl,
+                fit: BoxFit.cover,
+                placeholder: (context, url) => Container(
+                  color: Theme.of(context).colorScheme.surface,
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      color: Theme.of(context).colorScheme.primary,
+                      strokeWidth: 2,
+                    ),
+                  ),
+                ),
+                errorWidget: (context, url, error) => Container(
+                  color: Theme.of(context).colorScheme.surface,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.broken_image_rounded,
+                        color: Theme.of(context).textTheme.bodySmall?.color ??
+                            Colors.grey,
+                        size: 48,
+                      ),
+                      SizedBox(height: AppTheme.spacingS),
+                      Text(
+                        'Görsel yüklenemedi',
+                        style: TextStyle(
+                          color: Theme.of(context).textTheme.bodySmall?.color ??
+                              Colors.grey,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            : Image.file(
+                File(post.imageUrl),
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => Container(
+                  color: Theme.of(context).colorScheme.surface,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.broken_image_rounded,
+                        color: Theme.of(context).textTheme.bodySmall?.color ??
+                            Colors.grey,
+                        size: 48,
+                      ),
+                      SizedBox(height: AppTheme.spacingS),
+                      Text(
+                        'Görsel bulunamadı',
+                        style: TextStyle(
+                          color: Theme.of(context).textTheme.bodySmall?.color ??
+                              Colors.grey,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-              errorWidget: (context, url, error) => Container(
-                color: Theme.of(context).colorScheme.surface,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.broken_image_rounded,
-                      color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
-                      size: 48,
-                    ),
-                    SizedBox(height: AppTheme.spacingS),
-                    Text(
-                      'Görsel yüklenemedi',
-                      style: TextStyle(
-                        color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            )
-          : Image.file(
-              File(post.imageUrl),
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => Container(
-                color: Theme.of(context).colorScheme.surface,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.broken_image_rounded,
-                      color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
-                      size: 48,
-                    ),
-                    SizedBox(height: AppTheme.spacingS),
-                    Text(
-                      'Görsel bulunamadı',
-                      style: TextStyle(
-                        color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
       ),
     );
   }
@@ -367,7 +420,8 @@ class PostCard extends ConsumerWidget {
                       children: [
                         Icon(
                           Icons.chat_bubble_outline_rounded,
-                          color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+                          color: Theme.of(context).textTheme.bodyLarge?.color ??
+                              Colors.white,
                           size: 24,
                         ),
                         if (post.commentsCount > 0) ...[
@@ -375,7 +429,11 @@ class PostCard extends ConsumerWidget {
                           Text(
                             '${post.commentsCount}',
                             style: TextStyle(
-                              color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+                              color: Theme.of(context)
+                                      .textTheme
+                                      .bodyLarge
+                                      ?.color ??
+                                  Colors.white,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -406,7 +464,8 @@ class PostCard extends ConsumerWidget {
                   TextSpan(
                     text: '${post.username} ',
                     style: TextStyle(
-                      color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+                      color: Theme.of(context).textTheme.bodyLarge?.color ??
+                          Colors.white,
                       fontWeight: FontWeight.w600,
                       fontSize: 14,
                     ),
@@ -414,7 +473,8 @@ class PostCard extends ConsumerWidget {
                   TextSpan(
                     text: post.caption,
                     style: TextStyle(
-                      color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
+                      color: Theme.of(context).textTheme.bodyMedium?.color ??
+                          Colors.grey,
                       fontSize: 14,
                     ),
                   ),
@@ -432,7 +492,8 @@ class PostCard extends ConsumerWidget {
               child: Text(
                 '${post.commentsCount} yorumun tümünü gör',
                 style: TextStyle(
-                  color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
+                  color: Theme.of(context).textTheme.bodySmall?.color ??
+                      Colors.grey,
                   fontSize: 13,
                 ),
               ),
@@ -449,20 +510,28 @@ class PostCard extends ConsumerWidget {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: Theme.of(context).colorScheme.surface,
-        title: Text('Gönderiyi Düzenle', style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white)),
+        title: Text('Gönderiyi Düzenle',
+            style: TextStyle(
+                color: Theme.of(context).textTheme.bodyLarge?.color ??
+                    Colors.white)),
         content: TextField(
           controller: controller,
           maxLines: 3,
-          style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
+          style: TextStyle(
+              color:
+                  Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
           decoration: InputDecoration(
             hintText: 'Yeni açıklama...',
-            hintStyle: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey),
+            hintStyle: TextStyle(
+                color: Theme.of(context).textTheme.bodySmall?.color ??
+                    Colors.grey),
             enabledBorder: OutlineInputBorder(
               borderSide: BorderSide(color: Theme.of(context).dividerColor),
               borderRadius: BorderRadius.circular(8),
             ),
             focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
+              borderSide:
+                  BorderSide(color: Theme.of(context).colorScheme.primary),
               borderRadius: BorderRadius.circular(8),
             ),
           ),
@@ -470,11 +539,15 @@ class PostCard extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text('İptal', style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey)),
+            child: Text('İptal',
+                style: TextStyle(
+                    color: Theme.of(context).textTheme.bodySmall?.color ??
+                        Colors.grey)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text('Kaydet', style: TextStyle(color: Theme.of(context).colorScheme.primary)),
+            child: Text('Kaydet',
+                style: TextStyle(color: Theme.of(context).colorScheme.primary)),
           ),
         ],
       ),
@@ -504,16 +577,27 @@ class PostCard extends ConsumerWidget {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: Theme.of(context).colorScheme.surface,
-        title: Text('Gönderiyi Sil', style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white)),
-        content: Text('Bu gönderiyi kalıcı olarak silmek istediğinize emin misiniz?', style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey)),
+        title: Text('Gönderiyi Sil',
+            style: TextStyle(
+                color: Theme.of(context).textTheme.bodyLarge?.color ??
+                    Colors.white)),
+        content: Text(
+            'Bu gönderiyi kalıcı olarak silmek istediğinize emin misiniz?',
+            style: TextStyle(
+                color: Theme.of(context).textTheme.bodyMedium?.color ??
+                    Colors.grey)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text('İptal', style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey)),
+            child: Text('İptal',
+                style: TextStyle(
+                    color: Theme.of(context).textTheme.bodySmall?.color ??
+                        Colors.grey)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text('Sil', style: TextStyle(color: Theme.of(context).colorScheme.error)),
+            child: Text('Sil',
+                style: TextStyle(color: Theme.of(context).colorScheme.error)),
           ),
         ],
       ),

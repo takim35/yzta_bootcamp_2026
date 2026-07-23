@@ -155,8 +155,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                         shape: BoxShape.circle,
                         gradient: RadialGradient(
                           colors: [
-                            Theme.of(context).colorScheme.primary.withValues(alpha: 0.28),
-                            Theme.of(context).colorScheme.primary.withValues(alpha: 0),
+                            Theme.of(context)
+                                .colorScheme
+                                .primary
+                                .withValues(alpha: 0.28),
+                            Theme.of(context)
+                                .colorScheme
+                                .primary
+                                .withValues(alpha: 0),
                           ],
                         ),
                       ),
@@ -172,8 +178,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                         shape: BoxShape.circle,
                         gradient: RadialGradient(
                           colors: [
-                            Theme.of(context).colorScheme.secondary.withValues(alpha: 0.2),
-                            Theme.of(context).colorScheme.secondary.withValues(alpha: 0),
+                            Theme.of(context)
+                                .colorScheme
+                                .secondary
+                                .withValues(alpha: 0.2),
+                            Theme.of(context)
+                                .colorScheme
+                                .secondary
+                                .withValues(alpha: 0),
                           ],
                         ),
                       ),
@@ -225,22 +237,41 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                               // Language Toggle
                               GestureDetector(
                                 onTap: () {
-                                  ref.read(localeProvider.notifier).toggleLocale();
+                                  ref
+                                      .read(localeProvider.notifier)
+                                      .toggleLocale();
                                 },
                                 child: Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 12, vertical: 10),
                                   decoration: BoxDecoration(
-                                    color: Theme.of(context).colorScheme.surface,
+                                    color:
+                                        Theme.of(context).colorScheme.surface,
                                     borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(color: Theme.of(context).dividerColor),
                                   ),
                                   child: Row(
                                     children: [
-                                      Icon(Icons.language_rounded, color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey, size: 16),
+                                      Icon(Icons.language_rounded,
+                                          color: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyMedium
+                                                  ?.color ??
+                                              Colors.grey,
+                                          size: 16),
                                       SizedBox(width: 8),
                                       Text(
-                                        ref.watch(localeProvider) == AppLocale.tr ? 'Türkçe' : 'English',
-                                        style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white, fontSize: 13, fontWeight: FontWeight.w500),
+                                        ref.watch(localeProvider) ==
+                                                AppLocale.tr
+                                            ? 'Türkçe'
+                                            : 'English',
+                                        style: TextStyle(
+                                            color: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyLarge
+                                                    ?.color ??
+                                                Colors.white,
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w500),
                                       ),
                                     ],
                                   ),
@@ -260,7 +291,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                 borderRadius: BorderRadius.circular(20),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Theme.of(context).colorScheme.primary
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .primary
                                         .withValues(alpha: 0.45),
                                     blurRadius: 24,
                                     offset: Offset(0, 8),
@@ -283,7 +316,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                             style: TextStyle(
                               fontSize: 30,
                               fontWeight: FontWeight.w800,
-                              color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+                              color: Theme.of(context)
+                                      .textTheme
+                                      .bodyLarge
+                                      ?.color ??
+                                  Colors.white,
                               letterSpacing: -0.5,
                             ),
                           ),
@@ -309,24 +346,26 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                               padding: EdgeInsets.all(14),
                               margin: EdgeInsets.only(bottom: 16),
                               decoration: BoxDecoration(
-                                color:
-                                    Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .error
+                                    .withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: Theme.of(context).colorScheme.error
-                                      .withValues(alpha: 0.4),
-                                ),
                               ),
                               child: Row(
                                 children: [
                                   Icon(Icons.error_outline_rounded,
-                                      color: Theme.of(context).colorScheme.error, size: 18),
+                                      color:
+                                          Theme.of(context).colorScheme.error,
+                                      size: 18),
                                   SizedBox(width: 10),
                                   Expanded(
                                     child: Text(
                                       _errorMessage!,
                                       style: TextStyle(
-                                          color: Theme.of(context).colorScheme.error,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .error,
                                           fontSize: 13),
                                     ),
                                   ),
@@ -381,7 +420,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                               child: Text(
                                 s.forgotPassword,
                                 style: TextStyle(
-                                  color: Theme.of(context).colorScheme.secondary,
+                                  color:
+                                      Theme.of(context).colorScheme.secondary,
                                   fontWeight: FontWeight.w600,
                                   fontSize: 13,
                                 ),
@@ -404,10 +444,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                               decoration: BoxDecoration(
                                 color: Theme.of(context).colorScheme.surface,
                                 borderRadius: BorderRadius.circular(14),
-                                border: Border.all(
-                                  color: Theme.of(context).dividerColor,
-                                  width: 1.5,
-                                ),
                               ),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -433,9 +469,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                   ),
                                   SizedBox(width: 12),
                                   Text(
-                                    s.isTr ? 'Google ile Giriş Yap' : 'Continue with Google',
+                                    s.isTr
+                                        ? 'Google ile Giriş Yap'
+                                        : 'Continue with Google',
                                     style: TextStyle(
-                                      color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+                                      color: Theme.of(context)
+                                              .textTheme
+                                              .bodyLarge
+                                              ?.color ??
+                                          Colors.white,
                                       fontSize: 15,
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -455,12 +497,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                       color: Theme.of(context).dividerColor,
                                       thickness: 1)),
                               Padding(
-                                padding:
-                                    EdgeInsets.symmetric(horizontal: 16),
+                                padding: EdgeInsets.symmetric(horizontal: 16),
                                 child: Text(
                                   s.isTr ? 'veya' : 'or',
                                   style: TextStyle(
-                                      color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey, fontSize: 13),
+                                      color: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall
+                                              ?.color ??
+                                          Colors.grey,
+                                      fontSize: 13),
                                 ),
                               ),
                               Expanded(
@@ -479,25 +525,28 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                               Text(
                                 s.noAccount,
                                 style: TextStyle(
-                                    color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
+                                    color: Theme.of(context)
+                                            .textTheme
+                                            .bodyMedium
+                                            ?.color ??
+                                        Colors.grey,
                                     fontSize: 14),
                               ),
                               TextButton(
                                 onPressed: () {
                                   Navigator.of(context).push(
                                     MaterialPageRoute(
-                                        builder: (_) =>
-                                            RegisterScreen()),
+                                        builder: (_) => RegisterScreen()),
                                   );
                                 },
                                 style: TextButton.styleFrom(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 8),
+                                  padding: EdgeInsets.symmetric(horizontal: 8),
                                 ),
                                 child: Text(
                                   s.signUp,
                                   style: TextStyle(
-                                    color: Theme.of(context).colorScheme.primary,
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
                                     fontWeight: FontWeight.w700,
                                     fontSize: 14,
                                   ),
@@ -533,7 +582,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
               ? []
               : [
                   BoxShadow(
-                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.4),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .primary
+                        .withValues(alpha: 0.4),
                     blurRadius: 16,
                     offset: Offset(0, 6),
                   ),
@@ -575,20 +627,26 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
       controller: controller,
       obscureText: isPassword && !_isPasswordVisible,
       keyboardType: keyboardType,
-      style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white, fontSize: 15),
+      style: TextStyle(
+          color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
+          fontSize: 15),
       validator: validator,
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey, fontSize: 15),
-        prefixIcon:
-            Icon(icon, color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey, size: 20),
+        hintStyle: TextStyle(
+            color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
+            fontSize: 15),
+        prefixIcon: Icon(icon,
+            color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
+            size: 20),
         suffixIcon: isPassword
             ? IconButton(
                 icon: Icon(
                   _isPasswordVisible
                       ? Icons.visibility_off_outlined
                       : Icons.visibility_outlined,
-                  color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
+                  color: Theme.of(context).textTheme.bodySmall?.color ??
+                      Colors.grey,
                   size: 20,
                 ),
                 onPressed: () =>
@@ -597,8 +655,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
             : null,
         filled: true,
         fillColor: Theme.of(context).colorScheme.surface,
-        contentPadding:
-            EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+        contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide(color: Theme.of(context).dividerColor),
@@ -609,8 +666,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide:
-              BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.5),
+          borderSide: BorderSide(
+              color: Theme.of(context).colorScheme.primary, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
@@ -618,7 +675,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.error, width: 1.5),
+          borderSide: BorderSide(
+              color: Theme.of(context).colorScheme.error, width: 1.5),
         ),
       ),
     );

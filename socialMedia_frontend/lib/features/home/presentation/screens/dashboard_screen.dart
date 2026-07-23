@@ -32,11 +32,12 @@ class DashboardScreen extends ConsumerWidget {
               Text(
                 "Here's your outfit summary",
                 style: TextStyle(
-                  color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
+                  color: Theme.of(context).textTheme.bodySmall?.color ??
+                      Colors.grey,
                   fontSize: 14,
                 ),
               ),
-              
+
               SizedBox(height: 24),
 
               // AI Stylist Banner
@@ -73,7 +74,8 @@ class DashboardScreen extends ConsumerWidget {
                           color: Colors.white.withValues(alpha: 0.2),
                           shape: BoxShape.circle,
                         ),
-                        child: Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 24),
+                        child: Icon(Icons.auto_awesome_rounded,
+                            color: Colors.white, size: 24),
                       ),
                       SizedBox(width: 16),
                       Expanded(
@@ -103,16 +105,15 @@ class DashboardScreen extends ConsumerWidget {
                   ),
                 ),
               ),
-              
+
               SizedBox(height: 24),
-              
+
               // Weather Card
               Container(
                 padding: EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Theme.of(context).dividerColor),
                 ),
                 child: Row(
                   children: [
@@ -132,7 +133,9 @@ class DashboardScreen extends ConsumerWidget {
                         Text(
                           'Mostly Sunny',
                           style: TextStyle(
-                            color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
+                            color:
+                                Theme.of(context).textTheme.bodySmall?.color ??
+                                    Colors.grey,
                             fontSize: 12,
                           ),
                         ),
@@ -145,14 +148,18 @@ class DashboardScreen extends ConsumerWidget {
                         Text(
                           'feels 31°',
                           style: TextStyle(
-                            color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
+                            color:
+                                Theme.of(context).textTheme.bodyMedium?.color ??
+                                    Colors.grey,
                             fontSize: 12,
                           ),
                         ),
                         Text(
                           '2% chance of rain',
                           style: TextStyle(
-                            color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
+                            color:
+                                Theme.of(context).textTheme.bodySmall?.color ??
+                                    Colors.grey,
                             fontSize: 12,
                           ),
                         ),
@@ -161,9 +168,9 @@ class DashboardScreen extends ConsumerWidget {
                   ],
                 ),
               ),
-              
+
               SizedBox(height: 32),
-              
+
               // Pending Outfits Header
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -179,14 +186,15 @@ class DashboardScreen extends ConsumerWidget {
                   Text(
                     '0 total',
                     style: TextStyle(
-                      color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
+                      color: Theme.of(context).textTheme.bodySmall?.color ??
+                          Colors.grey,
                       fontSize: 12,
                     ),
                   ),
                 ],
               ),
               SizedBox(height: 16),
-              
+
               // Placeholder for empty outfits
               Container(
                 width: double.infinity,
@@ -194,15 +202,21 @@ class DashboardScreen extends ConsumerWidget {
                 decoration: BoxDecoration(
                   color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Theme.of(context).dividerColor, style: BorderStyle.solid),
                 ),
                 child: Column(
                   children: [
-                    Icon(Icons.checkroom_rounded, color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey, size: 40),
+                    Icon(Icons.checkroom_rounded,
+                        color: Theme.of(context).textTheme.bodySmall?.color ??
+                            Colors.grey,
+                        size: 40),
                     SizedBox(height: 12),
                     Text(
                       "No pending outfits",
-                      style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey, fontSize: 14),
+                      style: TextStyle(
+                          color:
+                              Theme.of(context).textTheme.bodyMedium?.color ??
+                                  Colors.grey,
+                          fontSize: 14),
                     ),
                   ],
                 ),
@@ -247,7 +261,7 @@ class DashboardScreen extends ConsumerWidget {
                   ),
                 ],
               ),
-              
+
               SizedBox(height: 100), // padding for bottom nav
             ],
           ),
@@ -280,7 +294,6 @@ class _ExploreCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Theme.of(context).dividerColor),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -299,7 +312,8 @@ class _ExploreCard extends StatelessWidget {
             Text(
               subtitle,
               style: TextStyle(
-                color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
+                color:
+                    Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
                 fontSize: 11,
               ),
             ),

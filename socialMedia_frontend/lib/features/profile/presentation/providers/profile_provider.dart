@@ -85,9 +85,8 @@ class ProfileProvider extends ChangeNotifier {
     // Optimistic update
     _user = _user!.copyWith(
       isFollowing: !wasFollowing,
-      followersCount: wasFollowing
-          ? _user!.followersCount - 1
-          : _user!.followersCount + 1,
+      followersCount:
+          wasFollowing ? _user!.followersCount - 1 : _user!.followersCount + 1,
     );
     notifyListeners();
 
@@ -134,7 +133,8 @@ class ProfileProvider extends ChangeNotifier {
     }
     final savedIndex = _savedPosts.indexWhere((p) => p.id == postId);
     if (savedIndex != -1) {
-      _savedPosts[savedIndex] = _savedPosts[savedIndex].copyWith(caption: caption);
+      _savedPosts[savedIndex] =
+          _savedPosts[savedIndex].copyWith(caption: caption);
     }
     notifyListeners();
   }

@@ -66,7 +66,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
       ),
       body: Consumer(
         builder: (context, ref, _) {
-        final provider = ref.watch(createPostProvider);
+          final provider = ref.watch(createPostProvider);
           return SingleChildScrollView(
             padding: const EdgeInsets.symmetric(
               horizontal: AppTheme.spacingL,
@@ -159,16 +159,13 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
           width: double.infinity,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-            border: Border.all(
-              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.4),
-              width: 2,
-              strokeAlign: BorderSide.strokeAlignInside,
-            ),
-            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
+            color:
+                Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
           ),
           child: CustomPaint(
             painter: _DashedBorderPainter(
-              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+              color:
+                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
               borderRadius: AppTheme.radiusLarge,
             ),
             child: Column(
@@ -192,7 +189,8 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                 Text(
                   'Kombinini paylaşmak için bir fotoğraf seç',
                   style: TextStyle(
-                    color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
+                    color: Theme.of(context).textTheme.bodySmall?.color ??
+                        Colors.grey,
                     fontSize: 12,
                   ),
                 ),
@@ -230,8 +228,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                 ),
                 decoration: BoxDecoration(
                   color: Colors.black.withValues(alpha: 0.6),
-                  borderRadius:
-                      BorderRadius.circular(AppTheme.radiusRound),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusRound),
                 ),
                 child: const Row(
                   mainAxisSize: MainAxisSize.min,
@@ -276,7 +273,8 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
           decoration: InputDecoration(
             hintText: 'Kombinin hakkında bir şeyler yaz...',
             counterStyle: TextStyle(
-              color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
+              color:
+                  Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
               fontSize: 11,
             ),
             filled: true,
@@ -291,8 +289,8 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-              borderSide:
-                  BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.5),
+              borderSide: BorderSide(
+                  color: Theme.of(context).colorScheme.primary, width: 1.5),
             ),
           ),
         ),
@@ -342,20 +340,20 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
         children: [
           Checkbox(
             value: provider.aiTrainingConsent,
-            onChanged: (value) =>
-                provider.setAiTrainingConsent(value ?? false),
+            onChanged: (value) => provider.setAiTrainingConsent(value ?? false),
           ),
           const SizedBox(width: AppTheme.spacingS),
           Expanded(
             child: Semantics(
               label: 'AI eğitim izni',
               child: GestureDetector(
-                onTap: () => provider
-                    .setAiTrainingConsent(!provider.aiTrainingConsent),
+                onTap: () =>
+                    provider.setAiTrainingConsent(!provider.aiTrainingConsent),
                 child: Text(
                   'Bu görsel, modelin gelişmesi için kullanılabilir',
                   style: TextStyle(
-                    color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
+                    color: Theme.of(context).textTheme.bodyMedium?.color ??
+                        Colors.grey,
                     fontSize: 13,
                     height: 1.4,
                   ),
@@ -447,8 +445,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
         SnackBar(
           content: const Row(
             children: [
-              Icon(Icons.check_circle_rounded,
-                  color: Colors.green, size: 20),
+              Icon(Icons.check_circle_rounded, color: Colors.green, size: 20),
               SizedBox(width: AppTheme.spacingS),
               Text('Paylaşım başarıyla oluşturuldu! 🎉'),
             ],

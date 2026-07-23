@@ -57,10 +57,6 @@ class VisibilitySelector extends ConsumerWidget {
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-            border: Border.all(
-              color: Theme.of(context).dividerColor,
-              width: 1,
-            ),
           ),
           child: Row(
             children: _options.map((option) {
@@ -96,7 +92,11 @@ class VisibilitySelector extends ConsumerWidget {
                             style: TextStyle(
                               color: isSelected
                                   ? Colors.white
-                                  : Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
+                                  : Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium
+                                          ?.color ??
+                                      Colors.grey,
                               fontSize: 11,
                               fontWeight: isSelected
                                   ? FontWeight.w600
@@ -120,12 +120,11 @@ class VisibilitySelector extends ConsumerWidget {
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 200),
           child: Text(
-            _options
-                .firstWhere((o) => o.value == currentValue)
-                .description,
+            _options.firstWhere((o) => o.value == currentValue).description,
             key: ValueKey(currentValue),
             style: TextStyle(
-              color: Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
+              color:
+                  Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey,
               fontSize: 12,
             ),
           ),
