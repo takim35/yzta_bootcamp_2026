@@ -378,11 +378,25 @@ class ApiService {
     String? displayName,
     String? bio,
     String? avatarUrl,
+    String? height,
+    String? weight,
+    String? chest,
+    String? waist,
+    String? hips,
+    String? location,
+    String? timezone,
   }) async {
     final body = {
       if (displayName != null) 'display_name': displayName,
       if (bio != null) 'bio': bio,
       if (avatarUrl != null) 'avatar_url': avatarUrl,
+      if (height != null) 'height': height,
+      if (weight != null) 'weight': weight,
+      if (chest != null) 'chest': chest,
+      if (waist != null) 'waist': waist,
+      if (hips != null) 'hips': hips,
+      if (location != null) 'location': location,
+      if (timezone != null) 'timezone': timezone,
     };
     await _put('/users/me', body, headers: {'Authorization': 'Bearer $userId'});
   }

@@ -22,7 +22,7 @@ class DashboardScreen extends ConsumerWidget {
               Text(
                 'Good morning, Demo',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                   fontSize: 26,
                   fontWeight: FontWeight.w700,
                   letterSpacing: -0.5,
@@ -117,7 +117,7 @@ class DashboardScreen extends ConsumerWidget {
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.wb_sunny_rounded, color: Colors.white, size: 28),
+                    Icon(Icons.wb_sunny_rounded, color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white, size: 28),
                     SizedBox(width: 16),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -125,7 +125,7 @@ class DashboardScreen extends ConsumerWidget {
                         Text(
                           '32°C',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                             fontSize: 24,
                             fontWeight: FontWeight.w700,
                           ),
@@ -178,7 +178,7 @@ class DashboardScreen extends ConsumerWidget {
                   Text(
                     'Pending Outfits',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
                     ),
@@ -228,7 +228,7 @@ class DashboardScreen extends ConsumerWidget {
               Text(
                 'Explore',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                 ),
@@ -298,12 +298,12 @@ class _ExploreCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, color: Colors.white, size: 24),
+            Icon(icon, color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white, size: 24),
             Spacer(),
             Text(
               title,
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
               ),

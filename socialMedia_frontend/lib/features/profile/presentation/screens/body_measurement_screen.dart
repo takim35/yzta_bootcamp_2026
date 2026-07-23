@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 
-class BodyMeasurementScreen extends StatefulWidget {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/profile_provider.dart';
+
+class BodyMeasurementScreen extends ConsumerStatefulWidget {
   const BodyMeasurementScreen({super.key});
 
   @override
-  State<BodyMeasurementScreen> createState() => _BodyMeasurementScreenState();
+  ConsumerState<BodyMeasurementScreen> createState() => _BodyMeasurementScreenState();
 }
 
-class _BodyMeasurementScreenState extends State<BodyMeasurementScreen> {
+class _BodyMeasurementScreenState extends ConsumerState<BodyMeasurementScreen> {
   final _heightCtrl = TextEditingController();
   final _weightCtrl = TextEditingController();
   final _bustCtrl = TextEditingController();
@@ -21,39 +24,95 @@ class _BodyMeasurementScreenState extends State<BodyMeasurementScreen> {
   @override
   void initState() {
     super.initState();
-    // Simulate checking if we already have data
-    // If we do, we would set _isEditing = false and _hasSavedData = true
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadData();
+    });
   }
 
-  void _save() {
-    setState(() {
-      _isEditing = false;
-      _hasSavedData = true;
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Measurements saved for AI algorithms!'),
-        backgroundColor: AppTheme.successColor,
-      ),
-    );
+  void _loadData() {
+    final user = ref.read(profileProvider).user;
+    if (user != null) {
+      if (user.height.isNotEmpty ||
+          user.weight.isNotEmpty ||
+          user.chest.isNotEmpty ||
+          user.waist.isNotEmpty ||
+          user.hips.isNotEmpty) {
+        setState(() {
+          _heightCtrl.text = user.height;
+          _weightCtrl.text = user.weight;
+          _bustCtrl.text = user.chest;
+          _waistCtrl.text = user.waist;
+          _hipsCtrl.text = user.hips;
+          _isEditing = false;
+          _hasSavedData = true;
+        });
+      }
+    }
   }
 
-  void _delete() {
-    setState(() {
-      _heightCtrl.clear();
-      _weightCtrl.clear();
-      _bustCtrl.clear();
-      _waistCtrl.clear();
-      _hipsCtrl.clear();
-      _isEditing = true;
-      _hasSavedData = false;
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Measurements deleted.'),
-        backgroundColor: AppTheme.errorColor,
-      ),
-    );
+  Future<void> _save() async {
+    try {
+      await ref.read(profileProvider).updateProfile(
+            height: _heightCtrl.text,
+            weight: _weightCtrl.text,
+            chest: _bustCtrl.text,
+            waist: _waistCtrl.text,
+            hips: _hipsCtrl.text,
+          );
+      if (!mounted) return;
+      setState(() {
+        _isEditing = false;
+        _hasSavedData = true;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Measurements saved for AI algorithms!'),
+          backgroundColor: AppTheme.successColor,
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error saving: $e'),
+          backgroundColor: AppTheme.errorColor,
+        ),
+      );
+    }
+  }
+
+  Future<void> _delete() async {
+    try {
+      await ref.read(profileProvider).updateProfile(
+            height: '',
+            weight: '',
+            chest: '',
+            waist: '',
+            hips: '',
+          );
+      if (!mounted) return;
+      setState(() {
+        _heightCtrl.clear();
+        _weightCtrl.clear();
+        _bustCtrl.clear();
+        _waistCtrl.clear();
+        _hipsCtrl.clear();
+        _isEditing = true;
+        _hasSavedData = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Measurements deleted.'),
+          backgroundColor: AppTheme.errorColor,
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error deleting: $e'),
+          backgroundColor: AppTheme.errorColor,
+        ),
+      );
+    }
   }
 
   @override

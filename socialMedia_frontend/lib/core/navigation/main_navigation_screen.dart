@@ -53,47 +53,32 @@ class MainNavigationScreen extends ConsumerWidget {
         height: 70,
         padding: EdgeInsets.symmetric(horizontal: 12.0),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            // Left side tabs
-            Row(
-              children: [
-                _NavBarItem(
-                  icon: Icons.home_rounded,
-                  label: 'Home',
-                  isSelected: currentIndex == 0,
-                  onTap: () =>
-                      ref.read(mainNavIndexProvider.notifier).state = 0,
-                ),
-                SizedBox(width: 24),
-                _NavBarItem(
-                  icon: Icons.checkroom_rounded,
-                  label: 'Wardrobe',
-                  isSelected: currentIndex == 1,
-                  onTap: () =>
-                      ref.read(mainNavIndexProvider.notifier).state = 1,
-                ),
-              ],
+            _NavBarItem(
+              icon: Icons.home_rounded,
+              label: 'Home',
+              isSelected: currentIndex == 0,
+              onTap: () => ref.read(mainNavIndexProvider.notifier).state = 0,
             ),
-            // Right side tabs
-            Row(
-              children: [
-                _NavBarItem(
-                  icon: Icons.auto_awesome_rounded,
-                  label: 'Try-On',
-                  isSelected: currentIndex == 2,
-                  onTap: () =>
-                      ref.read(mainNavIndexProvider.notifier).state = 2,
-                ),
-                SizedBox(width: 24),
-                _NavBarItem(
-                  icon: Icons.grid_view_rounded,
-                  label: 'More',
-                  isSelected: currentIndex == 3,
-                  onTap: () =>
-                      ref.read(mainNavIndexProvider.notifier).state = 3,
-                ),
-              ],
+            _NavBarItem(
+              icon: Icons.checkroom_rounded,
+              label: 'Wardrobe',
+              isSelected: currentIndex == 1,
+              onTap: () => ref.read(mainNavIndexProvider.notifier).state = 1,
+            ),
+            const SizedBox(width: 48), // Empty space for FAB
+            _NavBarItem(
+              icon: Icons.auto_awesome_rounded,
+              label: 'Try-On',
+              isSelected: currentIndex == 2,
+              onTap: () => ref.read(mainNavIndexProvider.notifier).state = 2,
+            ),
+            _NavBarItem(
+              icon: Icons.grid_view_rounded,
+              label: 'More',
+              isSelected: currentIndex == 3,
+              onTap: () => ref.read(mainNavIndexProvider.notifier).state = 3,
             ),
           ],
         ),
@@ -118,7 +103,7 @@ class _NavBarItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = isSelected
-        ? Colors.white
+        ? Theme.of(context).colorScheme.primary
         : Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey;
 
     return GestureDetector(

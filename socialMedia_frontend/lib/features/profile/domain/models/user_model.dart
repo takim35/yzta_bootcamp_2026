@@ -10,6 +10,13 @@ class UserModel {
   final int followersCount;
   final int followingCount;
   final bool isFollowing;
+  final String height;
+  final String weight;
+  final String chest;
+  final String waist;
+  final String hips;
+  final String location;
+  final String timezone;
 
   const UserModel({
     required this.userId,
@@ -21,6 +28,13 @@ class UserModel {
     required this.followersCount,
     required this.followingCount,
     required this.isFollowing,
+    this.height = '',
+    this.weight = '',
+    this.chest = '',
+    this.waist = '',
+    this.hips = '',
+    this.location = '',
+    this.timezone = '',
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -34,6 +48,13 @@ class UserModel {
       followersCount: json['followers_count'] as int? ?? 0,
       followingCount: json['following_count'] as int? ?? 0,
       isFollowing: json['is_following'] as bool? ?? false,
+      height: json['height'] as String? ?? '',
+      weight: json['weight'] as String? ?? '',
+      chest: json['chest'] as String? ?? '',
+      waist: json['waist'] as String? ?? '',
+      hips: json['hips'] as String? ?? '',
+      location: json['location'] as String? ?? '',
+      timezone: json['timezone'] as String? ?? '',
     );
   }
 
@@ -48,6 +69,13 @@ class UserModel {
       'followers_count': followersCount,
       'following_count': followingCount,
       'is_following': isFollowing,
+      'height': height,
+      'weight': weight,
+      'chest': chest,
+      'waist': waist,
+      'hips': hips,
+      'location': location,
+      'timezone': timezone,
     };
   }
 
@@ -61,6 +89,13 @@ class UserModel {
     int? followersCount,
     int? followingCount,
     bool? isFollowing,
+    String? height,
+    String? weight,
+    String? chest,
+    String? waist,
+    String? hips,
+    String? location,
+    String? timezone,
   }) {
     return UserModel(
       userId: userId ?? this.userId,
@@ -72,6 +107,13 @@ class UserModel {
       followersCount: followersCount ?? this.followersCount,
       followingCount: followingCount ?? this.followingCount,
       isFollowing: isFollowing ?? this.isFollowing,
+      height: height ?? this.height,
+      weight: weight ?? this.weight,
+      chest: chest ?? this.chest,
+      waist: waist ?? this.waist,
+      hips: hips ?? this.hips,
+      location: location ?? this.location,
+      timezone: timezone ?? this.timezone,
     );
   }
 

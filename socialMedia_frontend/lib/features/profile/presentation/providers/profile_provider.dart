@@ -139,6 +139,50 @@ class ProfileProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // ─── Profil Bilgilerini Güncelle ──────────────────────────────
+  Future<void> updateProfile({
+    String? displayName,
+    String? bio,
+    String? avatarUrl,
+    String? height,
+    String? weight,
+    String? chest,
+    String? waist,
+    String? hips,
+    String? location,
+    String? timezone,
+  }) async {
+    if (_user == null || _viewerId == null) return;
+    
+    await _api.updateProfile(
+      userId: _user!.userId,
+      displayName: displayName,
+      bio: bio,
+      avatarUrl: avatarUrl,
+      height: height,
+      weight: weight,
+      chest: chest,
+      waist: waist,
+      hips: hips,
+      location: location,
+      timezone: timezone,
+    );
+    
+    _user = _user!.copyWith(
+      displayName: displayName,
+      bio: bio,
+      avatarUrl: avatarUrl,
+      height: height,
+      weight: weight,
+      chest: chest,
+      waist: waist,
+      hips: hips,
+      location: location,
+      timezone: timezone,
+    );
+    notifyListeners();
+  }
+
   // ─── Temizle ────────────────────────────────────────────────
   void clear() {
     _user = null;

@@ -7,6 +7,7 @@ import '../../../../core/localization/locale_provider.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import 'local_profile_screen.dart';
 import 'body_measurement_screen.dart';
+import 'location_timezone_screen.dart';
 
 class MoreScreen extends ConsumerWidget {
   const MoreScreen({super.key});
@@ -124,7 +125,13 @@ class MoreScreen extends ConsumerWidget {
                     _SettingsTile(
                         title: 'Location & Timezone',
                         icon: Icons.location_on_rounded,
-                        onTap: () {}),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const LocationTimezoneScreen()),
+                          );
+                        }),
                     Divider(height: 1, color: Theme.of(context).dividerColor),
                     _SettingsTile(
                         title: 'Outfit Schedule',
