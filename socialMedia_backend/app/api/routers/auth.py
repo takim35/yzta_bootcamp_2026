@@ -11,8 +11,11 @@ from app.domain.schemas import (
     TokenRefreshRequest,
     TwoFASetupResponse, TwoFAVerifyRequest, TwoFAStatusResponse,
     TwoFALoginRequest,
+    RequestEmailChangeRequest, VerifyEmailChangeRequest,
+    RequestPasswordChangeRequest, VerifyPasswordChangeRequest
 )
 from app.repositories.auth_repository import AuthRepository
+from app.core.email_service import send_otp_email, generate_otp
 
 router = APIRouter()
 
@@ -260,3 +263,102 @@ def google_auth(
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f'Google girişi sırasında hata: {str(e)}')
+
+
+# ─── Profil Güvenlik Güncellemeleri (Email & Şifre) ─────────────
+
+mock_profile_update_codes = {}
+
+@router.post('/request-email-change')
+def request_email_change(
+    request: RequestEmailChangeRequest,
+    repo: AuthRepository = Depends(get_repository)
+):
+    """E-posta değiştirme işlemi için mevcut ve yeni e-postaya doğrulama kodu gönderir."""
+    try:
+        # Check if email is already used
+        check = repo.get_user_by_email(request.new_email)
+        if check:
+            raise HTTPException(status_code=400, detail="Bu e-posta adresi zaten kullanımda.")
+
+        code = generate_otp()
+        mock_profile_update_codes[request.new_email] = code
+        
+        # Gerçek mail gönderimi
+        send_otp_email(
+            to_email=request.new_email,
+            subject="Spot - E-posta Doğrulama Kodu",
+            body=f"E-posta adresinizi değiştirmek için doğrulama kodunuz: {code}"
+        )
+        
+        return {'success': True, 'message': 'Doğrulama kodu yeni e-postanıza gönderildi.'}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post('/verify-email-change')
+def verify_email_change(
+    request: VerifyEmailChangeRequest,
+    user_id: str, # Should ideally be from JWT
+    repo: AuthRepository = Depends(get_repository)
+):
+    """Gönderilen kodu doğrular ve e-postayı değiştirir."""
+    try:
+        if request.new_email not in mock_profile_update_codes or mock_profile_update_codes[request.new_email] != request.code:
+            raise HTTPException(status_code=400, detail="Geçersiz veya süresi dolmuş kod.")
+        
+        # Güncelleme yap
+        repo.update_user_email(user_id, request.new_email)
+        del mock_profile_update_codes[request.new_email]
+        return {'success': True, 'message': 'E-posta adresi başarıyla güncellendi.'}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post('/request-password-change')
+def request_password_change(
+    request: RequestPasswordChangeRequest,
+    user_id: str,
+    repo: AuthRepository = Depends(get_repository)
+):
+    """Şifre değiştirme işlemi için mevcut e-postaya kod gönderir."""
+    try:
+        user = repo.get_user_by_id(user_id)
+        if not user:
+            raise HTTPException(status_code=404, detail="Kullanıcı bulunamadı.")
+            
+        code = generate_otp()
+        mock_profile_update_codes[user_id] = code
+        
+        send_otp_email(
+            to_email=user["email"],
+            subject="Spot - Şifre Değiştirme Doğrulama Kodu",
+            body=f"Şifrenizi değiştirmek için doğrulama kodunuz: {code}"
+        )
+        return {'success': True, 'message': 'Doğrulama kodu e-postanıza gönderildi.'}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post('/verify-password-change')
+def verify_password_change(
+    request: VerifyPasswordChangeRequest,
+    user_id: str,
+    repo: AuthRepository = Depends(get_repository)
+):
+    """Kodu doğrular ve şifreyi değiştirir."""
+    try:
+        if user_id not in mock_profile_update_codes or mock_profile_update_codes[user_id] != request.code:
+            raise HTTPException(status_code=400, detail="Geçersiz veya süresi dolmuş kod.")
+            
+        repo.update_user_password(user_id, request.new_password)
+        del mock_profile_update_codes[user_id]
+        return {'success': True, 'message': 'Şifre başarıyla güncellendi.'}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+

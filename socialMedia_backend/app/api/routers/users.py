@@ -126,6 +126,13 @@ def update_profile(
     try:
         updates = []
         values = []
+        if body.username is not None:
+            # Check if username is taken
+            check = db.execute("SELECT 1 FROM users WHERE username = ? AND user_id != ?", (body.username, user_id)).fetchone()
+            if check:
+                raise HTTPException(status_code=400, detail="Bu kullanıcı adı zaten alınmış.")
+            updates.append("username = ?")
+            values.append(body.username)
         if body.display_name is not None:
             updates.append("display_name = ?")
             values.append(body.display_name)

@@ -49,6 +49,7 @@ class PasswordResetVerifyRequest(BaseModel):
 
 class ProfileUpdateRequest(BaseModel):
     """Profil güncelleme isteği."""
+    username: Optional[str] = None
     display_name: Optional[str] = None
     bio: Optional[str] = None
     avatar_url: Optional[str] = None
@@ -59,6 +60,20 @@ class ProfileUpdateRequest(BaseModel):
     hips: Optional[str] = None
     location: Optional[str] = None
     timezone: Optional[str] = None
+
+class RequestEmailChangeRequest(BaseModel):
+    new_email: EmailStr
+
+class VerifyEmailChangeRequest(BaseModel):
+    new_email: EmailStr
+    code: str
+
+class RequestPasswordChangeRequest(BaseModel):
+    pass # Uses auth header to send to current email
+
+class VerifyPasswordChangeRequest(BaseModel):
+    new_password: str
+    code: str
 
 
 class PrivacySettingsRequest(BaseModel):

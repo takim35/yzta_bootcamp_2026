@@ -85,6 +85,29 @@ class AuthRepository:
             return {"user_id": user["user_id"], "username": user["username"], "email": user["email"]}
         return None
 
+    def get_user_by_id(self, user_id: str) -> Optional[dict]:
+        """User ID'sine göre kullanıcıyı bulur."""
+        user = self.db.execute(
+            "SELECT user_id, username, email FROM users WHERE user_id = ?", (user_id,)
+        ).fetchone()
+        if user:
+            return {"user_id": user["user_id"], "username": user["username"], "email": user["email"]}
+        return None
+
+    def update_user_email(self, user_id: str, new_email: str) -> None:
+        """Kullanıcının e-postasını günceller."""
+        try:
+            self.db.execute("UPDATE users SET email = ? WHERE user_id = ?", (new_email, user_id))
+            self.db.commit()
+        except sqlite3.IntegrityError:
+            raise HTTPException(status_code=400, detail="Bu e-posta adresi zaten kullanımda.")
+
+    def update_user_password(self, user_id: str, new_password: str) -> None:
+        """Kullanıcının şifresini günceller."""
+        new_hash = hash_password(new_password)
+        self.db.execute("UPDATE users SET password_hash = ? WHERE user_id = ?", (new_hash, user_id))
+        self.db.commit()
+
     # ─── 2FA — TOTP ────────────────────────────────────────────
 
     def setup_totp(self, user_id: str) -> dict:
