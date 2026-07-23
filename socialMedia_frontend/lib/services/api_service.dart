@@ -31,7 +31,7 @@ class ApiService {
 
   final http.Client _client = http.Client();
   static const Duration _timeout =
-      Duration(seconds: 30); // Ollama AI çağrıları için daha uzun
+      Duration(seconds: 120); // Ollama AI çağrıları ve büyük istekler için uzatıldı
 
   // ─── Headers ────────────────────────────────────────────────
   Map<String, String> get _headers => {
@@ -375,6 +375,7 @@ class ApiService {
 
   Future<void> updateProfile({
     required String userId,
+    String? username,
     String? displayName,
     String? bio,
     String? avatarUrl,
@@ -387,6 +388,7 @@ class ApiService {
     String? timezone,
   }) async {
     final body = {
+      if (username != null) 'username': username,
       if (displayName != null) 'display_name': displayName,
       if (bio != null) 'bio': bio,
       if (avatarUrl != null) 'avatar_url': avatarUrl,
@@ -412,6 +414,47 @@ class ApiService {
   Future<void> deleteAccount(String userId) async {
     await _delete('/users/me', null,
         headers: {'Authorization': 'Bearer $userId'});
+  }
+
+  // ─── Profile Security (Email & Password) ──────────────────────
+  Future<void> requestEmailChange(String newEmail) async {
+    await _post('/auth/request-email-change', {'new_email': newEmail});
+  }
+
+  Future<void> verifyEmailChange(String userId, String newEmail, String code) async {
+    final uri = Uri.parse('$baseUrl/auth/verify-email-change').replace(
+      queryParameters: {'user_id': userId},
+    );
+    final response = await _client.post(uri, headers: _headers, body: jsonEncode({
+      'new_email': newEmail,
+      'code': code
+    })).timeout(_timeout);
+    if (response.statusCode != 200) {
+      _throwError(response);
+    }
+  }
+
+  Future<void> requestPasswordChange(String userId) async {
+    final uri = Uri.parse('$baseUrl/auth/request-password-change').replace(
+      queryParameters: {'user_id': userId},
+    );
+    final response = await _client.post(uri, headers: _headers, body: jsonEncode({})).timeout(_timeout);
+    if (response.statusCode != 200) {
+      _throwError(response);
+    }
+  }
+
+  Future<void> verifyPasswordChange(String userId, String newPassword, String code) async {
+    final uri = Uri.parse('$baseUrl/auth/verify-password-change').replace(
+      queryParameters: {'user_id': userId},
+    );
+    final response = await _client.post(uri, headers: _headers, body: jsonEncode({
+      'new_password': newPassword,
+      'code': code
+    })).timeout(_timeout);
+    if (response.statusCode != 200) {
+      _throwError(response);
+    }
   }
 
   // ─── Follow ─────────────────────────────────────────────────

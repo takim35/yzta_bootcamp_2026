@@ -141,6 +141,7 @@ class ProfileProvider extends ChangeNotifier {
 
   // ─── Profil Bilgilerini Güncelle ──────────────────────────────
   Future<void> updateProfile({
+    String? username,
     String? displayName,
     String? bio,
     String? avatarUrl,
@@ -156,6 +157,7 @@ class ProfileProvider extends ChangeNotifier {
     
     await _api.updateProfile(
       userId: _user!.userId,
+      username: username,
       displayName: displayName,
       bio: bio,
       avatarUrl: avatarUrl,
@@ -169,6 +171,7 @@ class ProfileProvider extends ChangeNotifier {
     );
     
     _user = _user!.copyWith(
+      username: username,
       displayName: displayName,
       bio: bio,
       avatarUrl: avatarUrl,

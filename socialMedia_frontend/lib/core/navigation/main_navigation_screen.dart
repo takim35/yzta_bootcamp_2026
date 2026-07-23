@@ -6,14 +6,40 @@ import '../../features/wardrobe/presentation/screens/wardrobe_screen.dart';
 import '../../features/profile/presentation/screens/more_screen.dart';
 import '../../features/home/presentation/screens/try_on_coming_soon_screen.dart';
 import '../../features/home/presentation/screens/social_main_screen.dart';
+import '../../features/auth/presentation/providers/auth_provider.dart';
+import '../../features/profile/presentation/providers/profile_provider.dart';
 
 final mainNavIndexProvider = StateProvider<int>((ref) => 0);
 
-class MainNavigationScreen extends ConsumerWidget {
-  MainNavigationScreen({super.key});
+class MainNavigationScreen extends ConsumerStatefulWidget {
+  const MainNavigationScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MainNavigationScreen> createState() => _MainNavigationScreenState();
+}
+
+class _MainNavigationScreenState extends ConsumerState<MainNavigationScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initProfile();
+    });
+  }
+
+  void _initProfile() {
+    // Load profile if not already loaded and user is logged in
+    final authState = ref.read(authProvider);
+    final userId = authState.currentUserId;
+    final profileUser = ref.read(profileProvider).user;
+    
+    if (userId != null && profileUser == null) {
+      ref.read(profileProvider).loadProfile(userId, userId);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final currentIndex = ref.watch(mainNavIndexProvider);
 
     final screens = [
