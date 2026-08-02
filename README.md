@@ -241,55 +241,6 @@ Sanal kıyafet giydirme (VTON) teknolojisi oldukça yüksek GPU gücü gerektire
 
 Uygulama geliştirme aşamasında yerel ağ üzerinde test edilmiştir. iPhone'un kişisel hotspot'u üzerinden Mac'in IP adresi (`172.20.10.13:8000`) kullanılarak bağlantı sağlanmıştır.
 
-## Proje Yönetimi: Görev Günlüğü ve Sprint Burndown
-
-Projenin görev takibi, görev günlüğü (task log) ve sprint burndown tablosu ile yapılmaktadır. Her görev; benzersiz bir kimlik (ID), efor puanı (story point), başlangıç/bitiş tarihi, sorumlu kişi ve ait olduğu sprint ile kayıt altına alınmaktadır.
-
-### Görev Grupları
-
-Görevler, ön ekine göre yedi ana gruba ayrılmıştır:
-
-| Grup | Kapsam | Efor | Durum |
-|---|---|---|---|
-| F | Temeller (rol dağılımı, araştırma) | 10 | ✅ Tamamlandı |
-| S | Feed / LLM / Öneri planlama | 45 | ✅ Tamamlandı |
-| AP | Kimlik doğrulama & profil | 92 | ✅ Tamamlandı |
-| O | Onboarding / karşılama ekranları | 38 | ✅ Tamamlandı |
-| CF | Dijital gardırop (kıyafet) CRUD | — | 🕓 Planlandı |
-| BU | AI stilist sohbet arayüzü | — | 🕓 Planlandı |
-| G | Kombin önerisi & galeri | — | 🕓 Planlandı |
-
-F, S, AP ve O gruplarındaki toplam **24 görev**, 19 Haziran – 4 Temmuz 2026 aralığında tamamlanmış olup **196 efor puanına** karşılık gelmektedir. Bu görevler sırasıyla:
-
-- Proje temelleri ve ekip rol dağılımı (`F-1`)
-- Sosyal medya akışı / LLM / öneri motoru için yaklaşım planlaması (`S-1`, `S-2`, `S-3`)
-- Kayıt ol–giriş yap–şifre sıfırlama–token yenileme–profil güncelleme–hesap silme uçtan uca kimlik doğrulama akışı (`AP-1` – `AP-12`)
-- Karşılama, onboarding adımları ve boş durum (empty-state) arayüzleri (`O-1` – `O-8`)
-
-Sorumlular **Özge** (arayüz ve kimlik doğrulama tarafı) ve **Ahmet** (planlama ve backend tarafı) olarak paylaşılmıştır.
-
-`CF` (dijital gardırop CRUD), `BU` (AI stilist sohbet arayüzü) ve `G` (kombin önerisi/galeri) gruplarındaki **21 görev**, görev günlüğünde tanımlanmış ancak henüz efor puanı ve tarih atanmamış durumdadır; bu görevler ilerleyen sprintlerde resmi olarak planlanacak ve burndown tablosuna dahil edilecektir. Bu görevlerin teknik altyapısı — kıyafet ekleme, kombin önerisi ve AI stilist sohbeti — yukarıdaki [Karşılaşılan Sorunlar ve Çözümler](#karşılaşılan-sorunlar-ve-çözümler) bölümünde anlatılan geliştirme çalışmaları kapsamında paralel olarak ilerletilmiştir.
-
-### Sprint Durumu
-
-- **Sprint 1 (19 Haziran – 5 Temmuz 2026):** F, S, AP ve O gruplarındaki tüm planlı görevler tamamlanmıştır. Sprintin resmi bitiş tarihi 5 Temmuz olup rapor tarihi (4 Temmuz) itibariyle sprint sona ermek üzeredir.
-- **Sprint 2 (6 – 19 Temmuz 2026):** Sprint, "Forgot password page UI" (`AP-3`, 5 puan) görevi ile 4 Temmuz'da başlamış, görev henüz devam etmektedir (bitiş tarihi atanmamış).
-
-### Sprint Burndown
-
-Toplam proje kapsamı **900 efor puanı** olarak belirlenmiştir. Aşağıdaki tablo, seçilen tarihlerdeki ideal (planlanan) burndown değeri ile gerçek tamamlanan/kalan puanları karşılaştırmaktadır.
-
-| Tarih | İdeal Kalan | Tamamlanan (Kümülatif) | Gerçek Kalan |
-|---|---|---|---|
-| 19 Haz | 847.1 | 0 | 900 |
-| 24 Haz | 582.4 | 23.75 | 876.25 |
-| 27 Haz | 423.5 | 91 | 809 |
-| 30 Haz | 264.7 | 122.5 | 777.5 |
-| 2 Tem | 158.8 | 160.5 | 739.5 |
-| 4 Tem | 52.9 | 196 | 704 |
-
-4 Temmuz 2026 itibariyle 900 puanlık toplam kapsamın **196 puanı (~%22'si)** tamamlanmış, **704 puan** kalan durumdadır. Gerçek kalan iş miktarının ideal burndown eğrisinin üzerinde seyretmesi, `CF`/`BU`/`G` gruplarındaki 21 görevin henüz efor puanı ile planlanmamış olmasından kaynaklanmaktadır; bu görevler resmi olarak puanlandığında toplam kapsam ve buna bağlı ideal eğri yeniden hesaplanacaktır.
-
 ## Sonuç
 
 Yapay zeka destekli moda sosyal medya platformu Dijital Gardrop'un tasarımı ve geliştirilmesi, görev günlüğü ve sprint burndown verileriyle desteklenerek sunulmuştur. Flutter, FastAPI ve Ollama/LLaMA 3.2 teknolojilerini bir araya getiren platform; kıyafet yönetimi, kombin önerisi, sosyal etkileşim ve içerik paylaşımını entegre etmektedir.
