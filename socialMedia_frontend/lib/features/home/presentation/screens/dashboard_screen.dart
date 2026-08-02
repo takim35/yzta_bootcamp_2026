@@ -284,7 +284,7 @@ class DashboardScreen extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Pending Outfits',
+                    strings.pendingOutfits,
                     style: TextStyle(
                       color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                       fontSize: 18,
@@ -292,7 +292,7 @@ class DashboardScreen extends ConsumerWidget {
                     ),
                   ),
                   Text(
-                    '0 total',
+                    '0 ${strings.total}',
                     style: TextStyle(
                       color: Theme.of(context).textTheme.bodySmall?.color ??
                           Colors.grey,
@@ -319,7 +319,7 @@ class DashboardScreen extends ConsumerWidget {
                         size: 40),
                     SizedBox(height: 12),
                     Text(
-                      "No pending outfits",
+                      strings.noPendingOutfits,
                       style: TextStyle(
                           color:
                               Theme.of(context).textTheme.bodyMedium?.color ??
@@ -334,7 +334,7 @@ class DashboardScreen extends ConsumerWidget {
 
               // Explore / Social Feed
               Text(
-                'Explore',
+                strings.explore,
                 style: TextStyle(
                   color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,
                   fontSize: 18,
@@ -348,8 +348,8 @@ class DashboardScreen extends ConsumerWidget {
                   Expanded(
                     child: _ExploreCard(
                       icon: Icons.add_circle_outline_rounded,
-                      title: 'Add Item',
-                      subtitle: 'Add clothes to wardrobe',
+                      title: strings.addItem,
+                      subtitle: strings.addItemSub,
                       onTap: () {
                         Navigator.push(
                           context,
@@ -362,8 +362,8 @@ class DashboardScreen extends ConsumerWidget {
                   Expanded(
                     child: _ExploreCard(
                       icon: Icons.bar_chart_rounded,
-                      title: 'Analytics',
-                      subtitle: 'Your style stats',
+                      title: strings.dashboardAnalytics,
+                      subtitle: strings.analyticsSub,
                       onTap: () {
                         Navigator.push(
                           context,

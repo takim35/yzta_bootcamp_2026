@@ -1,4 +1,4 @@
-#!/Users/ahmetcolak/Desktop/Bootcamp/yzta_bootcamp_2026/socialMedia_backend/venv/bin/python3
+#!/Users/ahmetcolak/Desktop/Bootcamp/yzta_bootcamp_2026/socialMedia_backend/venv/bin/python3.14
 import sys
 from fastapi.cli import main
 if __name__ == '__main__':

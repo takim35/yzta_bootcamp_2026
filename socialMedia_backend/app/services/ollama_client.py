@@ -57,46 +57,67 @@ def _extract_json(text: str) -> dict:
 # 1) CHATBOT
 # ─────────────────────────────────────────────
 
-CHATBOT_SYSTEM_PROMPT = """\
-Sen dijital gardırop uygulaması için profesyonel bir stilistsin (AI Stylist). KESİNLİKLE sadece Türkçe konuşmalısın. Anlamsız çeviriler (örn. göğüs ayarı vb.) veya yabancı kelimeler KULLANMA. Doğal ve sıcak bir dille kullanıcıyla sohbet et ve şunları öğren:
-- Nereye gidiyor / ne yapıyor (etkinlik: iş, randevu, spor, gezi vb.)
-- Hava durumu (bilmiyorsan kibarca sor)
-- Stil tercihi (rahat, şık, spor vb.)
+def get_chatbot_system_prompt(language: str = "tr") -> str:
+    if language == "en":
+        return """\
+You are a professional stylist (AI Stylist) for a digital wardrobe application. You MUST speak in English only.
 
-Eğer kullanıcı sana kombin önerisi sorarsa veya yeterince bilgi topladığını düşünüyorsan, ona kullanıcının gardırobundaki mevcut kıyafetlerden bir kombin ÖNER.
-Bunun için kullanıcının kıyafet listesini referans al ve seçtiğin kıyafetlerin ID'lerini 'onerilen_kiyafet_idleri' listesinde döndür. 
-Sadece sana verilen listedeki kıyafet ID'lerini kullan.
+IMPORTANT BEHAVIOR:
+- If the user asks you to recommend an outfit (e.g. "recommend an outfit", "suggest a look", "what should I wear"), you MUST immediately pick 2-4 items from their wardrobe and recommend them. Do NOT ask extra questions first — just recommend directly.
+- If the user provides context (event, weather, style), use it. If not, make a stylish casual recommendation.
+- When recommending, explain briefly why you chose those items and return their IDs in 'onerilen_kiyafet_idleri'.
+- Only use clothes IDs from the provided wardrobe list. Never invent items.
+- For general chat, be warm and concise.
 
-Kurallar:
-- Sadece Türkçe, sıcak ve kısa cümleler kur. Aynı anda sadece bir soru sor.
-- Yeterli bilgi alana kadar sohbeti sürdür. (Örn. en azından hava durumu ve etkinlik bilgisi)
-- Bir kombin önerdiğinde kıyafetleri neden seçtiğini açıkla.
-- Asla sana verilen gardırop listesi dışından bir kıyafet varmış gibi davranma.
+ALWAYS return your response in the following JSON format:
+{
+  "asistan_mesaji": "...",
+  "baglam": {"etkinlik": "...", "hava_durumu": "...", "stil_tercihi": "..."},
+  "hazir_mi": false,
+  "onerilen_kiyafet_idleri": [1, 2]
+}"""
+    else:
+        return """\
+Sen dijital gardırop uygulaması için profesyonel bir stilistsin (AI Stylist). KESİNLİKLE sadece Türkçe konuş.
+
+ÖNEMLİ DAVRANIŞ:
+- Kullanıcı "kombin öner", "ne giyeyim", "öneri ver" gibi bir şey derse, HEMEN gardırobundaki 2-4 kıyafetten bir kombin seç ve öner. Ekstra soru SORMA — doğrudan öner.
+- Kullanıcı bağlam verdiyse (etkinlik, hava, stil) onu kullan. Vermediyse şık ve günlük bir kombin öner.
+- Kombin önerdiğinde kıyafetleri neden seçtiğini kısaca açıkla ve seçtiğin ID'leri 'onerilen_kiyafet_idleri' listesinde döndür.
+- Sadece sana verilen gardırop listesindeki kıyafet ID'lerini kullan. Asla gardırop dışından kıyafet uydurma.
+- Genel sohbet için sıcak ve kısa cümleler kur.
 
 HER ZAMAN yanıtını aşağıdaki JSON formatında ver:
 {
   "asistan_mesaji": "...",
   "baglam": {"etkinlik": "...", "hava_durumu": "...", "stil_tercihi": "..."},
   "hazir_mi": false,
-  "onerilen_kiyafet_idleri": [1, 2] // Eğer kombin öneriyorsan seçtiğin ID'leri listele, önermiyorsan boş liste bırak []
+  "onerilen_kiyafet_idleri": [1, 2]
 }"""
 
-
-def get_chat_response(history: List[Dict], new_message: str, available_clothes: List[Dict] = None) -> dict:
+def get_chat_response(history: List[Dict], new_message: str, available_clothes: List[Dict] = None, available_outfits: List[Dict] = None, language: str = "tr") -> dict:
     """
     history: [{"rol": "user"/"assistant", "mesaj": "..."}]
     new_message: User's new chat message
     available_clothes: [{"id": 1, "isim": "...", ...}]
+    available_outfits: [{"id": 1, "aciklama": "...", "items": [{"item_id": 1}, ...]}, ...]
 
     Returns:
     {"asistan_mesaji": "...", "baglam": {...}, "hazir_mi": bool, "onerilen_kiyafet_idleri": [...]}
     """
-    system_content = CHATBOT_SYSTEM_PROMPT
+    system_content = get_chatbot_system_prompt(language)
     if available_clothes:
         clothes_info = []
         for c in available_clothes:
             clothes_info.append(f"[ID: {c.get('id')}] {c.get('kategori', '')} - {c.get('renk', '')} - {c.get('isim', '')}")
         system_content += "\n\nKULLANICININ GARDIROBUNDAKİ KIYAFETLER:\n" + "\n".join(clothes_info)
+
+    if available_outfits:
+        outfits_info = []
+        for o in available_outfits:
+            items = ", ".join([str(item.get('id', '')) for item in o.get("kiyafetler", [])])
+            outfits_info.append(f"[Outfit ID: {o.get('id')}] Adı/Açıklama: {o.get('aciklama', '')} - İçerdiği Kıyafet ID'leri: [{items}]")
+        system_content += "\n\nKULLANICININ KAYITLI KOMBİNLERİ (OUTFITS):\n" + "\n".join(outfits_info)
 
     messages = [{"role": "system", "content": system_content}]
     for m in history:
@@ -107,15 +128,28 @@ def get_chat_response(history: List[Dict], new_message: str, available_clothes: 
 
     raw = _ollama_chat(messages, temperature=0.7)
     if not raw:
-        # Smart fallback when Ollama server is offline
+        # Smart fallback when Ollama server is offline — pick items using rule-based logic
+        fallback_ids = []
+        if available_clothes:
+            top = next((c for c in available_clothes if c.get("kategori", "").lower() in ["üst giyim", "tişört", "t-shirt", "gömlek", "bluz", "kazak", "sweatshirt"]), None)
+            bottom = next((c for c in available_clothes if c.get("kategori", "").lower() in ["alt giyim", "pantolon", "şort", "etek", "jean"]), None)
+            shoes = next((c for c in available_clothes if c.get("kategori", "").lower() in ["ayakkabı", "sneaker", "bot"]), None)
+            if top: fallback_ids.append(top["id"])
+            if bottom: fallback_ids.append(bottom["id"])
+            if shoes: fallback_ids.append(shoes["id"])
+            if not fallback_ids:
+                fallback_ids = [c["id"] for c in available_clothes[:3]]
+        
+        if language == "en":
+            msg = "Here's a stylish outfit I've put together from your wardrobe! ✨"
+        else:
+            msg = "Gardırobundan sana özel bir kombin hazırladım! ✨"
+        
         return {
-            "asistan_mesaji": "Harika! Gardırobundaki en uygun kıyafetleri inceleyip sana özel kombinini hazırlıyorum ✨",
-            "baglam": {
-                "etkinlik": "Günlük",
-                "hava_durumu": "Güzel",
-                "stil_tercihi": "Rahat",
-            },
+            "asistan_mesaji": msg,
+            "baglam": {"etkinlik": "Günlük", "hava_durumu": "Güzel", "stil_tercihi": "Rahat"},
             "hazir_mi": True,
+            "onerilen_kiyafet_idleri": fallback_ids,
         }
 
     try:

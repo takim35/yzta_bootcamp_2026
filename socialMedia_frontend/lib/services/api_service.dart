@@ -645,8 +645,8 @@ class ApiService {
     return await _delete('/wardrobe/items/$itemId', null);
   }
 
-  Future<dynamic> chat(String userId, String message, {String? weather, String? sessionId}) async {
-    final body = {'user_id': userId, 'mesaj': message};
+  Future<dynamic> chat(String userId, String message, {String? weather, String? sessionId, String language = 'tr'}) async {
+    final body = {'user_id': userId, 'mesaj': message, 'language': language};
     if (weather != null) body['hava_durumu'] = weather;
     if (sessionId != null) body['session_id'] = sessionId;
     return await _post('/wardrobe/chat', body);

@@ -157,49 +157,54 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> {
               child: Row(
                 children: [
                   _FilterChip(
-                    label: s.isTr ? 'Favoriler' : 'Favorites',
+                    label: s.catAll,
+                    isSelected: _selectedCategory == null,
+                    onTap: () => setState(() => _selectedCategory = null),
+                  ),
+                  _FilterChip(
+                    label: s.catFavorites,
                     isSelected: _selectedCategory == 'Favorites',
                     onTap: () => setState(() => _selectedCategory =
                         _selectedCategory == 'Favorites' ? null : 'Favorites'),
                   ),
                   _FilterChip(
-                    label: s.isTr ? 'Kirli Sepeti' : 'Laundry Basket',
+                    label: s.catLaundry,
                     isSelected: _selectedCategory == 'Laundry Basket' || _selectedCategory == 'Kirli Sepeti',
                     onTap: () => setState(() => _selectedCategory =
                         (_selectedCategory == 'Laundry Basket' || _selectedCategory == 'Kirli Sepeti') ? null : 'Laundry Basket'),
                   ),
                   _FilterChip(
-                    label: 'Shirt',
+                    label: s.catShirt,
                     isSelected: _selectedCategory == 'Shirt',
                     onTap: () => setState(() => _selectedCategory =
                         _selectedCategory == 'Shirt' ? null : 'Shirt'),
                   ),
                   _FilterChip(
-                    label: 'T-Shirt',
+                    label: s.catTShirt,
                     isSelected: _selectedCategory == 'T-Shirt',
                     onTap: () => setState(() => _selectedCategory =
                         _selectedCategory == 'T-Shirt' ? null : 'T-Shirt'),
                   ),
                   _FilterChip(
-                    label: 'Pants',
+                    label: s.catPants,
                     isSelected: _selectedCategory == 'Pants',
                     onTap: () => setState(() => _selectedCategory =
                         _selectedCategory == 'Pants' ? null : 'Pants'),
                   ),
                   _FilterChip(
-                    label: 'Jeans',
+                    label: s.catJeans,
                     isSelected: _selectedCategory == 'Jeans',
                     onTap: () => setState(() => _selectedCategory =
                         _selectedCategory == 'Jeans' ? null : 'Jeans'),
                   ),
                   _FilterChip(
-                    label: 'Shoes',
+                    label: s.catShoes,
                     isSelected: _selectedCategory == 'Shoes',
                     onTap: () => setState(() => _selectedCategory =
                         _selectedCategory == 'Shoes' ? null : 'Shoes'),
                   ),
                   _FilterChip(
-                    label: 'Accessories',
+                    label: s.catAccessories,
                     isSelected: _selectedCategory == 'Accessories',
                     onTap: () => setState(() => _selectedCategory =
                         _selectedCategory == 'Accessories'

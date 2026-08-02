@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../features/feed/presentation/screens/feed_screen.dart';
 import '../../../../features/profile/presentation/screens/profile_screen.dart';
+import '../../../../features/search/presentation/screens/search_screen.dart';
 import '../../../../features/auth/presentation/providers/auth_provider.dart';
 
 class SocialMainScreen extends ConsumerStatefulWidget {
@@ -21,6 +22,7 @@ class _SocialMainScreenState extends ConsumerState<SocialMainScreen> {
 
     final List<Widget> screens = [
       const FeedScreen(),
+      const SearchScreen(),
       ProfileScreen(userId: currentUserId),
     ];
 
@@ -48,6 +50,10 @@ class _SocialMainScreenState extends ConsumerState<SocialMainScreen> {
             BottomNavigationBarItem(
               icon: Icon(Icons.public_rounded),
               label: 'Feed',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.search_rounded),
+              label: 'Search',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.person_rounded),

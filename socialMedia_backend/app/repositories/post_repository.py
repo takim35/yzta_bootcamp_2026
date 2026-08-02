@@ -5,8 +5,8 @@ from fastapi import HTTPException
 from app.domain.schemas import PostCreate, PostResponse, OutfitItemResponse, CommentResponse, MessageResponse
 
 
-def _ensure_active_title_column(db: sqlite3.Connection):
-    """active_title kolonu yoksa ekler (eski veritabanı uyumluluğu)."""
+def _ensure_tables(db: sqlite3.Connection):
+    """Gerekli tabloların ve kolonların olduğundan emin olur."""
     try:
         db.execute("SELECT active_title FROM users LIMIT 1")
     except sqlite3.OperationalError:
@@ -15,12 +15,21 @@ def _ensure_active_title_column(db: sqlite3.Connection):
             db.commit()
         except Exception:
             pass
+            
+    db.execute("""
+        CREATE TABLE IF NOT EXISTS shares (
+            share_id TEXT PRIMARY KEY,
+            post_id TEXT NOT NULL,
+            user_id TEXT NOT NULL,
+            created_at TEXT NOT NULL
+        )
+    """)
 
 
 class PostRepository:
     @staticmethod
     def create_post(db: sqlite3.Connection, post: PostCreate) -> MessageResponse:
-        _ensure_active_title_column(db)
+        _ensure_tables(db)
         post_id = str(uuid.uuid4())
         user = db.execute('SELECT user_id FROM users WHERE user_id = ?', (post.user_id,)).fetchone()
         if not user:
@@ -91,7 +100,7 @@ class PostRepository:
 
     @staticmethod
     def get_user_posts(db: sqlite3.Connection, user_id: str, viewer_id: str = None):
-        _ensure_active_title_column(db)
+        _ensure_tables(db)
         base_select = (
             'SELECT p.*, u.username, u.display_name, u.avatar_url, u.active_title '
             'FROM posts p JOIN users u ON p.user_id = u.user_id'
@@ -119,14 +128,26 @@ class PostRepository:
 
     @staticmethod
     def get_feed(db: sqlite3.Connection, user_id: str, limit: int = 20):
-        _ensure_active_title_column(db)
+        _ensure_tables(db)
         rows = db.execute(
-            "SELECT p.*, u.username, u.display_name, u.avatar_url, u.active_title "
-            "FROM posts p JOIN users u ON p.user_id = u.user_id "
-            "WHERE (p.user_id = ? OR p.visibility = 'public' OR "
-            "(p.visibility = 'followers' AND EXISTS ("
-            "SELECT 1 FROM follows WHERE follower_id = ? AND following_id = p.user_id"
-            "))) ORDER BY p.created_at DESC LIMIT ?",
-            (user_id, user_id, limit)
+            """
+            SELECT p.*, u.username, u.display_name, u.avatar_url, u.active_title, p.created_at as feed_time
+            FROM posts p JOIN users u ON p.user_id = u.user_id 
+            WHERE (p.user_id = ? OR p.visibility = 'public' OR 
+            (p.visibility = 'followers' AND EXISTS (
+            SELECT 1 FROM follows WHERE follower_id = ? AND following_id = p.user_id
+            )))
+            UNION ALL
+            SELECT p.*, u.username, u.display_name, u.avatar_url, u.active_title, s.created_at as feed_time
+            FROM shares s
+            JOIN posts p ON s.post_id = p.post_id
+            JOIN users u ON p.user_id = u.user_id
+            WHERE (s.user_id = ? OR p.visibility = 'public' OR 
+            (p.visibility = 'followers' AND EXISTS (
+            SELECT 1 FROM follows WHERE follower_id = ? AND following_id = s.user_id
+            )))
+            ORDER BY feed_time DESC LIMIT ?
+            """,
+            (user_id, user_id, user_id, user_id, limit)
         ).fetchall()
         return [PostRepository._build_post_response(db, row, user_id) for row in rows]

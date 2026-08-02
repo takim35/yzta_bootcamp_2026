@@ -42,6 +42,7 @@ class AnalyticsScreen extends ConsumerWidget {
             final stats = data['stats'] as Map<String, dynamic>? ?? {};
             final topColors = (data['top_colors'] as List<dynamic>?) ?? [];
             final topCategories = (data['top_categories'] as List<dynamic>?) ?? [];
+            final mostWornItems = (data['most_worn_items'] as List<dynamic>?) ?? [];
             final unlockedTitles = (data['unlocked_titles'] as List<dynamic>?) ?? [];
             
             return SingleChildScrollView(
@@ -125,6 +126,24 @@ class AnalyticsScreen extends ConsumerWidget {
                     ...topCategories.map((cat) => _CategoryRow(
                       label: cat['label'] as String? ?? '?',
                       count: cat['count'] as String? ?? '0',
+                    )),
+                    const SizedBox(height: 32),
+                  ],
+
+                  // Most Worn Items
+                  if (mostWornItems.isNotEmpty) ...[
+                    Text(
+                      'Most Worn Items',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).textTheme.bodyLarge?.color,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    ...mostWornItems.map((item) => _CategoryRow(
+                      label: item['label'] as String? ?? '?',
+                      count: item['count'] as String? ?? '0',
                     )),
                     const SizedBox(height: 32),
                   ],

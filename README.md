@@ -3,7 +3,7 @@
 **Yapay Zeka Destekli Moda Sosyal Medya Platformu**
 
 > YZTA Bootcamp 2026 — Takım 35 Proje Raporu
-> Ahmet Colak
+
 
 Dijital Gardrop; kullanıcıların dijital gardıroplarını yönetmelerine, yapay zeka destekli kombin önerileri almalarına ve moda içeriklerini paylaşmalarına olanak tanıyan bir mobil platformdur. Sistem; **Flutter** tabanlı çok platformlu mobil istemci, **FastAPI** tabanlı RESTful arka uç ve yerel olarak çalışan **Ollama/LLaMA 3.2** dil modeli üçlüsünden oluşmaktadır.
 
@@ -26,13 +26,109 @@ Bu README, 4 Temmuz 2026 tarihli güncel gorev günlüğü (task log) ve sprint 
 
 ---
 
-## Sistem Mimarisi
+# Dijital Gardrop - Teknik Mimari Belgesi
 
-Sistem, birbirine RESTful API aracılığıyla bağlanan üç ana katmandan oluşmaktadır:
+Bu belge, "Dijital Gardrop" (Yapay Zeka Destekli Moda Sosyal Medya Platformu) uygulamasının sistem mimarisini ve teknik altyapısını özetlemektedir.
 
-1. **İstemci Katmanı** — Flutter (Dart) ile geliştirilen iOS/Android uygulaması.
-2. **Uygulama Katmanı** — Python 3.9+ ve FastAPI ile geliştirilen REST arka uç.
-3. **AI Katmanı** — Yerel ağda çalışan Ollama sunucusu üzerindeki LLaMA 3.2 modeli.
+## 1. Genel Sistem Mimarisi
+
+Uygulama, üç ana katmandan oluşan bir istemci-sunucu (client-server) mimarisine sahiptir. İletişim, RESTful API üzerinden JSON formatında sağlanmaktadır.
+
+```mermaid
+graph TD
+    Client[Mobil İstemci<br>Flutter / iOS & Android] <-->|HTTP / REST API| Backend[Uygulama Sunucusu<br>FastAPI / Python]
+    Backend <-->|SQL| DB[(Veritabanı<br>SQLite)]
+    Backend <-->|HTTP / API| AI[Yapay Zeka Sunucusu<br>Ollama]
+    
+    subgraph AI Katmanı
+        AI -->|Görsel Analiz| Vision(Moondream2)
+        AI -->|Sohbet & Stilist| Text(LLaMA 3.2)
+    end
+```
+
+## 2. Katmanlar ve Teknolojiler
+
+### A. Mobil İstemci Katmanı (Frontend)
+Kullanıcıların etkileşime girdiği çapraz platform (cross-platform) mobil uygulamadır.
+
+- **Çerçeve (Framework):** Flutter (Sürüm 3.10+)
+- **Dil:** Dart (Sürüm 3.0+)
+- **Durum Yönetimi (State Management):** Riverpod (Uygulama içi veri akışı, oturum yönetimi)
+- **Ağ İstekleri:** Dio / HTTP Service (Backend ile REST iletişimi)
+- **Navigasyon:** GoRouter (Deklaratif sayfa yönlendirmesi)
+- **Yerel Depolama:** `shared_preferences` (Oturum kalıcılığı için kullanıcı ID/token tutma)
+- **Modüler Yapı (Feature-First):** Uygulama özellikleri `lib/features/` altında auth, feed, wardrobe, ai_stylist, profile gibi modüllere ayrılmıştır.
+
+### B. Uygulama Katmanı (Backend)
+İş mantığının işlendiği, veri erişiminin ve dış AI servis bağlantılarının yönetildiği katmandır.
+
+- **Çerçeve:** FastAPI (Asenkron, hızlı, modern Python web framework'ü)
+- **Dil:** Python 3.9+
+- **Sunucu:** Uvicorn (ASGI web sunucusu)
+- **Veritabanı:** SQLite (Geliştirme ve test kolaylığı için dosya tabanlı ilişkisel veritabanı) - `aiosqlite` ile asenkron erişim
+- **Modül Mimarisi:**
+  - `routers/`: API uç noktalarının (endpoints) tanımlandığı modüller (Auth, Posts, Feed, Wardrobe vb.)
+  - `domain/schemas.py`: Veri doğrulama için Pydantic modelleri (Request/Response yapıları)
+  - `repositories/`: Veritabanı ile etkileşim, CRUD işlemleri (Repository Pattern)
+  - `services/`: İş mantığı ve dış servis entegrasyonları (Örn: Ollama entegrasyonu, dosya yükleme, mail servisleri)
+  - `core/`: Yapılandırma (`.env` okuma) ve veritabanı bağlantı yönetimi.
+
+### C. Yapay Zeka Katmanı (AI Layer)
+Dış API'lere bağımlılığı (ve maliyetleri/gizlilik risklerini) ortadan kaldırmak için yerel (local) çalışan yapay zeka modelleri entegre edilmiştir.
+
+- **Motor:** Ollama (Modelleri çalıştırmak için sunucu arayüzü)
+- **Kullanılan Modeller:**
+  - **LLaMA 3.2 (Text):** AI stilist sohbeti, kombin önerileri ve akıllı metin oluşturma için.
+  - **Moondream2 (Vision):** Görsel analizi, yüklenen kıyafet fotoğraflarından etiket/özellik çıkarma (captioning) işlemleri için.
+
+---
+
+## 3. Veritabanı Şeması (Veri Modeli)
+
+Sistem ilişkisel bir veritabanı üzerine kuruludur. Ana bileşenler ve ilişkileri şu şekildedir:
+
+```mermaid
+erDiagram
+    USERS ||--o{ POSTS : creates
+    USERS ||--o{ KIYAFETLER : owns
+    USERS ||--o{ FOLLOWS : has
+    USERS ||--o{ LIKES : makes
+    USERS ||--o{ SOHBETLER : engages_in
+    USERS ||--o{ KOMBİN_ONERILER : requests
+    
+    POSTS ||--o{ LIKES : receives
+    POSTS ||--o{ COMMENTS : has
+    POSTS ||--o{ POST_OUTFIT_ITEMS : tags
+    
+    USERS {
+        string user_id PK
+        string username
+        string email
+        string avatar
+    }
+    
+    POSTS {
+        string post_id PK
+        string user_id FK
+        string image_url
+        string caption
+    }
+    
+    KIYAFETLER {
+        int id PK
+        string tur
+        string renk
+        string foto_url
+    }
+    
+    SOHBETLER {
+        int id PK
+        string user_id FK
+        string rol
+        string mesaj
+    }
+```
+
 
 ## Kullanılan Teknolojiler
 
@@ -284,19 +380,27 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 ### 3. Frontend (Flutter) Kurulumu
 
+Önceki paket çakışmalarını ve cache kaynaklı sorunları gidermek ve uygulamayı temiz bir şekilde ayağa kaldırmak için **Mutlaka Flutter Clean** işlemini yapmalısınız.
+
 ```bash
 cd socialMedia_frontend
 
-# Bağımlılıkları yükleyin
+# Temizleme ve bağımlılıkları yükleme
+flutter clean
 flutter pub get
 
-# API base URL'yi ayarlayın (lib/core/api/api_service.dart)
+# (Opsiyonel) iOS simülatörü için kütüphaneleri tazeleyin:
+# cd ios && pod install && cd ..
+
+# API base URL'yi ayarlayın (lib/services/api_service.dart vb. içinde)
 # iOS Simulator: http://localhost:8000
 # Android Emulator: http://10.0.2.2:8000
-# Fiziksel cihaz: http://<BILGISAYAR_IP>:8000
+# Fiziksel cihaz: http://<BILGISAYAR_IP>:8000 (Bilgisayarınızın yerel IP adresi)
+
+# Cihazları listele
+flutter devices
 
 # Uygulamayı çalıştırın
-flutter devices          # Mevcut cihazları listele
 flutter run -d <device_id>
 ```
 
@@ -307,9 +411,6 @@ flutter run -d ios
 
 # Android Emulator
 flutter run -d android
-
-# Chrome (Web)
-flutter run -d chrome
 ```
 
 ### 4. İki Terminle Eşzamanlı Çalıştırma

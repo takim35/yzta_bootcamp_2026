@@ -426,6 +426,27 @@ class AppStrings {
       '응답을 생성할 수 없습니다.',
       '无法生成回复。');
 
+  // Wardrobe Categories
+  String get catAll => isTr ? 'Tümü' : 'All';
+  String get catFavorites => isTr ? 'Favoriler' : 'Favorites';
+  String get catLaundry => isTr ? 'Kirli Sepeti' : 'Laundry Basket';
+  String get catShirt => isTr ? 'Gömlek' : 'Shirt';
+  String get catTShirt => isTr ? 'Tişört' : 'T-Shirt';
+  String get catPants => isTr ? 'Pantolon' : 'Pants';
+  String get catJeans => isTr ? 'Kot' : 'Jeans';
+  String get catShoes => isTr ? 'Ayakkabı' : 'Shoes';
+  String get catAccessories => isTr ? 'Aksesuar' : 'Accessories';
+  
+  // Dashboard additions
+  String get addItem => isTr ? 'Kıyafet Ekle' : 'Add Item';
+  String get addItemSub => isTr ? 'Gardırobuna kıyafet ekle' : 'Add clothes to wardrobe';
+  String get dashboardAnalytics => isTr ? 'İstatistikler' : 'Analytics';
+  String get analyticsSub => isTr ? 'Stil istatistiklerin' : 'Your style stats';
+  String get explore => isTr ? 'Keşfet' : 'Explore';
+  String get pendingOutfits => isTr ? 'Bekleyen Kombinler' : 'Pending Outfits';
+  String get total => isTr ? 'toplam' : 'total';
+  String get noPendingOutfits => isTr ? 'Bekleyen kombin yok' : 'No pending outfits';
+
   String translateWardrobe(String val) {
     if (isTr) return val;
     final trimmed = val.trim();

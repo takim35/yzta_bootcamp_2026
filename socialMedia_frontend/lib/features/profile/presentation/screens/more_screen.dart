@@ -224,11 +224,6 @@ class MoreScreen extends ConsumerWidget {
     final languages = [
       {'name': 'Türkçe', 'locale': AppLocale.tr},
       {'name': 'English', 'locale': AppLocale.en},
-      {'name': 'Deutsch', 'locale': AppLocale.de},
-      {'name': 'Français', 'locale': AppLocale.fr},
-      {'name': '日本語', 'locale': AppLocale.ja},
-      {'name': '한국어', 'locale': AppLocale.ko},
-      {'name': '中文', 'locale': AppLocale.zh},
     ];
     showDialog(
       context: context,

@@ -51,6 +51,7 @@ class ChatRequest(BaseModel):
     mesaj: str
     hava_durumu: Optional[str] = None
     session_id: Optional[str] = None
+    language: Optional[str] = "tr"
 
 ChatIstek = ChatRequest
 
@@ -158,16 +159,75 @@ def chat(request: ChatRequest, db: sqlite3.Connection = Depends(get_db)):
 
     history = repo.get_chat_history(request.user_id, session_id=session_id)
     
+    # --- Detect "show my outfits" intent ---
+    msg_lower = request.mesaj.lower().strip()
+    show_outfits_keywords = [
+        "kombinlerimi göster", "kombinlerim", "kayıtlı kombinlerim",
+        "show my outfits", "show my combines", "my outfits", "my combinations",
+        "saved outfits", "show combines", "list outfits", "list my outfits",
+    ]
+    is_show_outfits = any(kw in msg_lower for kw in show_outfits_keywords)
+    
+    if is_show_outfits:
+        # Directly return saved outfits without calling AI
+        outfits = repo.get_outfit_recommendations(request.user_id)
+        all_outfit_items = []
+        outfit_descriptions = []
+        for o in outfits:
+            clothes_in_outfit = o.get("kiyafetler", [])
+            all_outfit_items.extend(clothes_in_outfit)
+            desc = o.get("aciklama", "Kombin")
+            items_text = ", ".join([f"{c.get('isim', c.get('kategori', 'Kıyafet'))}" for c in clothes_in_outfit])
+            outfit_descriptions.append(f"• {desc}: {items_text}")
+        
+        if outfits:
+            if request.language == "en":
+                ai_text = f"Here are your saved outfits ({len(outfits)} total):\n" + "\n".join(outfit_descriptions)
+            else:
+                ai_text = f"İşte kayıtlı kombinlerin ({len(outfits)} adet):\n" + "\n".join(outfit_descriptions)
+        else:
+            ai_text = "You don't have any saved outfits yet." if request.language == "en" else "Henüz kayıtlı kombinin yok."
+        
+        result = {
+            "asistan_mesaji": ai_text,
+            "baglam": {},
+            "hazir_mi": True,
+            "onerilen_kiyafet_idleri": [c["id"] for c in all_outfit_items],
+            "outfit_items": all_outfit_items,
+        }
+        
+        import json
+        ai_content = json.dumps({"text": ai_text, "outfit_items": all_outfit_items}, ensure_ascii=False)
+        repo.save_chat_message(request.user_id, "user", request.mesaj, session_id=session_id)
+        repo.save_chat_message(request.user_id, "assistant", ai_content, session_id=session_id)
+        result["session_id"] = session_id
+        return result
+    
+    # --- Normal AI chat flow ---
     context_message = request.mesaj
     if request.hava_durumu:
         context_message = f"[System Note: Current weather at location is '{request.hava_durumu}']\nUser: {request.mesaj}"
 
     try:
         clean_clothes = repo.get_clothes(request.user_id, clean_only=True)
-        result = ollama_client.get_chat_response(history, context_message, available_clothes=clean_clothes)
+        outfits = repo.get_outfit_recommendations(request.user_id)
+        result = ollama_client.get_chat_response(
+            history, 
+            context_message, 
+            available_clothes=clean_clothes,
+            available_outfits=outfits,
+            language=request.language
+        )
     except Exception as e:
         raise HTTPException(status_code=502, detail=f"AI service error: {e}")
-        
+    
+    # --- Detect "recommend outfit" intent for smart fallback ---
+    recommend_keywords = [
+        "kombin öner", "kombin oluştur", "ne giyeyim", "öneri",
+        "recommend", "suggest", "outfit", "what should i wear",
+    ]
+    is_recommend = any(kw in msg_lower for kw in recommend_keywords)
+    
     suggested_items = []
     if result.get("onerilen_kiyafet_idleri"):
         valid_ids = {c["id"] for c in clean_clothes}
@@ -175,12 +235,28 @@ def chat(request: ChatRequest, db: sqlite3.Connection = Depends(get_db)):
             if item_id in valid_ids:
                 suggested_items.append(next(c for c in clean_clothes if c["id"] == item_id))
     
+    # If user asked for a recommendation but AI didn't provide items, use rule-based fallback
+    if is_recommend and not suggested_items and clean_clothes:
+        rec = ollama_client.generate_outfit_recommendation(
+            {"etkinlik": "günlük", "hava_durumu": "normal", "stil_tercihi": "rahat"},
+            clean_clothes
+        )
+        for item_id in rec.get("secilen_kiyafet_idleri", []):
+            cloth = next((c for c in clean_clothes if c["id"] == item_id), None)
+            if cloth:
+                suggested_items.append(cloth)
+        if suggested_items:
+            items_text = ", ".join([f"{c.get('isim', c.get('kategori', 'Kıyafet'))}" for c in suggested_items])
+            if request.language == "en":
+                result["asistan_mesaji"] = f"Here's a great outfit combination for you: {items_text} ✨\n{rec.get('aciklama', '')}"
+            else:
+                result["asistan_mesaji"] = f"İşte sana harika bir kombin önerisi: {items_text} ✨\n{rec.get('aciklama', '')}"
+    
     result["outfit_items"] = suggested_items
     
     import json
     ai_content = json.dumps({"text": result.get("asistan_mesaji", ""), "outfit_items": suggested_items}, ensure_ascii=False)
     
-    # User message will be text, but we should make it consistent if possible, though text is fine if we parse robustly.
     repo.save_chat_message(request.user_id, "user", request.mesaj, session_id=session_id)
     repo.save_chat_message(request.user_id, "assistant", ai_content, session_id=session_id)
     result["session_id"] = session_id

@@ -92,8 +92,9 @@ class _AiStylistScreenState extends ConsumerState<AiStylistScreen> {
     _scrollToBottom();
 
     try {
+      final s = ref.read(stringsProvider);
       final response =
-          await _apiService.chat(userId, text, weather: _weatherContext, sessionId: _currentSessionId);
+          await _apiService.chat(userId, text, weather: _weatherContext, sessionId: _currentSessionId, language: s.isTr ? 'tr' : 'en');
       final aiText = response['asistan_mesaji']?.toString() ??
           response['reply']?.toString() ??
           'Yanıt üretilemedi.';

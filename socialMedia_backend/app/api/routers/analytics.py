@@ -95,6 +95,24 @@ def get_user_analytics(user_id: str, db: sqlite3.Connection = Depends(get_db)):
         for cat in categories_query:
             top_categories.append({"label": cat["tur"].capitalize(), "count": f"{cat['count']} items"})
 
+        # En çok giyilen spesifik kıyafetler (Most Worn Items)
+        most_worn_items_query = db.execute(
+            """SELECT k.tur, k.renk, k.marka, COUNT(poi.item_id) as count 
+               FROM post_outfit_items poi
+               JOIN posts p ON poi.post_id = p.post_id
+               JOIN kiyafetler k ON poi.item_id = k.id
+               WHERE p.user_id = ?
+               GROUP BY poi.item_id
+               ORDER BY count DESC
+               LIMIT 5""", (user_id,)
+        ).fetchall()
+        
+        most_worn_items = []
+        for item in most_worn_items_query:
+            label_parts = [part for part in [item["renk"], item["marka"], item["tur"]] if part]
+            label = " ".join(label_parts).title() if label_parts else "Bilinmeyen Kıyafet"
+            most_worn_items.append({"label": label, "count": f"{item['count']} kez"})
+
         # Ünvanların hesaplanması (Unlocked Achievements)
         unlocked_titles = []
         for ach in ACHIEVEMENTS:
@@ -110,6 +128,7 @@ def get_user_analytics(user_id: str, db: sqlite3.Connection = Depends(get_db)):
             "stats": stats,
             "top_colors": top_colors,
             "top_categories": top_categories,
+            "most_worn_items": most_worn_items,
             "unlocked_titles": unlocked_titles
         }
     except Exception as e:

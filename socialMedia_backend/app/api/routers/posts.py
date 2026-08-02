@@ -174,7 +174,7 @@ def get_saved_posts(user_id: str, db: sqlite3.Connection = Depends(get_db)):
 
 
 @router.post('/{post_id}/save', response_model=MessageResponse)
-def save_post(post_id: str, req: LikeRequest, db: sqlite3.Connection = Depends(get_db)):
+def save_post(post_id: str, user_id: str = Query(...), db: sqlite3.Connection = Depends(get_db)):
     """Gönderiyi kaydeder."""
     try:
         db.execute("""
@@ -189,15 +189,15 @@ def save_post(post_id: str, req: LikeRequest, db: sqlite3.Connection = Depends(g
         saved_at = datetime.utcnow().isoformat()
         db.execute(
             "INSERT OR IGNORE INTO saved_posts (user_id, post_id, saved_at) VALUES (?,?,?)",
-            (req.user_id, post_id, saved_at),
+            (user_id, post_id, saved_at),
         )
         
         post = db.execute("SELECT user_id FROM posts WHERE post_id = ?", (post_id,)).fetchone()
-        if post and post["user_id"] != req.user_id:
+        if post and post["user_id"] != user_id:
             create_notification(
                 db=db,
                 user_id=post["user_id"],
-                actor_id=req.user_id,
+                actor_id=user_id,
                 notif_type="save",
                 post_id=post_id
             )
@@ -410,3 +410,65 @@ def get_comments(post_id: str, db: sqlite3.Connection = Depends(get_db)):
         ]
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Yorumlar listelenirken hata: {e}")
+
+
+@router.get("/{post_id}/likers")
+def get_post_likers(post_id: str, db: sqlite3.Connection = Depends(get_db)):
+    """Postu beğenen kullanıcıları listeler."""
+    try:
+        rows = db.execute(
+            """SELECT u.user_id, u.username, u.display_name, u.avatar_url
+               FROM likes l
+               JOIN users u ON l.user_id = u.user_id
+               WHERE l.post_id = ?""",
+            (post_id,)
+        ).fetchall()
+        
+        return [
+            {
+                "user_id": r["user_id"],
+                "username": r["username"],
+                "display_name": r["display_name"],
+                "avatar_url": r["avatar_url"],
+            }
+            for r in rows
+        ]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Beğenenler listelenirken hata: {e}")
+
+
+class ReportRequest(BaseModel):
+    user_id: str
+    reason: Optional[str] = "Uygunsuz içerik"
+
+
+@router.post("/{post_id}/report", status_code=201)
+def report_post(post_id: str, req: ReportRequest, db: sqlite3.Connection = Depends(get_db)):
+    """Bir gönderiyi raporlar."""
+    try:
+        post = db.execute("SELECT post_id FROM posts WHERE post_id = ?", (post_id,)).fetchone()
+        if not post:
+            raise HTTPException(status_code=404, detail="Gönderi bulunamadı.")
+            
+        db.execute("""
+            CREATE TABLE IF NOT EXISTS post_reports (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                post_id TEXT NOT NULL,
+                reporter_user_id TEXT NOT NULL,
+                reason TEXT,
+                created_at TEXT NOT NULL,
+                FOREIGN KEY (post_id) REFERENCES posts(post_id)
+            )
+        """)
+        from datetime import datetime
+        now = datetime.utcnow().isoformat()
+        db.execute(
+            "INSERT INTO post_reports (post_id, reporter_user_id, reason, created_at) VALUES (?,?,?,?)",
+            (post_id, req.user_id, req.reason, now),
+        )
+        db.commit()
+        return MessageResponse(success=True, message="Gönderi başarıyla raporlandı.")
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Raporlama sırasında hata: {e}")
