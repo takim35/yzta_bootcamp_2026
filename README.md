@@ -18,7 +18,7 @@ Bu README, 4 Temmuz 2026 tarihli güncel gorev günlüğü (task log) ve sprint 
 - [Veri Modeli](#veri-modeli)
 - [API Uç Noktaları](#api-uç-noktaları)
 - [Yapay Zeka Entegrasyonu](#yapay-zeka-entegrasyonu)
-- [Karşılaşılan Sorunlar ve Çözümler](#karşılaşılan-sorunlar-ve-çözümler)
+- [Detaylı Teknik Bilgiler ve AI Altyapısı](#detaylı-teknik-bilgiler-ve-ai-altyapısı)
 - [Ağ Bağlantısı ve Dağıtım](#ağ-bağlantısı-ve-dağıtım)
 - [Proje Yönetimi: Görev Günlüğü ve Sprint Burndown](#proje-yönetimi-görev-günlüğü-ve-sprint-burndown)
 - [Sonuç](#sonuç)
@@ -216,48 +216,26 @@ def kombin_onerisi_uret(baglam, temiz_kiyafetler):
     ...
 ```
 
-## Karşılaşılan Sorunlar ve Çözümler
+## Detaylı Teknik Bilgiler ve AI Altyapısı
 
-### iOS Kamera Çökmesi
-**Sorun:** Kıyafet ekleme ekranında kamera butonuna basıldığında uygulama iOS'ta çöküyordu.
-**Kök Neden:** `Info.plist` dosyasında `NSCameraUsageDescription` ve `NSPhotoLibraryUsageDescription` anahtarları eksikti.
-**Çözüm:** Dört izin anahtarı `Info.plist`'e eklendi: `NSCameraUsageDescription`, `NSPhotoLibraryUsageDescription`, `NSPhotoLibraryAddUsageDescription`, `NSMicrophoneUsageDescription`.
+Uygulamanın yapay zeka (AI) ve arka plan işlemleri, karmaşık ve maliyetli mimariler yerine performansı ve sadeliği önceleyen bir yaklaşımla geliştirilmiştir.
 
-### SQLite CHECK Kısıt İhlali
-**Sorun:** Gönderi oluşturulurken 500 hatası: *"Check constraint failed IN ('ust giyim', 'alt giyim', ...)"*.
-**Kök Neden:** `post_outfit_items` tablosuna `category = 'unknown'` değeri insert ediliyordu.
-**Çözüm:** `post_repository.py` dosyasında sabit değer `'unknown'` → `'diger'` olarak güncellendi.
+### Agent, Workflow ve Prompt Yapısı
+Sistemde, tam otonom ve serbest çalışan bir "Agent" yapısı kullanılmamaktadır. Bunun yerine öngörülebilirliği artırmak amacıyla **Kural Tabanlı İş Akışı (Rule-based Workflow)** ve **Bağlam Enjeksiyonu (Context Injection)** kullanılmaktadır. 
 
-### Oturum Kalıcılığı Eksikliği
-**Sorun:** Uygulama her açıldığında giriş ekranı gösteriliyor, kullanıcı oturumu hatırlanmıyordu.
-**Kök Neden:** `AuthProvider` sınıfı yalnızca bellekte `userId` tutuyor, kalıcı depolamaya yazılmıyordu.
-**Çözüm:** `shared_preferences` paketi entegre edildi. `_AuthGate` widget'ı oturum durumuna göre yönlendirme yapacak şekilde `main.dart`'a eklendi.
+- **İş Akışı (Workflow):** Kullanıcı bir mesaj gönderdiğinde arka plandaki NLP (Niyet Algılama) mantığı devreye girer. Kullanıcı "Kombinlerimi göster" gibi net bir komut verirse LLM hiç kullanılmadan direkt veritabanından veri çekilir. "Kombin öner" denildiğinde ise istek yerel LLM modeline (Ollama) iletilir. Sunucunun yanıt vermemesi durumunda ise sistem çökmek yerine kural tabanlı (kategorilere göre rastgele 1 alt, 1 üst, 1 ayakkabı seçen) "Smart Fallback" (Akıllı Yedek) mekanizmasını devreye sokar.
+- **Prompt Mimarisi:** AI Stilist'in yönlendirilmesi için çok katı bir **Sistem Promptu** (System Prompt) yazılmıştır. Modele doğrudan profesyonel bir stilist olduğu ve **kesinlikle yapılandırılmış JSON formatında** (örneğin `"onerilen_kiyafet_idleri": [1, 2]`) cevap dönmesi gerektiği emredilmiştir. Modelin serbest metin üretmesi sınırlandırılmış, uygulamanın (Frontend) bu JSON'ı ayrıştırarak ekrana UI bileşenleri çizmesi sağlanmıştır.
 
-### Resim Yükleme Akışı
-**Sorun:** Yerel dosya yolu backend'e gönderildiğinden resimler diğer cihazlarda görüntülenemiyordu.
-**Çözüm:**
-1. Backend'e `POST /captions/upload` multipart endpoint'i eklendi.
-2. Dosya UUID adıyla `static/uploads/` dizinine kaydedildi.
-3. Frontend resmi önce yüklüyor, dönen URL'yi post/kıyafet kaydına yazıyor.
+### Bilgi Tabanı ve RAG (Retrieval-Augmented Generation) Kullanımı
+Uygulamada Pinecone, ChromaDB gibi harici bir **Vektör Veritabanı** veya karmaşık bir **RAG mimarisi bulunmamaktadır.**
 
-### Likes/Comments 404 Hatası
-**Sorun:** Beğeni ve yorum endpoint'leri 404 döndürüyordu.
-**Kök Neden:** `likes.py` router'ı `main.py` dosyasına hiç dahil edilmemişti.
-**Çözüm:** `main.py`'e router kayıt edildi. `POST/GET /posts/{id}/comments` endpoint'leri eklendi. DELETE beğeni query param ile `user_id` alacak şekilde güncellendi.
+- Dijital bir gardıropta bulunan kıyafet sayısı (genellikle 50-100 adet) LLM'lerin bağlam penceresine (context window) kolaylıkla sığabildiği için vektör aramasına ihtiyaç duyulmamıştır.
+- Bunun yerine **Brute-Force Context Injection (Doğrudan Bağlam Enjeksiyonu)** kullanılmıştır. LLM'e giden prompt'un içerisine kullanıcının o an sahip olduğu kıyafetlerin listesi ID, renk ve tür bilgileriyle (Örn: `[ID: 1] Üst Giyim - Kırmızı`) düz metin olarak eklenir. Model, soruyu cevaplarken doğrudan bu listedeki ID'leri seçerek JSON formatında döndürür.
 
-### AI Stilist Yanıt Sorunu
-**Sorun:** AI Stilist ekranı "I could not generate response." mesajı gösteriyordu.
-**Kök Neden 1:** Frontend `response['reply']` anahtarını okurken backend `asistan_mesaji` anahtarını döndürüyordu.
-**Kök Neden 2:** Ekran `user_id = 'user_123'` şeklinde sabit değer kullanıyordu.
-**Çözüm:** `ai_stylist_screen.dart` tamamen yeniden yazıldı; doğru JSON anahtarları, gerçek kullanıcı ID'si ve geçmiş yükleme özelliği eklendi.
-
-### Python 3.9 Uyumluluk Sorunları
-**Sorun:** Backend Python 3.10+ tip söz dizimi (`list[X]`, `str | None`) kullandığından Python 3.9 ortamında hata veriyordu.
-**Çözüm:** Tüm tip ek açıklamaları `from typing import List, Optional` kullanılarak güncellendi.
-
-### Gönderi Silme Sorunu
-**Sorun:** Profil ekranındaki Sil butonu yalnızca SnackBar gösteriyor, API çağrısı yapmıyordu.
-**Çözüm:** `DELETE /posts/{post_id}?user_id={uid}` endpoint'i backend'e eklendi; `profile_provider.dart`'a `deletePost` metodu eklendi.
+### VTON (Virtual Try-On - Sanal Kıyafet Giydirme)
+Sanal kıyafet giydirme (VTON) teknolojisi oldukça yüksek GPU gücü gerektiren bir işlemdir.
+- Gerçek zamanlı VTON üreten modeller (örn: IDM-VTON) için gerekli olan **yüksek donanım maliyeti ve pahalı API anahtarları** sebebiyle, bu özellik tam anlamıyla aktif bir şekilde yayına alınamamıştır.
+- Mevcut mimaride VTON arayüzü ve altyapısı hazır durumdadır; sistem şimdilik sadece UI/UX demonstrasyonu amacıyla kural tabanlı yedek (mock) görseller sunmaktadır. Gelecek güncellemelerle birlikte uygun bütçeler sağlandığında, sisteme eklenecek bir API anahtarı ile VTON özelliği anında aktif edilebilecek şekilde kodlanmıştır.
 
 ## Ağ Bağlantısı ve Dağıtım
 
